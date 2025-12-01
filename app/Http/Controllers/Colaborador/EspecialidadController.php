@@ -1,5 +1,4 @@
 <?php
-// filepath: app/Http/Controllers/Colaborador/EspecialidadController.php
 
 namespace App\Http\Controllers\Colaborador;
 
@@ -7,15 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Models\Especialidad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class EspecialidadController extends Controller
+class EspecialidadController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    /**
+     * Definir middleware usando Laravel 11
+     */
+    public static function middleware(): array
     {
-        $this->middleware('permission:ver_especialidades')->only(['index', 'show']);
-        $this->middleware('permission:crear_especialidades')->only(['create', 'store']);
-        $this->middleware('permission:editar_especialidades')->only(['edit', 'update']);
-        $this->middleware('permission:eliminar_especialidades')->only('destroy');
+        return [
+            new Middleware('permission:especialidades.ver', only: ['index', 'show']),
+            new Middleware('permission:especialidades.crear', only: ['create', 'store']),
+            new Middleware('permission:especialidades.editar', only: ['edit', 'update']),
+            new Middleware('permission:especialidades.eliminar', only: ['destroy', 'toggleEstado']),
+        ];
     }
 
     public function index(Request $request)

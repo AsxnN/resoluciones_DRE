@@ -125,12 +125,22 @@ class ModuloSeeder extends Seeder
                 'i_active' => true,
             ],
             [
+                'nombre_modulo' => 'Unidades',
+                'slug' => 'unidades',
+                'descripcion' => 'Gestión de unidades organizacionales',
+                'ruta' => '/colaborador/unidades',
+                'icono' => 'fas fa-layer-group',
+                'orden' => 11,
+                'tipo_modulo' => 'colaborador',
+                'i_active' => true,
+            ],
+            [
                 'nombre_modulo' => 'Usuarios',
                 'slug' => 'usuarios',
                 'descripcion' => 'Gestión de usuarios del sistema',
                 'ruta' => '/colaborador/usuarios',
                 'icono' => 'fas fa-user-cog',
-                'orden' => 11,
+                'orden' => 12,
                 'tipo_modulo' => 'colaborador',
                 'i_active' => true,
             ],
@@ -138,6 +148,6 @@ class ModuloSeeder extends Seeder
 
         DB::table('modulos')->insert($modulos);
 
-        $this->command->info('✅ 13 módulos creados');
+        $this->command->info('✅ 14 módulos creados');
     }
 }

@@ -1,20 +1,17 @@
 <?php
-// filepath: app/Models/Colaborador.php
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Colaborador extends Model
 {
-    use HasFactory;
-
     protected $table = 'colaborador';
     protected $primaryKey = 'id_colab_dis';
     public $incrementing = false;
     protected $keyType = 'string';
-    
+
     const CREATED_AT = 'fecha_creacion';
     const UPDATED_AT = 'fecha_actualizacion';
 
@@ -38,80 +35,44 @@ class Colaborador extends Model
         'fecha_actualizacion' => 'datetime',
     ];
 
-    // ========================================
-    // RELACIONES
-    // ========================================
-
-    public function persona()
+    // Relaciones
+    public function persona(): BelongsTo
     {
         return $this->belongsTo(Persona::class, 'id_persona', 'id_persona');
     }
 
-    public function cargo()
+    public function cargo(): BelongsTo
     {
         return $this->belongsTo(Cargo::class, 'id_cargos', 'id_cargos');
     }
 
-    public function unidad()
-    {
-        return $this->belongsTo(Unidad::class, 'id_unidades', 'id_unidades');
-    }
-
-    public function direccion()
+    public function direccion(): BelongsTo
     {
         return $this->belongsTo(Direccion::class, 'id_direcciones', 'id_direcciones');
     }
 
-    public function dependencia()
+    public function dependencia(): BelongsTo
     {
         return $this->belongsTo(Dependencia::class, 'id_dependencia', 'id_dependencias');
     }
 
-    public function area()
+    public function area(): BelongsTo
     {
         return $this->belongsTo(Area::class, 'id_area', 'id_area');
     }
 
-    public function especialidad()
+    public function especialidad(): BelongsTo
     {
         return $this->belongsTo(Especialidad::class, 'id_especialidad', 'id_especialidad');
     }
 
-    public function tipoPersonal()
+    public function tipoPersonal(): BelongsTo
     {
         return $this->belongsTo(TipoPersonal::class, 'id_tipo_personal', 'id_tipo_personal');
     }
 
-    public function usuarioCreador()
+    public function usuario(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id_usuario');
-    }
-
-    // ========================================
-    // SCOPES
-    // ========================================
-
-    public function scopeActivos($query)
-    {
-        return $query->where('i_active', true);
-    }
-
-    public function scopeConPersona($query)
-    {
-        return $query->with('persona');
-    }
-
-    public function scopeConRelaciones($query)
-    {
-        return $query->with([
-            'persona',
-            'cargo',
-            'unidad',
-            'direccion',
-            'dependencia',
-            'area',
-            'especialidad',
-            'tipoPersonal'
-        ]);
+        return $this->belongsTo(User::class, 'id_usuario', 'id');
     }
 }

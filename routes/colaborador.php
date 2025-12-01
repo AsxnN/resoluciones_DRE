@@ -10,12 +10,15 @@ use App\Http\Controllers\Colaborador\DashboardController;
 use App\Http\Controllers\Colaborador\DependenciaController;
 use App\Http\Controllers\Colaborador\DireccionController;
 use App\Http\Controllers\Colaborador\EspecialidadController;
+use App\Http\Controllers\Colaborador\FirmaController;
 use App\Http\Controllers\Colaborador\MisResolucionesController;
 use App\Http\Controllers\Colaborador\PersonaController;
 use App\Http\Controllers\Colaborador\ResolucionController;
 use App\Http\Controllers\Colaborador\ResolucionFirmadaController;
 use App\Http\Controllers\Colaborador\TipoPersonalController;
 use App\Http\Controllers\Colaborador\UsuarioController;
+use App\Http\Controllers\Colaborador\ProfileController;
+use App\Http\Controllers\Colaborador\UnidadController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,6 +44,16 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
         // Dashboard
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         
+        // ========================================
+        // PERFIL DE USUARIO
+        // ========================================
+        Route::get('profile', [ProfileController::class, 'show'])->name('profile.show'); // ✅ AGREGAR ESTA LÍNEA
+        Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+        
+        
         // Notificaciones
         Route::patch('notificaciones/{notificacion}/marcar-leida', [DashboardController::class, 'marcarNotificacionLeida'])->name('notificaciones.marcar-leida');
         Route::post('notificaciones/marcar-todas-leidas', [DashboardController::class, 'marcarTodasLeidas'])->name('notificaciones.marcar-todas');
@@ -51,7 +64,9 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
         Route::resource('personas', PersonaController::class);
         Route::patch('personas/{persona}/toggle-estado', [PersonaController::class, 'toggleEstado'])->name('personas.toggle-estado');
         Route::get('personas/buscar/dni', [PersonaController::class, 'buscarPorDni'])->name('personas.buscar-dni');
-
+        
+        // ✅ AGREGAR RUTA DE EXPORTACIÓN
+        Route::get('personas-export', [PersonaController::class, 'export'])->name('personas.export');
         // ========================================
         // MÓDULO: RESOLUCIONES
         // ========================================
@@ -139,6 +154,9 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
         Route::resource('colaboradores', ColaboradorController::class);
         Route::patch('colaboradores/{colaborador}/toggle-estado', [ColaboradorController::class, 'toggleEstado'])->name('colaboradores.toggle-estado');
 
+
+        // Unidades
+        Route::resource('unidades', UnidadController::class);
         // ========================================
         // MÓDULO: USUARIOS
         // ========================================

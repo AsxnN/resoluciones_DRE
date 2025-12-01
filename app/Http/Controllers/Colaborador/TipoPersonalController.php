@@ -7,15 +7,19 @@ use App\Http\Controllers\Controller;
 use App\Models\TipoPersonal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class TipoPersonalController extends Controller
+class TipoPersonalController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('permission:ver_tipos_personal')->only(['index', 'show']);
-        $this->middleware('permission:crear_tipos_personal')->only(['create', 'store']);
-        $this->middleware('permission:editar_tipos_personal')->only(['edit', 'update']);
-        $this->middleware('permission:eliminar_tipos_personal')->only('destroy');
+        return [
+            new Middleware('permission:tipos_personal.ver', only: ['index', 'show']),
+            new Middleware('permission:tipos_personal.crear', only: ['create', 'store']),
+            new Middleware('permission:tipos_personal.editar', only: ['edit', 'update']),
+            new Middleware('permission:tipos_personal.eliminar', only: ['destroy', 'toggleEstado']),
+        ];
     }
 
     public function index(Request $request)

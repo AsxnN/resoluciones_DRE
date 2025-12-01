@@ -1,5 +1,4 @@
 <?php
-// filepath: app/Models/Dependencia.php
 
 namespace App\Models;
 
@@ -25,13 +24,22 @@ class Dependencia extends Model
 
     protected $casts = [
         'i_active' => 'boolean',
+        'fecha_creacion' => 'datetime',
+        'fecha_actualizacion' => 'datetime',
     ];
 
+    // Relaciones
     public function colaboradores()
     {
-        return $this->hasMany(Colaborador::class, 'id_dependencia');
+        return $this->hasMany(Colaborador::class, 'id_dependencia', 'id_dependencias');
     }
 
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'id_usuario', 'id');
+    }
+
+    // Scopes
     public function scopeActivos($query)
     {
         return $query->where('i_active', true);

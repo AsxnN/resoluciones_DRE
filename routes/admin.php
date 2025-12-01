@@ -2,6 +2,7 @@
 // filepath: routes/admin.php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\AuditoriaController;
 use App\Http\Controllers\Admin\GestionPrivilegiosController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use Illuminate\Support\Facades\Route;
@@ -12,12 +13,11 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// ========================================
-// AUTENTICACIÓN ADMIN
-// ========================================
 Route::prefix('admin')->name('admin.')->group(function () {
     
-    // Login
+    // ========================================
+    // AUTENTICACIÓN ADMIN
+    // ========================================
     Route::get('login', [AdminLoginController::class, 'showLoginForm'])->name('login');
     Route::post('login', [AdminLoginController::class, 'login']);
     Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
@@ -46,7 +46,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
 
         // ========================================
-        // REPORTES Y AUDITORÍA (OPCIONAL)
+        // AUDITORÍA
+        // ========================================
+        Route::prefix('auditoria')->name('auditoria.')->group(function () {
+            Route::get('/', [AuditoriaController::class, 'index'])->name('index');
+            Route::get('/exportar', [AuditoriaController::class, 'exportar'])->name('exportar');
+            Route::delete('/limpiar', [AuditoriaController::class, 'limpiar'])->name('limpiar');
+            Route::get('/{auditoria}', [AuditoriaController::class, 'show'])->name('show');
+        });
+
+        // ========================================
+        // ALIAS (PARA COMPATIBILIDAD CON VISTAS)
+        // ========================================
+        // Usuarios -> Privilegios
+        Route::get('usuarios', fn() => redirect()->route('admin.privilegios.index'))->name('usuarios.index');
+        Route::get('usuarios/{usuario}/editar', fn($usuario) => redirect()->route('admin.privilegios.gestionar', $usuario))->name('usuarios.edit');
+        
+        // Módulos -> Privilegios
+        Route::get('modulos', fn() => redirect()->route('admin.privilegios.index'))->name('modulos.index');
+
+        // Permisos -> Privilegios (NUEVO)
+        Route::get('permisos', fn() => redirect()->route('admin.privilegios.index'))->name('permisos.index');
+
+        // ========================================
+        // REPORTES Y AUDITORÍA (FUTURO)
         // ========================================
         Route::prefix('reportes')->name('reportes.')->group(function () {
             // Route::get('auditoria', [ReporteController::class, 'auditoria'])->name('auditoria');

@@ -12,12 +12,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ResolucionFirmadaController extends Controller
+class ResolucionFirmadaController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('permission:firmar_resoluciones');
+        return [
+            new Middleware('permission:resoluciones.firmar'),
+        ];
     }
 
     /**

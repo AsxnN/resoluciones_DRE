@@ -1,5 +1,4 @@
 <?php
-// filepath: app/Models/Cargo.php
 
 namespace App\Models;
 
@@ -25,16 +24,13 @@ class Cargo extends Model
 
     protected $casts = [
         'i_active' => 'boolean',
+        'fecha_creacion' => 'datetime',
+        'fecha_actualizacion' => 'datetime',
     ];
 
     public function colaboradores()
     {
-        return $this->hasMany(Colaborador::class, 'id_cargos');
-    }
-
-    public function usuarioCreador()
-    {
-        return $this->belongsTo(User::class, 'id_usuario');
+        return $this->hasMany(Colaborador::class, 'id_cargos', 'id_cargos');
     }
 
     public function scopeActivos($query)

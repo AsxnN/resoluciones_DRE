@@ -33,6 +33,7 @@ class PermisoSeeder extends Seeder
             'direcciones',
             'especialidades',
             'tipos-personal',
+            'unidades', // ← AGREGADO
             'usuarios',
         ];
 

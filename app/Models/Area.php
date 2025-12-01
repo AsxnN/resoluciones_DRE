@@ -1,5 +1,4 @@
 <?php
-// filepath: app/Models/Area.php
 
 namespace App\Models;
 
@@ -28,16 +27,6 @@ class Area extends Model
         'fecha_creacion' => 'datetime',
         'fecha_actualizacion' => 'datetime',
     ];
-
-    public function colaboradores()
-    {
-        return $this->hasMany(Colaborador::class, 'id_area');
-    }
-
-    public function usuarioCreador()
-    {
-        return $this->belongsTo(User::class, 'id_usuario');
-    }
 
     public function scopeActivos($query)
     {

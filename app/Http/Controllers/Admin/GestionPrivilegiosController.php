@@ -1,14 +1,14 @@
 <?php
-// filepath: app/Http/Controllers/Admin/GestionPrivilegiosController.php
 
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Modulo;
+use App\Models\Permiso;
 use App\Models\User;
 use App\Observers\PermisoObserver;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\DB;
 
 class GestionPrivilegiosController extends Controller
 {
@@ -18,8 +18,6 @@ class GestionPrivilegiosController extends Controller
     public function index()
     {
         $usuarios = User::with(['persona', 'permissions'])
-            ->where('tipo_acceso', '!=', 'admin')
-            ->orderBy('tipo_acceso')
             ->orderBy('name')
             ->paginate(20);
 
@@ -33,56 +31,71 @@ class GestionPrivilegiosController extends Controller
     {
         // Obtener todos los módulos con sus permisos
         $modulos = Modulo::with(['permisos' => function($query) {
-            $query->orderBy('name');
+            $query->where('i_active', true)->orderBy('name');
         }])
         ->where('i_active', true)
         ->orderBy('orden')
         ->get();
 
-        // Permisos actuales del usuario
+        // Obtener permisos actuales del usuario
         $permisosUsuario = $usuario->permissions->pluck('id')->toArray();
 
-        return view('admin.privilegios.gestionar', compact('usuario', 'modulos', 'permisosUsuario'));
+        // Obtener otros usuarios para copiar permisos
+        $otrosUsuarios = User::where('id', '!=', $usuario->id)
+            ->where('i_active', true)
+            ->with('persona')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.privilegios.gestionar', compact('usuario', 'modulos', 'permisosUsuario', 'otrosUsuarios'));
     }
 
     /**
-     * Actualizar permisos del usuario
+     * Actualizar permisos de usuario
      */
     public function actualizar(Request $request, User $usuario)
     {
         $request->validate([
-            'permisos' => 'nullable|array',
+            'permisos' => 'array',
             'permisos.*' => 'exists:permissions,id',
         ]);
 
-        $permisosNuevos = $request->input('permisos', []);
-        $permisosAnteriores = $usuario->permissions->pluck('id')->toArray();
+        DB::beginTransaction();
+        try {
+            // Obtener permisos anteriores
+            $permisosAnteriores = $usuario->permissions->pluck('id')->toArray();
+            $permisosNuevos = $request->input('permisos', []);
 
-        // Obtener permisos agregados y removidos
-        $permisosAgregados = array_diff($permisosNuevos, $permisosAnteriores);
-        $permisosRemovidos = array_diff($permisosAnteriores, $permisosNuevos);
-
-        // Sincronizar permisos
-        $usuario->syncPermissions($permisosNuevos);
-
-        // Registrar en metadata los cambios
-        foreach ($permisosAgregados as $permisoId) {
-            $permiso = Permission::find($permisoId);
-            if ($permiso) {
-                PermisoObserver::permisoAsignado($usuario, $permiso);
+            // Permisos a revocar
+            $permisosRevocados = array_diff($permisosAnteriores, $permisosNuevos);
+            foreach ($permisosRevocados as $permisoId) {
+                $permiso = Permiso::find($permisoId);
+                if ($permiso) {
+                    $usuario->revokePermissionTo($permiso);
+                    PermisoObserver::permisoRevocado($usuario, $permiso);
+                }
             }
-        }
 
-        foreach ($permisosRemovidos as $permisoId) {
-            $permiso = Permission::find($permisoId);
-            if ($permiso) {
-                PermisoObserver::permisoRevocado($usuario, $permiso);
+            // Permisos a asignar
+            $permisosAsignados = array_diff($permisosNuevos, $permisosAnteriores);
+            foreach ($permisosAsignados as $permisoId) {
+                $permiso = Permiso::find($permisoId);
+                if ($permiso) {
+                    $usuario->givePermissionTo($permiso);
+                    PermisoObserver::permisoAsignado($usuario, $permiso);
+                }
             }
-        }
 
-        return redirect()
-            ->route('admin.privilegios.gestionar', $usuario)
-            ->with('success', '✅ Permisos actualizados correctamente');
+            DB::commit();
+
+            return redirect()
+                ->route('admin.privilegios.gestionar', $usuario)
+                ->with('success', "Permisos de {$usuario->name} actualizados correctamente");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Error al actualizar permisos: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -90,43 +103,50 @@ class GestionPrivilegiosController extends Controller
      */
     public function toggleEstado(User $usuario)
     {
-        $usuario->i_active = !$usuario->i_active;
-        $usuario->save();
+        $usuario->update(['i_active' => !$usuario->i_active]);
 
         $estado = $usuario->i_active ? 'activado' : 'desactivado';
-
-        return redirect()
-            ->back()
-            ->with('success', "Usuario {$estado} correctamente");
+        
+        return back()->with('success', "Usuario {$usuario->name} {$estado} correctamente");
     }
 
     /**
-     * Copiar permisos de un usuario a otro
+     * Copiar permisos de otro usuario
      */
     public function copiarPermisos(Request $request)
     {
         $request->validate([
-            'usuario_origen' => 'required|exists:users,id',
-            'usuario_destino' => 'required|exists:users,id|different:usuario_origen',
+            'usuario_destino_id' => 'required|exists:users,id',
+            'usuario_origen_id' => 'required|exists:users,id',
         ]);
 
-        $usuarioOrigen = User::findOrFail($request->usuario_origen);
-        $usuarioDestino = User::findOrFail($request->usuario_destino);
+        $usuarioDestino = User::findOrFail($request->usuario_destino_id);
+        $usuarioOrigen = User::findOrFail($request->usuario_origen_id);
 
-        $permisos = $usuarioOrigen->permissions->pluck('id')->toArray();
-        $usuarioDestino->syncPermissions($permisos);
+        DB::beginTransaction();
+        try {
+            // Revocar todos los permisos actuales
+            $usuarioDestino->syncPermissions([]);
 
-        // Registrar auditoría
-        foreach ($permisos as $permisoId) {
-            $permiso = Permission::find($permisoId);
-            if ($permiso) {
+            // Copiar permisos del usuario origen
+            $permisos = $usuarioOrigen->permissions;
+            
+            foreach ($permisos as $permiso) {
+                $usuarioDestino->givePermissionTo($permiso);
                 PermisoObserver::permisoAsignado($usuarioDestino, $permiso);
             }
-        }
 
-        return redirect()
-            ->back()
-            ->with('success', '✅ Permisos copiados exitosamente');
+            // Registrar la acción de copiado
+            PermisoObserver::permisosCopiadosDesdeOtroUsuario($usuarioDestino, $usuarioOrigen);
+
+            DB::commit();
+
+            return back()->with('success', "Permisos copiados de {$usuarioOrigen->name} a {$usuarioDestino->name}");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Error al copiar permisos: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -139,18 +159,24 @@ class GestionPrivilegiosController extends Controller
         ]);
 
         $modulo = Modulo::findOrFail($request->modulo_id);
-        $permisos = $modulo->permisos;
 
-        foreach ($permisos as $permiso) {
-            if (!$usuario->hasPermissionTo($permiso)) {
-                $usuario->givePermissionTo($permiso);
-                PermisoObserver::permisoAsignado($usuario, $permiso);
+        DB::beginTransaction();
+        try {
+            foreach ($modulo->permisos as $permiso) {
+                if (!$usuario->hasPermissionTo($permiso)) {
+                    $usuario->givePermissionTo($permiso);
+                    PermisoObserver::permisoAsignado($usuario, $permiso);
+                }
             }
-        }
 
-        return redirect()
-            ->back()
-            ->with('success', "✅ Todos los permisos del módulo '{$modulo->nombre_modulo}' asignados");
+            DB::commit();
+
+            return back()->with('success', "Todos los permisos del módulo '{$modulo->nombre_modulo}' asignados");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Error al asignar módulo: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -163,17 +189,23 @@ class GestionPrivilegiosController extends Controller
         ]);
 
         $modulo = Modulo::findOrFail($request->modulo_id);
-        $permisos = $modulo->permisos;
 
-        foreach ($permisos as $permiso) {
-            if ($usuario->hasPermissionTo($permiso)) {
-                $usuario->revokePermissionTo($permiso);
-                PermisoObserver::permisoRevocado($usuario, $permiso);
+        DB::beginTransaction();
+        try {
+            foreach ($modulo->permisos as $permiso) {
+                if ($usuario->hasPermissionTo($permiso)) {
+                    $usuario->revokePermissionTo($permiso);
+                    PermisoObserver::permisoRevocado($usuario, $permiso);
+                }
             }
-        }
 
-        return redirect()
-            ->back()
-            ->with('success', "✅ Todos los permisos del módulo '{$modulo->nombre_modulo}' revocados");
+            DB::commit();
+
+            return back()->with('success', "Todos los permisos del módulo '{$modulo->nombre_modulo}' revocados");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Error al revocar módulo: ' . $e->getMessage());
+        }
     }
 }

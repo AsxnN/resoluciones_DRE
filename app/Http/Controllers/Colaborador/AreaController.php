@@ -7,15 +7,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Area;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class AreaController extends Controller
+class AreaController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('permission:ver_areas')->only(['index', 'show']);
-        $this->middleware('permission:crear_areas')->only(['create', 'store']);
-        $this->middleware('permission:editar_areas')->only(['edit', 'update']);
-        $this->middleware('permission:eliminar_areas')->only('destroy');
+        return [
+            new Middleware('permission:areas.ver', only: ['index', 'show']),
+            new Middleware('permission:areas.crear', only: ['create', 'store']),
+            new Middleware('permission:areas.editar', only: ['edit', 'update']),
+            new Middleware('permission:areas.eliminar', only: ['destroy', 'toggleEstado']),
+        ];
     }
 
     public function index(Request $request)

@@ -12,15 +12,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ResolucionController extends Controller
+class ResolucionController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('permission:ver_resoluciones')->only(['index', 'show']);
-        $this->middleware('permission:crear_resoluciones')->only(['create', 'store']);
-        $this->middleware('permission:editar_resoluciones')->only(['edit', 'update']);
-        $this->middleware('permission:eliminar_resoluciones')->only('destroy');
+        return [
+            new Middleware('permission:resoluciones.ver', only: ['index', 'show']),
+            new Middleware('permission:resoluciones.crear', only: ['create', 'store']),
+            new Middleware('permission:resoluciones.editar', only: ['edit', 'update']),
+            new Middleware('permission:resoluciones.eliminar', only: ['destroy', 'toggleEstado']),
+        ];
     }
 
     /**

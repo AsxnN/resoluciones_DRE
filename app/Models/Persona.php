@@ -1,10 +1,11 @@
 <?php
-// filepath: app/Models/Persona.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Persona extends Model
 {
@@ -42,22 +43,97 @@ class Persona extends Model
     // RELACIONES
     // ========================================
 
-    public function user()
+    public function user(): HasOne
     {
         return $this->hasOne(User::class, 'id_persona', 'id_persona');
     }
 
-    public function colaborador()
+    public function colaborador(): HasOne
     {
         return $this->hasOne(Colaborador::class, 'id_persona', 'id_persona');
     }
 
-    public function cliente()
+    public function cliente(): HasOne
     {
         return $this->hasOne(Cliente::class, 'id_persona', 'id_persona');
     }
 
-    public function resoluciones()
+    /**
+     * Relaciones delegadas desde colaborador (si es colaborador)
+     */
+    public function direccion()
+    {
+        return $this->hasOneThrough(
+            Direccion::class,
+            Colaborador::class,
+            'id_persona',      // FK en colaborador
+            'id_direcciones',  // PK en direccion
+            'id_persona',      // PK en persona
+            'id_direcciones'   // FK en colaborador
+        );
+    }
+
+    public function dependencia()
+    {
+        return $this->hasOneThrough(
+            Dependencia::class,
+            Colaborador::class,
+            'id_persona',
+            'id_dependencias',
+            'id_persona',
+            'id_dependencia'
+        );
+    }
+
+    public function area()
+    {
+        return $this->hasOneThrough(
+            Area::class,
+            Colaborador::class,
+            'id_persona',
+            'id_area',
+            'id_persona',
+            'id_area'
+        );
+    }
+
+    public function cargo()
+    {
+        return $this->hasOneThrough(
+            Cargo::class,
+            Colaborador::class,
+            'id_persona',
+            'id_cargos',
+            'id_persona',
+            'id_cargos'
+        );
+    }
+
+    public function especialidad()
+    {
+        return $this->hasOneThrough(
+            Especialidad::class,
+            Colaborador::class,
+            'id_persona',
+            'id_especialidad',
+            'id_persona',
+            'id_especialidad'
+        );
+    }
+
+    public function tipoPersonal()
+    {
+        return $this->hasOneThrough(
+            TipoPersonal::class,
+            Colaborador::class,
+            'id_persona',
+            'id_tipo_personal',
+            'id_persona',
+            'id_tipo_personal'
+        );
+    }
+
+    public function resoluciones(): BelongsToMany
     {
         return $this->belongsToMany(
             Resolucion::class,
@@ -99,7 +175,7 @@ class Persona extends Model
     }
 
     // ========================================
-    // ACCESORIOS
+    // ACCESSORS
     // ========================================
 
     public function getNombreCompletoAttribute(): string

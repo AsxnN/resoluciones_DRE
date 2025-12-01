@@ -7,15 +7,19 @@ use App\Http\Controllers\Controller;
 use App\Models\Cargo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class CargoController extends Controller
+class CargoController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('permission:ver_cargos')->only(['index', 'show']);
-        $this->middleware('permission:crear_cargos')->only(['create', 'store']);
-        $this->middleware('permission:editar_cargos')->only(['edit', 'update']);
-        $this->middleware('permission:eliminar_cargos')->only('destroy');
+        return [
+            new Middleware('permission:cargos.ver', only: ['index', 'show']),
+            new Middleware('permission:cargos.crear', only: ['create', 'store']),
+            new Middleware('permission:cargos.editar', only: ['edit', 'update']),
+            new Middleware('permission:cargos.eliminar', only: ['destroy', 'toggleEstado']),
+        ];
     }
 
     public function index(Request $request)

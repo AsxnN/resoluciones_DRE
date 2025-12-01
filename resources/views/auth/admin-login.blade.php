@@ -122,7 +122,7 @@
         @if (config('app.env') === 'local')
             <div class="mt-6 bg-yellow-900 bg-opacity-30 border border-yellow-600 rounded-lg p-4 text-center">
                 <p class="text-yellow-200 text-xs font-mono">
-                    🔑 Admin: admin@resoluciones.gob.pe / Admin123456
+                    admin@resoluciones.gob.pe  Admin123456
                 </p>
             </div>
         @endif

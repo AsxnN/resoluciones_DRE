@@ -127,7 +127,7 @@
         @if (config('app.env') === 'local')
             <div class="mt-6 bg-white bg-opacity-20 backdrop-blur-sm border border-white border-opacity-30 rounded-lg p-4 text-center">
                 <p class="text-white text-xs font-mono">
-                    🔑 Colab: colaborador@dre.gob.pe / SGRDreHuanuco2025!
+                    colaborador@resoluciones.gob.pe Colab123456
                 </p>
             </div>
         @endif

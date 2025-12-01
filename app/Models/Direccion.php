@@ -1,5 +1,4 @@
 <?php
-// filepath: app/Models/Direccion.php
 
 namespace App\Models;
 
@@ -12,9 +11,7 @@ class Direccion extends Model
 
     protected $table = 'direccion';
     protected $primaryKey = 'id_direcciones';
-    
-    const CREATED_AT = 'fecha_creacion';
-    const UPDATED_AT = 'fecha_actualizacion';
+    public $timestamps = false;
 
     protected $fillable = [
         'nombre_direcciones',
@@ -26,13 +23,35 @@ class Direccion extends Model
         'i_active' => 'boolean',
     ];
 
-    public function colaboradores()
+    // Relaciones
+    public function personas()
     {
-        return $this->hasMany(Colaborador::class, 'id_direcciones');
+        return $this->hasMany(Persona::class, 'id_direcciones', 'id_direcciones');
     }
 
-    public function scopeActivos($query)
+    public function areas()
+    {
+        return $this->hasMany(Area::class, 'id_direcciones', 'id_direcciones');
+    }
+
+    public function colaboradores()
+    {
+        return $this->hasMany(Colaborador::class, 'id_direcciones', 'id_direcciones');
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'id_usuario', 'id');
+    }
+
+    // Scopes
+    public function scopeActivas($query)
     {
         return $query->where('i_active', true);
+    }
+
+    public function scopeBuscar($query, $search)
+    {
+        return $query->where('nombre_direcciones', 'like', "%{$search}%");
     }
 }

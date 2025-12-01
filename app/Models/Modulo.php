@@ -1,20 +1,13 @@
 <?php
-// filepath: app/Models/Modulo.php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Modulo extends Model
 {
-    use HasFactory;
-
     protected $table = 'modulos';
     protected $primaryKey = 'id_modulo';
-    
-    const CREATED_AT = 'fecha_creacion';
-    const UPDATED_AT = 'fecha_actualizacion';
 
     protected $fillable = [
         'nombre_modulo',
@@ -28,72 +21,33 @@ class Modulo extends Model
     ];
 
     protected $casts = [
-        'orden' => 'integer',
         'i_active' => 'boolean',
-        'fecha_creacion' => 'datetime',
-        'fecha_actualizacion' => 'datetime',
+        'orden' => 'integer',
     ];
 
-    // ========================================
-    // RELACIONES
-    // ========================================
-
-    public function permisos()
-    {
-        return $this->hasMany(Permiso::class, 'id_modulo', 'id_modulo');
-    }
-
-    public function permisosActivos()
+    /**
+     * Relación con permisos
+     */
+    public function permisos(): HasMany
     {
         return $this->hasMany(Permiso::class, 'id_modulo', 'id_modulo')
-                    ->where('i_active', true);
+                    ->where('i_active', true)
+                    ->orderBy('name');
     }
 
-    // ========================================
-    // SCOPES
-    // ========================================
-
+    /**
+     * Scope para módulos activos
+     */
     public function scopeActivos($query)
     {
-        return $query->where('i_active', true);
+        return $query->where('i_active', true)->orderBy('orden');
     }
 
-    public function scopeOrdenados($query)
+    /**
+     * Obtener cantidad de permisos
+     */
+    public function getCantidadPermisosAttribute(): int
     {
-        return $query->orderBy('orden');
-    }
-
-    public function scopeAdmin($query)
-    {
-        return $query->where('tipo_modulo', 'admin');
-    }
-
-    public function scopeColaborador($query)
-    {
-        return $query->where('tipo_modulo', 'colaborador');
-    }
-
-    public function scopeCompartido($query)
-    {
-        return $query->where('tipo_modulo', 'compartido');
-    }
-
-    // ========================================
-    // MÉTODOS AUXILIARES
-    // ========================================
-
-    public function esAdmin(): bool
-    {
-        return $this->tipo_modulo === 'admin';
-    }
-
-    public function esColaborador(): bool
-    {
-        return $this->tipo_modulo === 'colaborador';
-    }
-
-    public function esCompartido(): bool
-    {
-        return $this->tipo_modulo === 'compartido';
+        return $this->permisos()->count();
     }
 }

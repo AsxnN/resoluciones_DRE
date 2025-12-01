@@ -1,31 +1,29 @@
 <?php
-// filepath: app/Models/Auditoria.php
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Auditoria extends Model
 {
-    use HasFactory;
-
     protected $table = 'auditoria';
     protected $primaryKey = 'id_auditoria';
-    
-    const CREATED_AT = 'fecha_accion';
-    const UPDATED_AT = null;
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false;
 
     protected $fillable = [
+        'id_usuario',
+        'accion',
         'tabla_afectada',
         'id_registro',
-        'accion',
+        'descripcion',
         'datos_anteriores',
         'datos_nuevos',
-        'id_usuario',
         'ip_address',
         'user_agent',
-        'descripcion',
+        'fecha_accion',
     ];
 
     protected $casts = [
@@ -34,36 +32,78 @@ class Auditoria extends Model
         'fecha_accion' => 'datetime',
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'id_auditoria';
+    }
+
     // ========================================
     // RELACIONES
     // ========================================
 
-    public function usuario()
+    public function usuario(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'id_usuario');
+        return $this->belongsTo(User::class, 'id_usuario', 'id');
     }
 
     // ========================================
-    // SCOPES
+    // ACCESSORS (Solo los que tienen sentido)
     // ========================================
 
-    public function scopePorTabla($query, $tabla)
+    public function getAccionFormateadaAttribute(): string
     {
-        return $query->where('tabla_afectada', $tabla);
+        return match($this->accion) {
+            'crear' => 'Creación',
+            'editar' => 'Edición',
+            'eliminar' => 'Eliminación',
+            'login' => 'Inicio de Sesión',
+            'logout' => 'Cierre de Sesión',
+            'actualizar' => 'Actualización',
+            default => ucfirst(str_replace('_', ' ', $this->accion))
+        };
     }
 
-    public function scopePorAccion($query, $accion)
+    // ========================================
+    // MÉTODOS ESTÁTICOS
+    // ========================================
+
+    public static function registrarLogin(int $idUsuario): void
     {
-        return $query->where('accion', $accion);
+        self::create([
+            'id_usuario' => $idUsuario,
+            'accion' => 'login',
+            'descripcion' => "Inicio de sesión exitoso",
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'fecha_accion' => now(),
+        ]);
     }
 
-    public function scopePorUsuario($query, $idUsuario)
+    public static function registrarLogout(): void
     {
-        return $query->where('id_usuario', $idUsuario);
+        self::create([
+            'id_usuario' => auth()->id(),
+            'accion' => 'logout',
+            'descripcion' => 'Cierre de sesión',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'fecha_accion' => now(),
+        ]);
     }
 
-    public function scopeRecientes($query, $dias = 30)
+    public static function registrarActualizacion(string $tabla, int $idRegistro, array $datosAnteriores, array $datosNuevos, string $descripcion): void
     {
-        return $query->where('fecha_accion', '>=', now()->subDays($dias));
+        self::create([
+            'id_usuario' => auth()->id(),
+            'accion' => 'actualizar',
+            'tabla_afectada' => $tabla,
+            'id_registro' => $idRegistro,
+            'descripcion' => $descripcion,
+            'datos_anteriores' => $datosAnteriores,
+            'datos_nuevos' => $datosNuevos,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'fecha_accion' => now(),
+        ]);
     }
 }

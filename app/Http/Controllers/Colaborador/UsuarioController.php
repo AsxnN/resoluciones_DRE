@@ -10,15 +10,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class UsuarioController extends Controller
+class UsuarioController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('permission:ver_usuarios')->only(['index', 'show']);
-        $this->middleware('permission:crear_usuarios')->only(['create', 'store']);
-        $this->middleware('permission:editar_usuarios')->only(['edit', 'update']);
-        $this->middleware('permission:eliminar_usuarios')->only('destroy');
+        return [
+            new Middleware('permission:usuarios.ver', only: ['index', 'show']),
+            new Middleware('permission:usuarios.crear', only: ['create', 'store']),
+            new Middleware('permission:usuarios.editar', only: ['edit', 'update']),
+            new Middleware('permission:usuarios.eliminar', only: ['destroy', 'toggleEstado']),
+        ];
     }
 
     public function index(Request $request)

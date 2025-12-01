@@ -7,17 +7,20 @@ use App\Http\Controllers\Controller;
 use App\Models\Dependencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class DependenciaController extends Controller
+class DependenciaController extends Controller implements HasMiddleware
 {
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('permission:ver_dependencias')->only(['index', 'show']);
-        $this->middleware('permission:crear_dependencias')->only(['create', 'store']);
-        $this->middleware('permission:editar_dependencias')->only(['edit', 'update']);
-        $this->middleware('permission:eliminar_dependencias')->only('destroy');
+        return [
+            new Middleware('permission:dependencias.ver', only: ['index', 'show']),
+            new Middleware('permission:dependencias.crear', only: ['create', 'store']),
+            new Middleware('permission:dependencias.editar', only: ['edit', 'update']),
+            new Middleware('permission:dependencias.eliminar', only: ['destroy', 'toggleEstado']),
+        ];
     }
-
     public function index(Request $request)
     {
         $query = Dependencia::query();
