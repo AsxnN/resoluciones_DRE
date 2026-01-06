@@ -33,7 +33,9 @@ class PermisoSeeder extends Seeder
             'direcciones',
             'especialidades',
             'tipos-personal',
-            'unidades', // ← AGREGADO
+            'unidades',
+            'tipos-resolucion', // ← AGREGADO ⭐
+            'roles',            // ← AGREGADO ⭐
             'usuarios',
         ];
 
@@ -73,7 +75,7 @@ class PermisoSeeder extends Seeder
             ]);
         }
 
-        $this->command->info('✅ Permisos creados');
+        $this->command->info('✅ Permisos creados exitosamente');
     }
 
     private function crearPermisosCrud(int $idModulo, string $slug): void
@@ -94,19 +96,29 @@ class PermisoSeeder extends Seeder
         foreach ($permisos as $accion => $descripcion) {
             $nombrePermiso = "{$slug}.{$accion}";
 
-            DB::table('permissions')->insert([
-                'id_modulo' => $idModulo,
-                'name' => $nombrePermiso,
-                'slug' => $nombrePermiso,
-                'guard_name' => 'colaborador',
-                'descripcion' => $descripcion,
-                'tipo_permiso' => $tipo,
-                'i_active' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Verificar si ya existe antes de insertar
+            $existe = DB::table('permissions')
+                ->where('name', $nombrePermiso)
+                ->where('guard_name', 'colaborador')
+                ->exists();
 
-            $this->command->info("  ✓ {$nombrePermiso}");
+            if (!$existe) {
+                DB::table('permissions')->insert([
+                    'id_modulo' => $idModulo,
+                    'name' => $nombrePermiso,
+                    'slug' => $nombrePermiso,
+                    'guard_name' => 'colaborador',
+                    'descripcion' => $descripcion,
+                    'tipo_permiso' => $tipo,
+                    'i_active' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                $this->command->info("  ✓ {$nombrePermiso}");
+            } else {
+                $this->command->warn("  ⚠ {$nombrePermiso} (ya existe)");
+            }
         }
     }
 }

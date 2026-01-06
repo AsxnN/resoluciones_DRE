@@ -19,6 +19,8 @@ use App\Http\Controllers\Colaborador\TipoPersonalController;
 use App\Http\Controllers\Colaborador\UsuarioController;
 use App\Http\Controllers\Colaborador\ProfileController;
 use App\Http\Controllers\Colaborador\UnidadController;
+use App\Http\Controllers\Colaborador\RolController;
+use App\Http\Controllers\Colaborador\TipoResolucionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -70,11 +72,18 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
         // ========================================
         // MÓDULO: RESOLUCIONES
         // ========================================
-        Route::resource('resoluciones', ResolucionController::class);
+        Route::resource('resoluciones', ResolucionController::class)->parameters(['resoluciones' => 'resolucion']);
         Route::get('resoluciones/{resolucion}/descargar', [ResolucionController::class, 'descargar'])->name('resoluciones.descargar');
         Route::get('resoluciones/{resolucion}/descargar-firmado', [ResolucionController::class, 'descargarFirmado'])->name('resoluciones.descargar-firmado');
         Route::patch('resoluciones/{resolucion}/cambiar-estado', [ResolucionController::class, 'cambiarEstado'])->name('resoluciones.cambiar-estado');
         Route::post('resoluciones/generar-numero', [ResolucionController::class, 'generarNumero'])->name('resoluciones.generar-numero');
+
+        Route::get('resoluciones/crear/paso1', [ResolucionController::class, 'create'])->name('resoluciones.create');
+        Route::post('resoluciones/crear/paso1', [ResolucionController::class, 'storePaso1'])->name('resoluciones.store-paso1');
+        Route::get('resoluciones/crear/paso2', [ResolucionController::class, 'createPaso2'])->name('resoluciones.create-paso2');
+        Route::post('resoluciones/crear/paso2', [ResolucionController::class, 'storePaso2'])->name('resoluciones.store-paso2');
+        Route::get('resoluciones/crear/paso3', [ResolucionController::class, 'createPaso3'])->name('resoluciones.create-paso3');
+        Route::post('resoluciones/crear/guardar', [ResolucionController::class, 'storeFinal'])->name('resoluciones.store-final');
 
         // Firmas (CORREGIDO)
         Route::prefix('firma')->name('firma.')->group(function () {
@@ -163,5 +172,13 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
         Route::resource('usuarios', UsuarioController::class);
         Route::patch('usuarios/{usuario}/toggle-estado', [UsuarioController::class, 'toggleEstado'])->name('usuarios.toggle-estado');
         Route::post('usuarios/{usuario}/reset-password', [UsuarioController::class, 'resetPassword'])->name('usuarios.reset-password');
+        
+        // Tipos de Resolución
+        Route::resource('tipos-resolucion', TipoResolucionController::class)->parameters([
+            'tipos-resolucion' => 'tipoResolucion'
+        ]);
+
+        // Roles
+        Route::resource('roles', RolController::class);
     });
 });

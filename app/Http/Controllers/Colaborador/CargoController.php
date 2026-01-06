@@ -27,14 +27,14 @@ class CargoController extends Controller implements HasMiddleware
         $query = Cargo::query();
 
         if ($request->filled('search')) {
-            $query->where('nombre_cargo', 'like', '%' . $request->search . '%');
+            $query->buscar($request->search);
         }
 
         if ($request->filled('i_active')) {
             $query->where('i_active', $request->boolean('i_active'));
         }
 
-        $cargos = $query->orderBy('nombre_cargo')->paginate(20)->withQueryString();
+        $cargos = $query->orderBy('codigo_cargo')->paginate(20)->withQueryString();
 
         return view('colaborador.cargos.index', compact('cargos'));
     }
@@ -47,16 +47,25 @@ class CargoController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'codigo_cargo' => 'required|string|max:20|unique:cargo,codigo_cargo',
             'nombre_cargo' => 'required|string|max:100|unique:cargo,nombre_cargo',
-            'descripcion' => 'nullable|string|max:255',
+            'descripcion' => 'nullable|string',
         ]);
 
         $validated['id_usuario'] = Auth::id();
+        $validated['i_active'] = true;
 
         Cargo::create($validated);
 
         return redirect()->route('colaborador.cargos.index')
             ->with('success', '✅ Cargo creado exitosamente');
+    }
+
+    public function show(Cargo $cargo)
+    {
+        $cargo->load(['usuario', 'colaboradores.persona']);
+        
+        return view('colaborador.cargos.show', compact('cargo'));
     }
 
     public function edit(Cargo $cargo)
@@ -67,10 +76,13 @@ class CargoController extends Controller implements HasMiddleware
     public function update(Request $request, Cargo $cargo)
     {
         $validated = $request->validate([
-            'nombre_cargo' => 'required|string|max:100|unique:cargo,nombre_cargo,' . $cargo->id_cargo . ',id_cargo',
-            'descripcion' => 'nullable|string|max:255',
-            'i_active' => 'required|boolean',
+            'codigo_cargo' => 'required|string|max:20|unique:cargo,codigo_cargo,' . $cargo->id_cargos . ',id_cargos',
+            'nombre_cargo' => 'required|string|max:100|unique:cargo,nombre_cargo,' . $cargo->id_cargos . ',id_cargos',
+            'descripcion' => 'nullable|string',
+            'i_active' => 'nullable|boolean',
         ]);
+
+        $validated['i_active'] = $request->has('i_active');
 
         $cargo->update($validated);
 
@@ -82,7 +94,7 @@ class CargoController extends Controller implements HasMiddleware
     {
         if ($cargo->colaboradores()->count() > 0) {
             return redirect()->back()
-                ->with('error', '❌ No se puede eliminar un cargo con colaboradores asociados');
+                ->with('error', '❌ No se puede eliminar: hay ' . $cargo->colaboradores()->count() . ' colaboradores con este cargo');
         }
 
         $cargo->delete();
@@ -96,7 +108,9 @@ class CargoController extends Controller implements HasMiddleware
         $cargo->i_active = !$cargo->i_active;
         $cargo->save();
 
+        $estado = $cargo->i_active ? 'activado' : 'desactivado';
+
         return redirect()->back()
-            ->with('success', '✅ Cargo ' . ($cargo->i_active ? 'activado' : 'desactivado'));
+            ->with('success', "✅ Cargo {$estado} correctamente");
     }
 }

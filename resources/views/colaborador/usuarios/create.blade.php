@@ -35,14 +35,14 @@
                         <!-- Nombre -->
                         <div>
                             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                                Nombre de Usuario <span class="text-red-500">*</span>
+                                Nombre Completo <span class="text-red-500">*</span>
                             </label>
                             <input type="text" 
                                    id="name" 
                                    name="name" 
                                    value="{{ old('name') }}"
                                    required
-                                   placeholder="Ej: Juan Pérez"
+                                   placeholder="Ej: Juan Pérez García"
                                    class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('name') border-red-500 @enderror">
                             @error('name')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -69,12 +69,13 @@
                         <!-- DNI -->
                         <div>
                             <label for="dni" class="block text-sm font-medium text-gray-700 mb-2">
-                                DNI
+                                DNI <span class="text-red-500">*</span>
                             </label>
                             <input type="text" 
                                    id="dni" 
                                    name="dni" 
                                    value="{{ old('dni') }}"
+                                   required
                                    maxlength="8"
                                    pattern="[0-9]{8}"
                                    placeholder="12345678"
@@ -134,75 +135,6 @@
                     </div>
                 </div>
 
-                <!-- Asociar Persona -->
-                <div class="pb-6 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">👤 Asociar con Persona</h3>
-                    
-                    <div>
-                        <label for="id_persona" class="block text-sm font-medium text-gray-700 mb-2">
-                            Persona (Opcional)
-                        </label>
-                        <select id="id_persona" 
-                                name="id_persona"
-                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('id_persona') border-red-500 @enderror">
-                            <option value="">Sin asociar</option>
-                            @foreach($personas as $persona)
-                            <option value="{{ $persona->id_persona }}" {{ old('id_persona') == $persona->id_persona ? 'selected' : '' }}>
-                                {{ $persona->dni_persona }} - {{ $persona->nombres_persona }} {{ $persona->apellido_paterno_persona }} {{ $persona->apellido_materno_persona }}
-                            </option>
-                            @endforeach
-                        </select>
-                        @error('id_persona')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        <p class="mt-1 text-xs text-gray-500">Vincular el usuario con una persona registrada en el sistema</p>
-                    </div>
-                </div>
-
-                <!-- Roles y Permisos -->
-                <div class="pb-6 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">🔑 Roles y Permisos</h3>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-3">
-                            Asignar Roles <span class="text-red-500">*</span>
-                        </label>
-                        <div class="space-y-3">
-                            @foreach($roles as $role)
-                            <div class="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
-                                <div class="flex items-center h-5">
-                                    <input type="checkbox" 
-                                           id="role_{{ $role->id }}" 
-                                           name="roles[]" 
-                                           value="{{ $role->name }}"
-                                           {{ in_array($role->name, old('roles', [])) ? 'checked' : '' }}
-                                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5">
-                                </div>
-                                <div class="ml-3">
-                                    <label for="role_{{ $role->id }}" class="font-medium text-gray-900 cursor-pointer">
-                                        {{ ucfirst($role->name) }}
-                                    </label>
-                                    <p class="text-sm text-gray-500">
-                                        @if($role->name === 'admin')
-                                            Acceso total al sistema y gestión de usuarios
-                                        @elseif($role->name === 'colaborador')
-                                            Acceso para gestión de resoluciones y personal
-                                        @elseif($role->name === 'director')
-                                            Acceso para aprobación y firma de resoluciones
-                                        @else
-                                            {{ $role->name }}
-                                        @endif
-                                    </p>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                        @error('roles')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
                 <!-- Estado y Configuración -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">⚙️ Configuración</h3>
@@ -211,11 +143,11 @@
                         <!-- Usuario Activo -->
                         <div class="flex items-center p-4 bg-gray-50 rounded-lg">
                             <input type="checkbox" 
-                                   id="activo" 
-                                   name="activo" 
-                                   value="1"
-                                   {{ old('activo', true) ? 'checked' : '' }}
-                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5">
+                                id="activo" 
+                                name="activo" 
+                                value="1"
+                                {{ old('activo', true) ? 'checked' : '' }}
+                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5">
                             <label for="activo" class="ml-3">
                                 <span class="text-sm font-medium text-gray-700">Usuario Activo</span>
                                 <p class="text-xs text-gray-500">El usuario podrá acceder al sistema</p>
@@ -262,12 +194,13 @@
                 </svg>
             </div>
             <div class="ml-3">
-                <h3 class="text-sm font-medium text-blue-800">Información sobre Usuarios</h3>
+                <h3 class="text-sm font-medium text-blue-800">Información Importante</h3>
                 <div class="mt-2 text-sm text-blue-700">
                     <ul class="list-disc list-inside space-y-1">
                         <li>La contraseña debe tener al menos 8 caracteres</li>
-                        <li>Es recomendable asociar el usuario con una persona del sistema</li>
-                        <li>Puede asignar múltiples roles a un mismo usuario</li>
+                        <li>Se creará automáticamente una persona asociada al usuario</li>
+                        <li>El email será compartido entre el usuario y la persona</li>
+                        <li>Los <strong>roles y permisos</strong> se asignan desde el <strong>Panel de Administración</strong></li>
                         <li>Los usuarios inactivos no podrán acceder al sistema</li>
                     </ul>
                 </div>

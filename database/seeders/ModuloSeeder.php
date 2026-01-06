@@ -135,19 +135,44 @@ class ModuloSeeder extends Seeder
                 'i_active' => true,
             ],
             [
+                'nombre_modulo' => 'Tipos de Resolución', // ← AGREGADO ⭐
+                'slug' => 'tipos-resolucion',
+                'descripcion' => 'Gestión de tipos de resoluciones',
+                'ruta' => '/colaborador/tipos-resolucion',
+                'icono' => 'fas fa-file-signature',
+                'orden' => 12,
+                'tipo_modulo' => 'colaborador',
+                'i_active' => true,
+            ],
+            [
+                'nombre_modulo' => 'Roles', // ← AGREGADO ⭐
+                'slug' => 'roles',
+                'descripcion' => 'Gestión de roles y permisos',
+                'ruta' => '/colaborador/roles',
+                'icono' => 'fas fa-shield-alt',
+                'orden' => 13,
+                'tipo_modulo' => 'colaborador',
+                'i_active' => true,
+            ],
+            [
                 'nombre_modulo' => 'Usuarios',
                 'slug' => 'usuarios',
                 'descripcion' => 'Gestión de usuarios del sistema',
                 'ruta' => '/colaborador/usuarios',
                 'icono' => 'fas fa-user-cog',
-                'orden' => 12,
+                'orden' => 14,
                 'tipo_modulo' => 'colaborador',
                 'i_active' => true,
             ],
         ];
 
-        DB::table('modulos')->insert($modulos);
+        foreach ($modulos as $modulo) {
+            DB::table('modulos')->updateOrInsert(
+                ['slug' => $modulo['slug']],
+                $modulo
+            );
+        }
 
-        $this->command->info('✅ 14 módulos creados');
+        $this->command->info('✅ ' . count($modulos) . ' módulos creados/actualizados');
     }
 }

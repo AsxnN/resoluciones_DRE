@@ -160,7 +160,7 @@
                     <a href="{{ route('colaborador.areas.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.areas.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 16a1 1 0 001-1h4a1 1 0 011 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-3zM14 16a1 1 0 011-1h4a1 1 0 011 1v3a1 1 0 01-1 1h-4a1 1 0 01-1-1v-3z"/>
                         </svg>
                         <span class="font-medium">Áreas</span>
                     </a>
@@ -193,7 +193,7 @@
                     <a href="{{ route('colaborador.tipos-personal.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.tipos-personal.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
                         </svg>
                         <span class="font-medium">Tipos de Personal</span>
                     </a>
@@ -202,22 +202,57 @@
                     <!-- Unidades -->
                     @can('unidades.ver')
                     <a href="{{ route('colaborador.unidades.index') }}" 
-                    class="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-700 hover:text-white transition rounded-lg {{ request()->routeIs('colaborador.unidades.*') ? 'bg-gray-700 text-white border-l-4 border-blue-500' : '' }}">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.unidades.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
-                        <span>Unidades</span>
+                        <span class="font-medium">Unidades</span>
+                    </a>
+                    @endcan
+
+                    <!-- Tipos de Resolución -->
+                    @can('tipos_resolucion.ver')
+                    <a href="{{ route('colaborador.tipos-resolucion.index') }}" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.tipos-resolucion.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        </svg>
+                        <span class="font-medium">Tipos de Resolución</span>
+                    </a>
+                    @endcan
+
+                    <!-- Roles -->
+                    @can('roles.ver')
+                    <a href="{{ route('colaborador.roles.index') }}" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.roles.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        <span class="font-medium">Roles</span>
                     </a>
                     @endcan
                     
-                    <!-- Divider para Sistema (solo si tiene permisos de usuarios) -->
-                    @can('usuarios.ver')
+
+                    <!-- Divider para Sistema (solo si tiene permisos de usuarios o privilegios) -->
+                    @canany(['usuarios.ver', 'privilegios.gestionar'])
                     <div class="my-4 border-t border-blue-800"></div>
                     
                     <div class="px-4 py-2">
                         <p class="text-xs font-semibold text-blue-300 uppercase tracking-wider">Sistema</p>
                     </div>
+
+                    <!-- Gestión de Privilegios -->
+                    @can('privilegios.gestionar')
+                    <a href="{{ route('admin.privilegios.index') }}" 
+                       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('admin.privilegios.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        <span class="font-medium">Gestión de Privilegios</span>
+                    </a>
+                    @endcan
                     
+                    @can('usuarios.ver')
                     <a href="{{ route('colaborador.usuarios.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.usuarios.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,7 +261,7 @@
                         <span class="font-medium">Usuarios</span>
                     </a>
                     @endcan
-                    
+                    @endcanany
                 </div>
             </nav>
 

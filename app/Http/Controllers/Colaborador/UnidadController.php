@@ -1,4 +1,5 @@
 <?php
+// filepath: app/Http/Controllers/Colaborador/UnidadController.php
 
 namespace App\Http\Controllers\Colaborador;
 
@@ -26,7 +27,7 @@ class UnidadController extends Controller implements HasMiddleware
         $query = Unidad::query();
 
         if ($request->filled('search')) {
-            $query->buscar($request->search);
+            $query->where('nombre_unidades', 'like', '%' . $request->search . '%');
         }
 
         if ($request->filled('i_active')) {
@@ -74,8 +75,10 @@ class UnidadController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'nombre_unidades' => 'required|string|max:100|unique:unidad,nombre_unidades,' . $unidad->id_unidad . ',id_unidad',
-            'i_active' => 'required|boolean',
+            'i_active' => 'boolean',
         ]);
+
+        $validated['i_active'] = $request->has('i_active') ? 1 : 0;
 
         $unidad->update($validated);
 

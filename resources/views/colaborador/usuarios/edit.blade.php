@@ -149,7 +149,7 @@
                             <option value="">Sin asociar</option>
                             @foreach($personas as $persona)
                             <option value="{{ $persona->id_persona }}" {{ old('id_persona', $usuario->id_persona) == $persona->id_persona ? 'selected' : '' }}>
-                                {{ $persona->dni_persona }} - {{ $persona->nombres_persona }} {{ $persona->apellido_paterno_persona }} {{ $persona->apellido_materno_persona }}
+                                {{ $persona->num_documento }} - {{ $persona->nombres }} {{ $persona->apellido_paterno }} {{ $persona->apellido_materno }}
                             </option>
                             @endforeach
                         </select>
@@ -214,7 +214,7 @@
                                    id="activo" 
                                    name="activo" 
                                    value="1"
-                                   {{ old('activo', $usuario->activo) ? 'checked' : '' }}
+                                   {{ old('activo', $usuario->i_active) ? 'checked' : '' }}
                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5">
                             <label for="activo" class="ml-3">
                                 <span class="text-sm font-medium text-gray-700">Usuario Activo</span>
@@ -251,11 +251,11 @@
                 <h3 class="text-sm font-medium text-yellow-800">Información Importante</h3>
                 <div class="mt-2 text-sm text-yellow-700">
                     <ul class="list-disc list-inside space-y-1">
-                        <li>Último acceso: {{ $usuario->last_login_at ? $usuario->last_login_at->format('d/m/Y H:i') : 'Nunca' }}</li>
+                        <li>Último acceso: {{ $usuario->ultima_sesion ? $usuario->ultima_sesion->format('d/m/Y H:i') : 'Nunca' }}</li>
                         <li>Email verificado: {{ $usuario->email_verified_at ? '✓ Sí' : '✗ No' }}</li>
                         <li>Creado: {{ $usuario->created_at->format('d/m/Y H:i') }}</li>
-                        @if($usuario->resoluciones_count > 0)
-                        <li class="text-red-700 font-semibold">Tiene {{ $usuario->resoluciones_count }} resoluciones asociadas</li>
+                        @if($usuario->resoluciones()->count() > 0)
+                        <li class="text-red-700 font-semibold">Tiene {{ $usuario->resoluciones()->count() }} resoluciones asociadas</li>
                         @endif
                     </ul>
                 </div>

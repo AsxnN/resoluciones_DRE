@@ -3,6 +3,9 @@
 
 namespace App\Http\Controllers\Colaborador;
 
+use App\Mail\ResolucionNotificacion;
+use Illuminate\Support\Facades\Mail;
+
 use App\Http\Controllers\Controller;
 use App\Models\Estado;
 use App\Models\Persona;
@@ -90,8 +93,14 @@ class ResolucionController extends Controller implements HasMiddleware
     {
         $estados = Estado::all();
         $tiposResolucion = TipoResolucion::where('i_active', true)->get();
+        $personas = Persona::where('i_active', true)
+            ->orderBy('apellido_paterno')
+            ->get();
+        $dependencias = \App\Models\Dependencia::where('i_active', true)
+            ->orderBy('nombre_dependencia')
+            ->get();
 
-        return view('colaborador.resoluciones.create', compact('estados', 'tiposResolucion'));
+        return view('colaborador.resoluciones.create-paso1', compact('estados', 'tiposResolucion', 'personas', 'dependencias'));
     }
 
     /**
@@ -158,17 +167,15 @@ class ResolucionController extends Controller implements HasMiddleware
      */
     public function show(Resolucion $resolucion)
     {
-        // Verificar permisos
-        if (!Auth::user()->can('ver_todas_resoluciones') && $resolucion->id_usuario !== Auth::id()) {
-            abort(403);
-        }
+        // El middleware ya verificó el permiso 'resoluciones.ver'
+        // Ya no necesitamos verificaciones adicionales
 
         $resolucion->load([
             'estado',
             'tipoResolucion',
             'usuarioCreador.persona',
             'usuarioFirmante.persona',
-            'personasInvolucradas',
+            'personas',
             'colaFirmas.estadoFirma',
             'colaFirmas.usuarioFirmante.persona',
             'historialFirmas.usuario.persona',
@@ -375,5 +382,229 @@ class ResolucionController extends Controller implements HasMiddleware
             'success' => true,
             'num_resolucion' => $numResolucion,
         ]);
+    }
+
+    /**
+     * Paso 1: Mostrar formulario para datos básicos y personas relacionadas
+     */
+    public function createPaso1()
+    {
+        $estados = Estado::all();
+        $tiposResolucion = TipoResolucion::where('i_active', true)->get();
+        $personas = Persona::where('i_active', true)
+            ->orderBy('apellido_paterno')
+            ->get();
+
+        return view('colaborador.resoluciones.create-paso1', compact('estados', 'tiposResolucion', 'personas'));
+    }
+
+    /**
+     * Guardar datos del paso 1 en sesión y mostrar paso 2
+     */
+    public function storePaso1(Request $request)
+    {
+        $validated = $request->validate([
+            'num_resolucion' => 'required|string|max:50|unique:resolucion,num_resolucion',
+            'fecha_resolucion' => 'required|date',
+            'id_estado' => 'required|exists:estado,id_estado',
+            'id_tipo_resolucion' => 'required|exists:tipo_resolucion,id_tipo_resolucion',
+            'id_dependencia' => 'nullable|exists:dependencia,id_dependencias',  // CORREGIDO
+            'personas_relacionadas' => 'nullable|array',
+            'personas_relacionadas.*.id_persona' => 'required|exists:persona,id_persona',
+        ]);
+
+        // Guardar en sesión
+        session(['resolucion_paso1' => $validated]);
+
+        return redirect()->route('colaborador.resoluciones.create-paso2');
+    }
+
+    /**
+     * Paso 2: Mostrar formulario para contenido de la resolución
+     */
+    public function createPaso2()
+    {
+        if (!session()->has('resolucion_paso1')) {
+            return redirect()->route('colaborador.resoluciones.create')
+                ->with('error', 'Debe completar el paso 1 primero');
+        }
+
+        $datosPaso1 = session('resolucion_paso1');  // CORREGIDO: estaba como $datossPaso1
+        $resoluciones = Resolucion::orderBy('num_resolucion', 'desc')->take(10)->get();
+
+        return view('colaborador.resoluciones.create-paso2', compact('datosPaso1', 'resoluciones'));
+    }
+
+    /**
+     * Guardar datos del paso 2 en sesión y mostrar paso 3
+     */
+    public function storePaso2(Request $request)
+    {
+        if (!session()->has('resolucion_paso1')) {
+            return redirect()->route('colaborador.resoluciones.create')
+                ->with('error', 'Debe completar el paso 1 primero');
+        }
+
+        $validated = $request->validate([
+            'id_resolucion_dependiente' => 'nullable|exists:resolucion,id_resolucion',
+            'visto_resolucion' => 'required|string',
+            'asunto_resolucion' => 'required|string|max:500',
+            'archivo_resolucion' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+        ]);
+
+        // Subir archivo si existe
+        if ($request->hasFile('archivo_resolucion')) {
+            $archivo = $request->file('archivo_resolucion');
+            $nombreArchivo = time() . '_' . $archivo->getClientOriginalName();
+            $path = $archivo->storeAs('resoluciones/temp', $nombreArchivo, 'public');
+            $validated['archivo_resolucion'] = $path;
+        }
+
+        // Guardar en sesión
+        session(['resolucion_paso2' => $validated]);
+
+        return redirect()->route('colaborador.resoluciones.create-paso3');
+    }
+
+    /**
+     * Paso 3: Mostrar resumen y opciones de envío
+     */
+    public function createPaso3()
+    {
+        if (!session()->has('resolucion_paso1') || !session()->has('resolucion_paso2')) {
+            return redirect()->route('colaborador.resoluciones.create')
+                ->with('error', 'Debe completar los pasos anteriores primero');
+        }
+
+        $datosPaso1 = session('resolucion_paso1');
+        $datosPaso2 = session('resolucion_paso2');
+
+        // DEBUG TEMPORAL
+        // dd($datosPaso1, $datosPaso2);
+
+        return view('colaborador.resoluciones.create-paso3', compact('datosPaso1', 'datosPaso2'));
+    }
+
+    /**
+     * Guardar la resolución completa (Paso 3 final)
+        */
+    public function storeFinal(Request $request)
+    {
+        if (!session()->has('resolucion_paso1') || !session()->has('resolucion_paso2')) {
+            return redirect()->route('colaborador.resoluciones.create')
+                ->with('error', 'Debe completar todos los pasos');
+        }
+
+        $validated = $request->validate([
+            'enviar_whatsapp' => 'nullable|boolean',
+            'enviar_correo' => 'nullable|boolean',
+            'aceptar_terminos' => 'required|accepted',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $paso1 = session('resolucion_paso1');
+            $paso2 = session('resolucion_paso2');
+
+            // Mover archivo de temp a ubicación final si existe
+            if (isset($paso2['archivo_resolucion'])) {
+                $tempPath = $paso2['archivo_resolucion'];
+                $finalPath = str_replace('/temp/', '/', $tempPath);
+                Storage::disk('public')->move($tempPath, $finalPath);
+                $paso2['archivo_resolucion'] = $finalPath;
+            }
+
+            // Crear resolución
+            $resolucion = Resolucion::create([
+                'id_estado' => $paso1['id_estado'],
+                'id_tipo_resolucion' => $paso1['id_tipo_resolucion'],
+                'id_dependencia' => $paso1['id_dependencia'] ?? null,
+                'num_resolucion' => $paso1['num_resolucion'],
+                'fecha_resolucion' => $paso1['fecha_resolucion'],
+                'visto_resolucion' => $paso2['visto_resolucion'],
+                'asunto_resolucion' => $paso2['asunto_resolucion'],
+                'archivo_resolucion' => $paso2['archivo_resolucion'] ?? null,
+                'id_resolucion_dependiente' => $paso2['id_resolucion_dependiente'] ?? null,
+                'id_usuario' => Auth::id(),
+            ]);
+
+            // Cargar relaciones necesarias para el email
+            $resolucion->load(['estado', 'tipoResolucion']);
+
+            // Asociar personas relacionadas y enviar notificaciones
+            $correosEnviados = 0;
+            $erroresCorreo = 0;
+            $personasSinCorreo = 0;
+
+            if (isset($paso1['personas_relacionadas']) && is_array($paso1['personas_relacionadas'])) {
+                foreach ($paso1['personas_relacionadas'] as $personaData) {
+                    // Asociar persona a la resolución
+                    $resolucion->personas()->attach($personaData['id_persona'], [
+                        'tipo_relacion' => 'involucrado',
+                        'i_active' => true,
+                    ]);
+                    
+                    // Enviar correo si está marcada la opción
+                    if ($request->boolean('enviar_correo')) {
+                        $persona = Persona::find($personaData['id_persona']);
+                        
+                        if ($persona) {
+                            if ($persona->correo) {
+                                try {
+                                    Mail::to($persona->correo)->send(new ResolucionNotificacion($resolucion, $persona));
+                                    $correosEnviados++;
+                                } catch (\Exception $e) {
+                                    $erroresCorreo++;
+                                    \Log::error('Error al enviar correo a ' . $persona->correo . ': ' . $e->getMessage());
+                                }
+                            } else {
+                                $personasSinCorreo++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+
+            // Limpiar sesión
+            session()->forget(['resolucion_paso1', 'resolucion_paso2']);
+
+            // Construir mensaje de éxito
+            $mensaje = '✅ Resolución creada exitosamente';
+            
+            if ($request->boolean('enviar_correo')) {
+                $detalles = [];
+                if ($correosEnviados > 0) {
+                    $detalles[] = "{$correosEnviados} correo(s) enviado(s)";
+                }
+                if ($erroresCorreo > 0) {
+                    $detalles[] = "{$erroresCorreo} error(es) al enviar";
+                }
+                if ($personasSinCorreo > 0) {
+                    $detalles[] = "{$personasSinCorreo} persona(s) sin correo registrado";
+                }
+                
+                if (count($detalles) > 0) {
+                    $mensaje .= '. Notificaciones: ' . implode(', ', $detalles);
+                }
+            }
+
+            return redirect()
+                ->route('colaborador.resoluciones.show', $resolucion)
+                ->with('success', $mensaje);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            // Eliminar archivo temporal si existe
+            if (isset($paso2['archivo_resolucion'])) {
+                Storage::disk('public')->delete($paso2['archivo_resolucion']);
+            }
+
+            return redirect()
+                ->back()
+                ->with('error', '❌ Error al crear resolución: ' . $e->getMessage());
+        }
     }
 }

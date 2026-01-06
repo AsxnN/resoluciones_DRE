@@ -48,6 +48,11 @@ class Persona extends Model
         return $this->hasOne(User::class, 'id_persona', 'id_persona');
     }
 
+    public function usuario(): HasOne
+    {
+        return $this->user(); // Alias en español
+    }
+
     public function colaborador(): HasOne
     {
         return $this->hasOne(Colaborador::class, 'id_persona', 'id_persona');

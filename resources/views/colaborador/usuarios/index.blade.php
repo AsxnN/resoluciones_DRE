@@ -11,7 +11,7 @@
             <h1 class="text-3xl font-bold text-gray-900">👥 Gestión de Usuarios</h1>
             <p class="text-gray-600 mt-1">Administración de usuarios del sistema</p>
         </div>
-        @can('crear_usuarios')
+        @can('usuarios.crear')
         <a href="{{ route('colaborador.usuarios.create') }}" 
            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +156,7 @@
                     <td class="px-6 py-4">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 h-10 w-10">
-                                @if($usuario->persona && $usuario->persona->foto_persona)
+                                @if($usuario->persona && ($usuario->persona->foto_persona ?? false))
                                     <img class="h-10 w-10 rounded-full object-cover" 
                                          src="{{ asset('storage/' . $usuario->persona->foto_persona) }}" 
                                          alt="{{ $usuario->name }}">
@@ -169,18 +169,15 @@
                             <div class="ml-4">
                                 <div class="text-sm font-medium text-gray-900">{{ $usuario->name }}</div>
                                 <div class="text-sm text-gray-500">{{ $usuario->email }}</div>
-                                @if($usuario->dni)
-                                <div class="text-xs text-gray-400 font-mono">DNI: {{ $usuario->dni }}</div>
-                                @endif
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         @if($usuario->persona)
                         <div class="text-sm text-gray-900">
-                            {{ $usuario->persona->nombres_persona }} {{ $usuario->persona->apellido_paterno_persona }}
+                            {{ $usuario->persona->nombres }} {{ $usuario->persona->apellido_paterno }}
                         </div>
-                        <div class="text-xs text-gray-500">{{ $usuario->persona->cargo_persona ?? 'Sin cargo' }}</div>
+                        <div class="text-xs text-gray-500">{{ $usuario->persona->tipo_documento }}: {{ $usuario->persona->num_documento }}</div>
                         @else
                         <span class="text-xs text-gray-400">Sin asociar</span>
                         @endif
@@ -196,19 +193,19 @@
                         @endforeach
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        @if($usuario->last_login_at)
+                        @if($usuario->ultima_sesion)
                             <div class="flex items-center">
                                 <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span>{{ $usuario->last_login_at->diffForHumans() }}</span>
+                                <span>{{ $usuario->ultima_sesion->diffForHumans() }}</span>
                             </div>
                         @else
                             <span class="text-xs text-gray-400">Nunca</span>
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        @if($usuario->activo)
+                        @if($usuario->i_active)
                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                 ✓ Activo
                             </span>
@@ -220,17 +217,19 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end gap-2">
+                            @can('usuarios.ver')
                             <a href="{{ route('colaborador.usuarios.show', $usuario) }}" 
                                class="text-blue-600 hover:text-blue-900" title="Ver">
                                 👁️
                             </a>
-                            @can('editar_usuarios')
+                            @endcan
+                            @can('usuarios.editar')
                             <a href="{{ route('colaborador.usuarios.edit', $usuario) }}" 
                                class="text-yellow-600 hover:text-yellow-900" title="Editar">
                                 ✏️
                             </a>
                             @endcan
-                            @can('eliminar_usuarios')
+                            @can('usuarios.eliminar')
                             @if($usuario->id !== auth()->id())
                             <form method="POST" 
                                   action="{{ route('colaborador.usuarios.destroy', $usuario) }}" 

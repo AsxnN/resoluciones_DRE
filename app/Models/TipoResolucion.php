@@ -1,5 +1,4 @@
 <?php
-// filepath: app/Models/TipoResolucion.php
 
 namespace App\Models;
 
@@ -28,31 +27,25 @@ class TipoResolucion extends Model
         'fecha_actualizacion' => 'datetime',
     ];
 
-    // ========================================
-    // RELACIONES
-    // ========================================
-
+    // Relaciones
     public function resoluciones()
     {
-        return $this->hasMany(Resolucion::class, 'id_tipo_resolucion');
+        return $this->hasMany(Resolucion::class, 'id_tipo_resolucion', 'id_tipo_resolucion');
     }
 
-    public function usuarioCreador()
+    public function usuario()
     {
-        return $this->belongsTo(User::class, 'id_usuario');
+        return $this->belongsTo(User::class, 'id_usuario', 'id');
     }
 
-    // ========================================
-    // SCOPES
-    // ========================================
-
+    // Scopes
     public function scopeActivos($query)
     {
         return $query->where('i_active', true);
     }
 
-    public function scopePorNombre($query, $nombre)
+    public function scopeBuscar($query, $search)
     {
-        return $query->where('nombre_tipo_resolucion', 'like', "%{$nombre}%");
+        return $query->where('nombre_tipo_resolucion', 'like', '%' . $search . '%');
     }
 }

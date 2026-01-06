@@ -18,7 +18,7 @@ class TipoPersonalController extends Controller implements HasMiddleware
             new Middleware('permission:tipos_personal.ver', only: ['index', 'show']),
             new Middleware('permission:tipos_personal.crear', only: ['create', 'store']),
             new Middleware('permission:tipos_personal.editar', only: ['edit', 'update']),
-            new Middleware('permission:tipos_personal.eliminar', only: ['destroy', 'toggleEstado']),
+            new Middleware('permission:tipos_personal.eliminar', only: ['destroy']),
         ];
     }
 
@@ -48,15 +48,19 @@ class TipoPersonalController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'nombre_tipo_personal' => 'required|string|max:100|unique:tipo_personal,nombre_tipo_personal',
-            'descripcion' => 'nullable|string|max:255',
         ]);
 
-        $validated['id_usuario'] = Auth::id();
+        $validated['i_active'] = 1;
 
         TipoPersonal::create($validated);
 
         return redirect()->route('colaborador.tipos-personal.index')
             ->with('success', '✅ Tipo de Personal creado exitosamente');
+    }
+
+    public function show(TipoPersonal $tipoPersonal)
+    {
+        return view('colaborador.tipos-personal.show', compact('tipoPersonal'));
     }
 
     public function edit(TipoPersonal $tipoPersonal)
@@ -68,9 +72,10 @@ class TipoPersonalController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'nombre_tipo_personal' => 'required|string|max:100|unique:tipo_personal,nombre_tipo_personal,' . $tipoPersonal->id_tipo_personal . ',id_tipo_personal',
-            'descripcion' => 'nullable|string|max:255',
-            'i_active' => 'required|boolean',
+            'i_active' => 'boolean',
         ]);
+
+        $validated['i_active'] = $request->has('i_active') ? 1 : 0;
 
         $tipoPersonal->update($validated);
 
@@ -89,14 +94,5 @@ class TipoPersonalController extends Controller implements HasMiddleware
 
         return redirect()->route('colaborador.tipos-personal.index')
             ->with('success', '✅ Tipo de Personal eliminado exitosamente');
-    }
-
-    public function toggleEstado(TipoPersonal $tipoPersonal)
-    {
-        $tipoPersonal->i_active = !$tipoPersonal->i_active;
-        $tipoPersonal->save();
-
-        return redirect()->back()
-            ->with('success', '✅ Tipo de Personal ' . ($tipoPersonal->i_active ? 'activado' : 'desactivado'));
     }
 }
