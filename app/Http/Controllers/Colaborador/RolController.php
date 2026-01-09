@@ -4,11 +4,11 @@
 namespace App\Http\Controllers\Colaborador;
 
 use App\Http\Controllers\Controller;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use App\Models\Rol;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
 
 class RolController extends Controller implements HasMiddleware
 {
@@ -24,96 +24,84 @@ class RolController extends Controller implements HasMiddleware
 
     public function index(Request $request)
     {
-        $query = Role::withCount(['users', 'permissions'])
-            ->where('guard_name', 'colaborador'); // Solo roles del guard colaborador
+        $query = Rol::withCount('colaboradores');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%');
+            $query->where('nombre_rol', 'like', '%' . $request->search . '%');
         }
 
-        $roles = $query->orderBy('name')->paginate(20)->withQueryString();
+        $roles = $query->where('i_active', true)
+            ->orderBy('nombre_rol')
+            ->paginate(20)
+            ->withQueryString();
 
         return view('colaborador.roles.index', compact('roles'));
     }
 
     public function create()
     {
-        $permissions = Permission::where('guard_name', 'colaborador')->get();
-        
-        return view('colaborador.roles.create', compact('permissions'));
+        return view('colaborador.roles.create');
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:100|unique:roles,name',
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'exists:permissions,id',
+            'nombre_rol' => 'required|string|max:100|unique:roles_organizacionales,nombre_rol',
+            'descripcion' => 'nullable|string|max:255',
         ]);
 
-        // Guard fijo en colaborador
-        $role = Role::create([
-            'name' => $validated['name'],
-            'guard_name' => 'colaborador',
+        Rol::create([
+            'nombre_rol' => $validated['nombre_rol'],
+            'descripcion' => $validated['descripcion'] ?? null,
+            'i_active' => true,
+            'id_usuario' => Auth::id(),
         ]);
-
-        if (isset($validated['permissions'])) {
-            $permissions = Permission::whereIn('id', $validated['permissions'])->pluck('name');
-            $role->syncPermissions($permissions);
-        }
 
         return redirect()->route('colaborador.roles.index')
-            ->with('success', '✅ Rol creado exitosamente');
+            ->with('success', '✅ Rol organizacional creado exitosamente');
     }
 
-    public function show(Role $role)
+    public function show(Rol $role)
     {
-        $role->load(['permissions', 'users']);
+        $role->load('colaboradores');
         
         return view('colaborador.roles.show', compact('role'));
     }
 
-    public function edit(Role $role)
+    public function edit(Rol $role)
     {
-        $permissions = Permission::where('guard_name', 'colaborador')->get();
-        
-        return view('colaborador.roles.edit', compact('role', 'permissions'));
+        return view('colaborador.roles.edit', compact('role'));
     }
 
-    public function update(Request $request, Role $role)
+    public function update(Request $request, Rol $role)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:100|unique:roles,name,' . $role->id,
-            'permissions' => 'nullable|array',
-            'permissions.*' => 'exists:permissions,id',
+            'nombre_rol' => 'required|string|max:100|unique:roles_organizacionales,nombre_rol,' . $role->id_rol . ',id_rol',
+            'descripcion' => 'nullable|string|max:255',
+            'i_active' => 'nullable|boolean',
         ]);
 
         $role->update([
-            'name' => $validated['name'],
+            'nombre_rol' => $validated['nombre_rol'],
+            'descripcion' => $validated['descripcion'] ?? null,
+            'i_active' => $validated['i_active'] ?? true,
         ]);
 
-        if (isset($validated['permissions'])) {
-            $permissions = Permission::whereIn('id', $validated['permissions'])->pluck('name');
-            $role->syncPermissions($permissions);
-        } else {
-            $role->syncPermissions([]);
-        }
-
         return redirect()->route('colaborador.roles.index')
-            ->with('success', '✅ Rol actualizado exitosamente');
+            ->with('success', '✅ Rol organizacional actualizado exitosamente');
     }
 
-    public function destroy(Role $role)
+    public function destroy(Rol $role)
     {
-        // Verificar si tiene usuarios asignados
-        if ($role->users()->count() > 0) {
+        // Verificar si tiene colaboradores asignados
+        if ($role->colaboradores()->count() > 0) {
             return redirect()->back()
-                ->with('error', '❌ No se puede eliminar un rol con usuarios asignados');
+                ->with('error', '❌ No se puede eliminar un rol con colaboradores asignados');
         }
 
-        $role->delete();
+        $role->update(['i_active' => false]);
 
         return redirect()->route('colaborador.roles.index')
-            ->with('success', '✅ Rol eliminado exitosamente');
+            ->with('success', '✅ Rol desactivado exitosamente');
     }
 }

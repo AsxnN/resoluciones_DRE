@@ -1,15 +1,15 @@
 {{-- filepath: resources/views/colaborador/roles/index.blade.php --}}
 @extends('layouts.colaborador')
 
-@section('title', 'Gestión de Roles')
+@section('title', 'Gestión de Roles Organizacionales')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header -->
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">🛡️ Gestión de Roles</h1>
-            <p class="text-gray-600 mt-1">Administración de roles y permisos del sistema</p>
+            <h1 class="text-3xl font-bold text-gray-900">🏢 Roles Organizacionales</h1>
+            <p class="text-gray-600 mt-1">Gestión de roles para la estructura organizacional</p>
         </div>
         @can('roles.crear')
         <a href="{{ route('colaborador.roles.create') }}" 
@@ -21,6 +21,19 @@
         </a>
         @endcan
     </div>
+
+    <!-- Mensajes -->
+    @if(session('success'))
+    <div class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+        <p class="text-green-700">{{ session('success') }}</p>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+        <p class="text-red-700">{{ session('error') }}</p>
+    </div>
+    @endif
 
     <!-- Filtros -->
     <div class="bg-white rounded-lg shadow mb-6 p-6">
@@ -54,10 +67,13 @@
                         Rol
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Usuarios
+                        Descripción
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Permisos
+                        Colaboradores
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Estado
                     </th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Acciones
@@ -71,47 +87,58 @@
                         <div class="flex items-center">
                             <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center bg-blue-100 rounded-lg">
                                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">{{ $rol->name }}</div>
-                                <div class="text-xs text-gray-500">Creado: {{ $rol->created_at->format('d/m/Y') }}</div>
+                                <div class="text-sm font-medium text-gray-900">{{ $rol->nombre_rol }}</div>
+                                <div class="text-xs text-gray-500">ID: {{ $rol->id_rol }}</div>
                             </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-700">
+                            {{ Str::limit($rol->descripcion ?? 'Sin descripción', 50) }}
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full font-medium">
-                            {{ $rol->users_count ?? 0 }} usuarios
+                            {{ $rol->colaboradores_count ?? 0 }} colaboradores
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded-full font-medium">
-                            {{ $rol->permissions_count ?? 0 }} permisos
-                        </span>
+                        @if($rol->i_active)
+                            <span class="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full font-medium">
+                                ✓ Activo
+                            </span>
+                        @else
+                            <span class="px-3 py-1 text-xs bg-red-100 text-red-800 rounded-full font-medium">
+                                ✗ Inactivo
+                            </span>
+                        @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end gap-2">
                             @can('roles.ver')
-                            <a href="{{ route('colaborador.roles.show', $rol) }}" 
+                            <a href="{{ route('colaborador.roles.show', $rol->id_rol) }}" 
                                class="text-blue-600 hover:text-blue-900" title="Ver">
                                 👁️
                             </a>
                             @endcan
                             @can('roles.editar')
-                            <a href="{{ route('colaborador.roles.edit', $rol) }}" 
+                            <a href="{{ route('colaborador.roles.edit', $rol->id_rol) }}" 
                                class="text-yellow-600 hover:text-yellow-900" title="Editar">
                                 ✏️
                             </a>
                             @endcan
                             @can('roles.eliminar')
                             <form method="POST" 
-                                  action="{{ route('colaborador.roles.destroy', $rol) }}" 
-                                  onsubmit="return confirm('¿Está seguro de eliminar este rol?')"
+                                  action="{{ route('colaborador.roles.destroy', $rol->id_rol) }}" 
+                                  onsubmit="return confirm('¿Está seguro de desactivar este rol?')"
                                   class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-900" title="Eliminar">
+                                <button type="submit" class="text-red-600 hover:text-red-900" title="Desactivar">
                                     🗑️
                                 </button>
                             </form>
@@ -121,11 +148,11 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" class="px-6 py-12 text-center">
+                    <td colspan="5" class="px-6 py-12 text-center">
                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                         </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay roles</h3>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No hay roles organizacionales</h3>
                         <p class="mt-1 text-sm text-gray-500">Comienza creando un nuevo rol</p>
                     </td>
                 </tr>

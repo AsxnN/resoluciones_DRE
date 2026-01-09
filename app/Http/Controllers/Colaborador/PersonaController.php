@@ -17,9 +17,6 @@ use Illuminate\Routing\Controllers\Middleware;
 
 class PersonaController extends Controller implements HasMiddleware
 {
-    /**
-     * Definir middleware usando Laravel 11
-     */
     public static function middleware(): array
     {
         return [
@@ -31,18 +28,22 @@ class PersonaController extends Controller implements HasMiddleware
     }
 
     /**
-     * Listar todas las personas
+     * Listar todas las personas (colaboradores y clientes)
      */
     public function index(Request $request)
     {
-        $query = Persona::with(['colaborador.direccion', 'colaborador.dependencia', 'colaborador.area', 'colaborador.cargo'])
-            ->where('tipo_persona', 'colaborador')
+        $query = Persona::with(['colaborador.direccion', 'colaborador.dependencia', 'colaborador.area', 'colaborador.cargo', 'cliente'])
             ->where('i_active', true)
             ->orderBy('apellido_paterno')
             ->orderBy('apellido_materno')
             ->orderBy('nombres');
 
-        // Filtros
+        // ✅ FILTRO POR TIPO DE PERSONA (colaborador/cliente)
+        if ($request->filled('tipo_persona')) {
+            $query->where('tipo_persona', $request->tipo_persona);
+        }
+
+        // Filtros de búsqueda
         if ($request->filled('buscar')) {
             $buscar = $request->buscar;
             $query->where(function($q) use ($buscar) {
@@ -53,6 +54,7 @@ class PersonaController extends Controller implements HasMiddleware
             });
         }
 
+        // Filtros solo para colaboradores
         if ($request->filled('direccion_id')) {
             $query->whereHas('colaborador', function($q) use ($request) {
                 $q->where('id_direcciones', $request->direccion_id);
@@ -77,27 +79,34 @@ class PersonaController extends Controller implements HasMiddleware
             });
         }
 
-        // ✅ Agregar filtro por área
         if ($request->filled('area_id')) {
             $query->whereHas('colaborador', function($q) use ($request) {
                 $q->where('id_area', $request->area_id);
             });
         }
 
-        $personas = $query->paginate(20);
+        $personas = $query->paginate(20)->withQueryString();
 
-        // Para los filtros - CORREGIR nombres de columnas
+        // Estadísticas
+        $stats = [
+            'total' => Persona::where('i_active', true)->count(),
+            'colaboradores' => Persona::where('tipo_persona', 'colaborador')->where('i_active', true)->count(),
+            'clientes' => Persona::where('tipo_persona', 'cliente')->where('i_active', true)->count(),
+        ];
+
+        // Para los filtros
         $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get();
         $dependencias = Dependencia::where('i_active', true)->orderBy('nombre_dependencia')->get();
-        $areas = Area::where('i_active', true)->orderBy('nombre_area')->get(); // ✅ AGREGAR ESTA LÍNEA
+        $areas = Area::where('i_active', true)->orderBy('nombre_area')->get();
         $cargos = Cargo::where('i_active', true)->orderBy('nombre_cargo')->get();
         $tiposPersonal = TipoPersonal::where('i_active', true)->orderBy('nombre_tipo_personal')->get();
 
         return view('colaborador.personas.index', compact(
             'personas',
+            'stats',
             'direcciones',
             'dependencias',
-            'areas',        // ✅ AGREGAR ESTA LÍNEA
+            'areas',
             'cargos',
             'tiposPersonal'
         ));
@@ -108,7 +117,7 @@ class PersonaController extends Controller implements HasMiddleware
      */
     public function create()
     {
-        $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get(); // ✅ CORREGIR
+        $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get();
         $dependencias = Dependencia::where('i_active', true)->orderBy('nombre_dependencia')->get();
         $areas = Area::where('i_active', true)->orderBy('nombre_area')->get();
         $cargos = Cargo::where('i_active', true)->orderBy('nombre_cargo')->get();
@@ -131,24 +140,25 @@ class PersonaController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'dni' => 'required|string|size:8|unique:personas,dni',
+            'tipo_persona' => 'required|in:colaborador,cliente',
+            'tipo_documento' => 'required|string|max:20',
+            'num_documento' => 'required|string|max:20|unique:persona,num_documento',
             'nombres' => 'required|string|max:100',
-            'apellido_paterno' => 'required|string|max:50',
-            'apellido_materno' => 'required|string|max:50',
-            'fecha_nacimiento' => 'nullable|date',
-            'sexo' => 'nullable|in:M,F',
+            'apellido_paterno' => 'required|string|max:100',
+            'apellido_materno' => 'nullable|string|max:100',
+            'correo' => 'nullable|email|max:100|unique:persona,correo',
             'telefono' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:100',
-            'direccion_residencia' => 'nullable|string|max:255',
-            'id_direccion' => 'required|exists:direcciones,id_direccion',
-            'id_dependencia' => 'required|exists:dependencias,id_dependencia',
-            'id_area' => 'nullable|exists:areas,id_area',
-            'id_cargo' => 'required|exists:cargos,id_cargo',
-            'id_especialidad' => 'nullable|exists:especialidades,id_especialidad',
-            'id_tipo_personal' => 'required|exists:tipos_personal,id_tipo_personal',
+            'whatsapp' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string',
+        ], [
+            'tipo_persona.required' => 'Debe seleccionar el tipo de persona',
+            'num_documento.required' => 'El número de documento es obligatorio',
+            'num_documento.unique' => 'Este documento ya está registrado',
+            'correo.unique' => 'Este correo ya está registrado',
         ]);
 
         $validated['i_active'] = true;
+        $validated['datos_completos'] = false;
 
         DB::beginTransaction();
         try {
@@ -158,13 +168,13 @@ class PersonaController extends Controller implements HasMiddleware
 
             return redirect()
                 ->route('colaborador.personas.index')
-                ->with('success', 'Persona registrada correctamente');
+                ->with('success', '✅ Persona registrada correctamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
             return back()
                 ->withInput()
-                ->with('error', 'Error al registrar persona: ' . $e->getMessage());
+                ->with('error', '❌ Error al registrar persona: ' . $e->getMessage());
         }
     }
 
@@ -173,14 +183,7 @@ class PersonaController extends Controller implements HasMiddleware
      */
     public function show(Persona $persona)
     {
-        $persona->load([
-            'direccion',
-            'dependencia',
-            'area',
-            'cargo',
-            'especialidad',
-            'tipoPersonal'
-        ]);
+        $persona->load(['colaborador.direccion', 'colaborador.dependencia', 'colaborador.area', 'colaborador.cargo', 'cliente']);
 
         return view('colaborador.personas.show', compact('persona'));
     }
@@ -190,7 +193,7 @@ class PersonaController extends Controller implements HasMiddleware
      */
     public function edit(Persona $persona)
     {
-        $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get(); // ✅ CORREGIR
+        $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get();
         $dependencias = Dependencia::where('i_active', true)->orderBy('nombre_dependencia')->get();
         $areas = Area::where('i_active', true)->orderBy('nombre_area')->get();
         $cargos = Cargo::where('i_active', true)->orderBy('nombre_cargo')->get();
@@ -214,21 +217,16 @@ class PersonaController extends Controller implements HasMiddleware
     public function update(Request $request, Persona $persona)
     {
         $validated = $request->validate([
-            'dni' => 'required|string|size:8|unique:personas,dni,' . $persona->id_persona . ',id_persona',
+            'tipo_persona' => 'required|in:colaborador,cliente',
+            'tipo_documento' => 'required|string|max:20',
+            'num_documento' => 'required|string|max:20|unique:persona,num_documento,' . $persona->id_persona . ',id_persona',
             'nombres' => 'required|string|max:100',
-            'apellido_paterno' => 'required|string|max:50',
-            'apellido_materno' => 'required|string|max:50',
-            'fecha_nacimiento' => 'nullable|date',
-            'sexo' => 'nullable|in:M,F',
+            'apellido_paterno' => 'required|string|max:100',
+            'apellido_materno' => 'nullable|string|max:100',
+            'correo' => 'nullable|email|max:100|unique:persona,correo,' . $persona->id_persona . ',id_persona',
             'telefono' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:100',
-            'direccion_residencia' => 'nullable|string|max:255',
-            'id_direccion' => 'required|exists:direcciones,id_direccion',
-            'id_dependencia' => 'required|exists:dependencias,id_dependencia',
-            'id_area' => 'nullable|exists:areas,id_area',
-            'id_cargo' => 'required|exists:cargos,id_cargo',
-            'id_especialidad' => 'nullable|exists:especialidades,id_especialidad',
-            'id_tipo_personal' => 'required|exists:tipos_personal,id_tipo_personal',
+            'whatsapp' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -239,13 +237,13 @@ class PersonaController extends Controller implements HasMiddleware
 
             return redirect()
                 ->route('colaborador.personas.index')
-                ->with('success', 'Persona actualizada correctamente');
+                ->with('success', '✅ Persona actualizada correctamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
             return back()
                 ->withInput()
-                ->with('error', 'Error al actualizar persona: ' . $e->getMessage());
+                ->with('error', '❌ Error al actualizar persona: ' . $e->getMessage());
         }
     }
 
@@ -260,11 +258,11 @@ class PersonaController extends Controller implements HasMiddleware
 
             DB::commit();
 
-            return back()->with('success', 'Persona eliminada correctamente');
+            return back()->with('success', '✅ Persona eliminada correctamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al eliminar persona: ' . $e->getMessage());
+            return back()->with('error', '❌ Error al eliminar persona: ' . $e->getMessage());
         }
     }
 
@@ -280,11 +278,11 @@ class PersonaController extends Controller implements HasMiddleware
             DB::commit();
 
             $estado = $persona->i_active ? 'activada' : 'desactivada';
-            return back()->with('success', "Persona {$estado} correctamente");
+            return back()->with('success', "✅ Persona {$estado} correctamente");
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Error al cambiar estado: ' . $e->getMessage());
+            return back()->with('error', '❌ Error al cambiar estado: ' . $e->getMessage());
         }
     }
 
@@ -295,40 +293,39 @@ class PersonaController extends Controller implements HasMiddleware
     {
         $dni = $request->get('dni');
         
-        $persona = Persona::where('dni', $dni)
+        $persona = Persona::where('num_documento', $dni)
             ->where('i_active', true)
-            ->with([
-                'direccion',
-                'dependencia',
-                'area',
-                'cargo',
-                'especialidad',
-                'tipoPersonal'
-            ])
+            ->with(['colaborador.direccion', 'colaborador.dependencia', 'colaborador.area', 'colaborador.cargo', 'cliente'])
             ->first();
 
         if ($persona) {
             return response()->json([
                 'found' => true,
                 'persona' => $persona,
-                'nombre_completo' => $persona->nombre_completo,
+                'nombre_completo' => $persona->nombres . ' ' . $persona->apellido_paterno . ' ' . ($persona->apellido_materno ?? ''),
             ]);
         }
 
         return response()->json(['found' => false]);
     }
 
+    /**
+     * Exportar personas a CSV
+     */
     public function export(Request $request)
     {
         try {
-            $query = Persona::with(['colaborador.direccion', 'colaborador.dependencia', 'colaborador.area', 'colaborador.cargo'])
-                ->where('tipo_persona', 'colaborador')
+            $query = Persona::with(['colaborador.direccion', 'colaborador.dependencia', 'colaborador.area', 'colaborador.cargo', 'cliente'])
                 ->where('i_active', true)
                 ->orderBy('apellido_paterno')
                 ->orderBy('apellido_materno')
                 ->orderBy('nombres');
 
-            // Aplicar los mismos filtros que en index()
+            // Aplicar filtros
+            if ($request->filled('tipo_persona')) {
+                $query->where('tipo_persona', $request->tipo_persona);
+            }
+
             if ($request->filled('buscar')) {
                 $buscar = $request->buscar;
                 $query->where(function($q) use ($buscar) {
@@ -336,36 +333,6 @@ class PersonaController extends Controller implements HasMiddleware
                       ->orWhere('apellido_paterno', 'like', "%{$buscar}%")
                       ->orWhere('apellido_materno', 'like', "%{$buscar}%")
                       ->orWhere('num_documento', 'like', "%{$buscar}%");
-                });
-            }
-
-            if ($request->filled('direccion_id')) {
-                $query->whereHas('colaborador', function($q) use ($request) {
-                    $q->where('id_direcciones', $request->direccion_id);
-                });
-            }
-
-            if ($request->filled('dependencia_id')) {
-                $query->whereHas('colaborador', function($q) use ($request) {
-                    $q->where('id_dependencia', $request->dependencia_id);
-                });
-            }
-
-            if ($request->filled('cargo_id')) {
-                $query->whereHas('colaborador', function($q) use ($request) {
-                    $q->where('id_cargos', $request->cargo_id);
-                });
-            }
-
-            if ($request->filled('area_id')) {
-                $query->whereHas('colaborador', function($q) use ($request) {
-                    $q->where('id_area', $request->area_id);
-                });
-            }
-
-            if ($request->filled('tipo_personal_id')) {
-                $query->whereHas('colaborador', function($q) use ($request) {
-                    $q->where('id_tipo_personal', $request->tipo_personal_id);
                 });
             }
 
@@ -389,6 +356,7 @@ class PersonaController extends Controller implements HasMiddleware
                 
                 // Encabezados
                 fputcsv($file, [
+                    'Tipo Persona',
                     'Tipo Documento',
                     'N° Documento',
                     'Apellido Paterno',
@@ -406,6 +374,7 @@ class PersonaController extends Controller implements HasMiddleware
                 // Datos
                 foreach ($personas as $persona) {
                     fputcsv($file, [
+                        ucfirst($persona->tipo_persona),
                         $persona->tipo_documento ?? '',
                         $persona->num_documento ?? '',
                         $persona->apellido_paterno ?? '',
@@ -414,7 +383,9 @@ class PersonaController extends Controller implements HasMiddleware
                         $persona->correo ?? '',
                         $persona->telefono ?? '',
                         $persona->whatsapp ?? '',
-                        $persona->colaborador->direccion->nombre_direcciones ?? '',
+                        $persona->tipo_persona == 'colaborador' && $persona->colaborador 
+                            ? ($persona->colaborador->direccion->nombre_direcciones ?? '') 
+                            : ($persona->direccion ?? ''),
                         $persona->colaborador->dependencia->nombre_dependencia ?? '',
                         $persona->colaborador->area->nombre_area ?? '',
                         $persona->colaborador->cargo->nombre_cargo ?? '',
@@ -427,7 +398,7 @@ class PersonaController extends Controller implements HasMiddleware
             return response()->stream($callback, 200, $headers);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al exportar: ' . $e->getMessage());
+            return back()->with('error', '❌ Error al exportar: ' . $e->getMessage());
         }
     }
 }

@@ -46,8 +46,8 @@ class DependenciaController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'cod_dependencia' => 'required|string|max:20|unique:dependencia,cod_dependencia',
             'nombre_dependencia' => 'required|string|max:100|unique:dependencia,nombre_dependencia',
-            'descripcion' => 'nullable|string|max:255',
         ]);
 
         $validated['id_usuario'] = Auth::id();
@@ -66,8 +66,8 @@ class DependenciaController extends Controller implements HasMiddleware
     public function update(Request $request, Dependencia $dependencia)
     {
         $validated = $request->validate([
-            'nombre_dependencia' => 'required|string|max:100|unique:dependencia,nombre_dependencia,' . $dependencia->id_dependencia . ',id_dependencia',
-            'descripcion' => 'nullable|string|max:255',
+            'cod_dependencia' => 'required|string|max:20|unique:dependencia,cod_dependencia,' . $dependencia->id_dependencias . ',id_dependencias',
+            'nombre_dependencia' => 'required|string|max:100|unique:dependencia,nombre_dependencia,' . $dependencia->id_dependencias . ',id_dependencias',
             'i_active' => 'required|boolean',
         ]);
 

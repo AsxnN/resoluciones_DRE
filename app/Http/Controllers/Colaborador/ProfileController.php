@@ -4,41 +4,103 @@ namespace App\Http\Controllers\Colaborador;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
 {
     /**
-     * Mostrar formulario de edición de perfil
+     * Mostrar el perfil del usuario
      */
-    public function edit()
+    public function show()
     {
-        return view('colaborador.profile.edit', [
-            'user' => auth()->user(),
-        ]);
+        $user = Auth::user();
+        $persona = $user->persona;
+        
+        return view('colaborador.profile.show', compact('user', 'persona'));
     }
 
     /**
-     * Actualizar información del perfil
+     * Mostrar formulario de edición del perfil
+     */
+    public function edit()
+    {
+        $user = Auth::user();
+        $persona = $user->persona;
+        
+        return view('colaborador.profile.edit', compact('user', 'persona'));
+    }
+
+    /**
+     * Actualizar datos del perfil
+     * Sincroniza entre users y persona
      */
     public function update(Request $request)
     {
-        $user = auth()->user();
+        $user = Auth::user();
+        $persona = $user->persona;
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            // Datos de Usuario (users)
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            
+            // Datos de Persona (persona)
+            'tipo_documento' => 'required|string|max:20',
+            'num_documento' => 'required|string|max:20|unique:persona,num_documento,' . $persona->id_persona . ',id_persona',
+            'nombres' => 'required|string|max:100',
+            'apellido_paterno' => 'required|string|max:100',
+            'apellido_materno' => 'nullable|string|max:100',
+            'telefono' => 'nullable|string|max:20',
+            'whatsapp' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string',
+        ], [
+            'num_documento.required' => 'El número de documento es obligatorio',
+            'num_documento.unique' => 'Este documento ya está registrado',
         ]);
 
-        $user->update($validated);
+        DB::beginTransaction();
+        try {
+            // Construir el nombre completo
+            $nombreCompleto = trim($validated['nombres'] . ' ' . $validated['apellido_paterno'] . ' ' . ($validated['apellido_materno'] ?? ''));
 
-        return back()->with('success', 'Perfil actualizado correctamente.');
-    }
+            // Actualizar User
+            $user->update([
+                'name' => $nombreCompleto,
+                'email' => $validated['email'],
+            ]);
 
-    public function show()
-    {
-        return view('colaborador.profile.show');
+            // Actualizar Persona
+            $persona->update([
+                'tipo_documento' => $validated['tipo_documento'],
+                'num_documento' => $validated['num_documento'],
+                'nombres' => $validated['nombres'],
+                'apellido_paterno' => $validated['apellido_paterno'],
+                'apellido_materno' => $validated['apellido_materno'],
+                'correo' => $validated['email'], // Sincronizar email
+                'telefono' => $validated['telefono'],
+                'whatsapp' => $validated['whatsapp'],
+                'direccion' => $validated['direccion'],
+            ]);
+
+            // Verificar si los datos están completos
+            if ($this->datosCompletos($persona)) {
+                $persona->update(['datos_completos' => true]);
+            }
+
+            DB::commit();
+
+            return redirect()
+                ->route('colaborador.profile.show')
+                ->with('success', '✅ Perfil actualizado correctamente');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withInput()
+                ->with('error', '❌ Error al actualizar perfil: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -47,35 +109,31 @@ class ProfileController extends Controller
     public function updatePassword(Request $request)
     {
         $validated = $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
+            'current_password' => 'required',
+            'password' => ['required', 'confirmed', Password::defaults()],
         ]);
 
-        $request->user()->update([
-            'password' => Hash::make($validated['password']),
+        if (!Hash::check($validated['current_password'], Auth::user()->password)) {
+            return back()->with('error', '❌ La contraseña actual es incorrecta');
+        }
+
+        Auth::user()->update([
+            'password' => Hash::make($validated['password'])
         ]);
 
-        return back()->with('success', 'Contraseña actualizada correctamente.');
+        return back()->with('success', '✅ Contraseña actualizada correctamente');
     }
 
     /**
-     * Eliminar cuenta (opcional)
+     * Verificar si los datos de la persona están completos
      */
-    public function destroy(Request $request)
+    private function datosCompletos($persona): bool
     {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-
-        auth()->logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/');
+        return !empty($persona->tipo_documento) &&
+               !empty($persona->num_documento) &&
+               !empty($persona->nombres) &&
+               !empty($persona->apellido_paterno) &&
+               !empty($persona->correo) &&
+               !empty($persona->telefono);
     }
 }

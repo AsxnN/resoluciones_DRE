@@ -28,9 +28,28 @@
 
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Código de Dependencia <span class="text-red-500">*</span>
+                </label>
+                <input type="text" 
+                       name="cod_dependencia" 
+                       value="{{ old('cod_dependencia') }}" 
+                       placeholder="Ej: DEP-001"
+                       required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('cod_dependencia') border-red-500 @enderror">
+                @error('cod_dependencia')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="mt-1 text-xs text-gray-500">Código único de la dependencia</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
                     Nombre de la Dependencia <span class="text-red-500">*</span>
                 </label>
-                <input type="text" name="nombre_dependencia" value="{{ old('nombre_dependencia') }}" required
+                <input type="text" 
+                       name="nombre_dependencia" 
+                       value="{{ old('nombre_dependencia') }}" 
+                       required
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('nombre_dependencia') border-red-500 @enderror">
                 @error('nombre_dependencia')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

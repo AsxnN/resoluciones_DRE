@@ -96,14 +96,14 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end gap-2">
                             @can('unidades.editar')
-                            <a href="{{ route('colaborador.unidades.edit', $unidad) }}" 
+                                <a href="{{ route('colaborador.unidades.edit', $unidad) }}"
                                class="text-yellow-600 hover:text-yellow-900" title="Editar">
                                 ✏️
                             </a>
                             @endcan
                             @can('unidades.eliminar')
                             <form method="POST" 
-                                  action="{{ route('colaborador.unidades.destroy', $unidad) }}" 
+                                    action="{{ route('colaborador.unidades.destroy', $unidad) }}"
                                   onsubmit="return confirm('¿Está seguro de eliminar esta unidad?')"
                                   class="inline">
                                 @csrf

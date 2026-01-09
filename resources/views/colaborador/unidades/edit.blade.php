@@ -23,7 +23,7 @@
 
     <!-- Formulario -->
     <div class="bg-white rounded-lg shadow-lg p-8">
-        <form method="POST" action="{{ route('colaborador.unidades.update', $unidad) }}">
+            <form method="POST" action="{{ route('colaborador.unidades.update', $unidad) }}">
             @csrf
             @method('PUT')
 

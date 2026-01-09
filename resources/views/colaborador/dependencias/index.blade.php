@@ -53,6 +53,7 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
@@ -61,7 +62,8 @@
             <tbody class="divide-y divide-gray-200">
                 @forelse($dependencias as $dependencia)
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 text-sm">#{{ $dependencia->id_dependencia }}</td>
+                    <td class="px-6 py-4 text-sm">#{{ $dependencia->id_dependencias }}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-blue-600">{{ $dependencia->cod_dependencia }}</td>
                     <td class="px-6 py-4 text-sm font-medium">{{ $dependencia->nombre_dependencia }}</td>
                     <td class="px-6 py-4">
                         @if($dependencia->i_active)
@@ -89,7 +91,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
                         No se encontraron dependencias
                     </td>
                 </tr>

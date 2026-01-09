@@ -14,7 +14,7 @@ class Unidad extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'nombre_unidades',  // ← Cambiado de nombre_unidad a nombre_unidades
+        'nombre_unidad',  // ← Cambiado de nombre_unidad a nombre_unidades
         'id_usuario',
         'i_active'
     ];
@@ -24,6 +24,11 @@ class Unidad extends Model
         'fecha_actualizacion' => 'datetime',
     ];
 
+    public function getRouteKeyName()
+    {
+        return 'id_unidad';
+    }
+
     // Relaciones
     public function usuario()
     {
@@ -32,7 +37,7 @@ class Unidad extends Model
 
     public function colaboradores()
     {
-        return $this->hasMany(Colaborador::class, 'id_unidades', 'id_unidad');
+        return $this->hasMany(Colaborador::class, 'id_unidad', 'id_unidad');
     }
 
     // Scopes
@@ -43,6 +48,6 @@ class Unidad extends Model
 
     public function scopeBuscar($query, $search)
     {
-        return $query->where('nombre_unidades', 'like', "%{$search}%");
+        return $query->where('nombre_unidad', 'like', "%{$search}%");
     }
 }

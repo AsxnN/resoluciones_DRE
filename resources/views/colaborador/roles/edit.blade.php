@@ -1,7 +1,7 @@
 {{-- filepath: resources/views/colaborador/roles/edit.blade.php --}}
 @extends('layouts.colaborador')
 
-@section('title', 'Editar Rol')
+@section('title', 'Editar Rol Organizacional')
 
 @section('content')
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,58 +15,62 @@
                 </svg>
             </a>
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">✏️ Editar Rol</h1>
-                <p class="text-gray-600 mt-1">Modificar información de: <strong>{{ $role->name }}</strong></p>
+                <h1 class="text-3xl font-bold text-gray-900">✏️ Editar Rol Organizacional</h1>
+                <p class="text-gray-600 mt-1">Modificar: <strong>{{ $role->nombre_rol }}</strong></p>
             </div>
         </div>
     </div>
 
     <!-- Formulario -->
     <div class="bg-white rounded-lg shadow-lg p-8">
-        <form method="POST" action="{{ route('colaborador.roles.update', $role) }}">
+        <form method="POST" action="{{ route('colaborador.roles.update', $role->id_rol) }}">
             @csrf
             @method('PUT')
 
             <div class="space-y-6">
                 <!-- Nombre del Rol -->
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="nombre_rol" class="block text-sm font-medium text-gray-700 mb-2">
                         Nombre del Rol <span class="text-red-500">*</span>
                     </label>
                     <input type="text" 
-                           id="name" 
-                           name="name" 
-                           value="{{ old('name', $role->name) }}"
+                           id="nombre_rol" 
+                           name="nombre_rol" 
+                           value="{{ old('nombre_rol', $role->nombre_rol) }}"
                            required
                            maxlength="100"
-                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('name') border-red-500 @enderror">
-                    @error('name')
+                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('nombre_rol') border-red-500 @enderror">
+                    @error('nombre_rol')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <!-- Permisos -->
-                @if(isset($permissions) && $permissions->count() > 0)
+                <!-- Descripción -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">
-                        Permisos Asignados
+                    <label for="descripcion" class="block text-sm font-medium text-gray-700 mb-2">
+                        Descripción
                     </label>
-                    <div class="border border-gray-300 rounded-lg p-4 max-h-96 overflow-y-auto">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            @foreach($permissions as $permission)
-                            <label class="flex items-center p-2 hover:bg-gray-50 rounded">
-                                <input type="checkbox" 
-                                       name="permissions[]" 
-                                       value="{{ $permission->id }}"
-                                       {{ $role->hasPermissionTo($permission->name) ? 'checked' : '' }}
-                                       class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span class="ml-2 text-sm text-gray-700">{{ $permission->name }}</span>
-                            </label>
-                            @endforeach
-                        </div>
-                    </div>
+                    <textarea id="descripcion" 
+                              name="descripcion" 
+                              rows="4"
+                              maxlength="255"
+                              class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('descripcion') border-red-500 @enderror">{{ old('descripcion', $role->descripcion) }}</textarea>
+                    @error('descripcion')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
-                @endif
+
+                <!-- Estado -->
+                <div>
+                    <label class="flex items-center">
+                        <input type="checkbox" 
+                               name="i_active" 
+                               value="1"
+                               {{ old('i_active', $role->i_active) ? 'checked' : '' }}
+                               class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="ml-2 text-sm text-gray-700">Activo</span>
+                    </label>
+                </div>
             </div>
 
             <!-- Botones -->

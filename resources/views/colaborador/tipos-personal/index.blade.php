@@ -11,7 +11,7 @@
             <h1 class="text-3xl font-bold text-gray-900">👥 Gestión de Tipos de Personal</h1>
             <p class="text-gray-600 mt-1">Administración de tipos de personal</p>
         </div>
-        @can('tipos_personal.crear')
+        @can('tipos-personal.crear')
         <a href="{{ route('colaborador.tipos-personal.create') }}" 
            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -95,13 +95,13 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end gap-2">
-                            @can('tipos_personal.editar')
+                            @can('tipos-personal.editar')
                             <a href="{{ route('colaborador.tipos-personal.edit', $tipo) }}" 
                                class="text-yellow-600 hover:text-yellow-900" title="Editar">
                                 ✏️
                             </a>
                             @endcan
-                            @can('tipos_personal.eliminar')
+                            @can('tipos-personal.eliminar')
                             <form method="POST" 
                                   action="{{ route('colaborador.tipos-personal.destroy', $tipo) }}" 
                                   onsubmit="return confirm('¿Está seguro de eliminar este tipo?')"

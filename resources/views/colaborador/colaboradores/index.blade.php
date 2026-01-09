@@ -92,7 +92,7 @@
                             <div class="text-sm text-gray-500">{{ $colaborador->persona->dni ?? '' }}</div>
                         </td>
                         <td class="px-6 py-4 text-sm">{{ $colaborador->cargo->nombre_cargo ?? 'N/A' }}</td>
-                        <td class="px-6 py-4 text-sm">{{ $colaborador->unidad->nombre_unidades ?? 'N/A' }}</td>
+                        <td class="px-6 py-4 text-sm">{{ $colaborador->unidad->nombre_unidad ?? 'N/A' }}</td>
                         <td class="px-6 py-4 text-sm">{{ $colaborador->direccion->nombre_direcciones ?? 'N/A' }}</td>
                         <td class="px-6 py-4">
                             @if($colaborador->i_active)

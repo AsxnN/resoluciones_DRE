@@ -49,11 +49,13 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
         // ========================================
         // PERFIL DE USUARIO
         // ========================================
-        Route::get('profile', [ProfileController::class, 'show'])->name('profile.show'); // ✅ AGREGAR ESTA LÍNEA
-        Route::get('profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-        Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+        // Rutas de Perfil (sin permisos, siempre disponibles)
+        Route::prefix('profile')->name('profile.')->group(function () {
+            Route::get('/', [ProfileController::class, 'show'])->name('show');
+            Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
+            Route::put('/update', [ProfileController::class, 'update'])->name('update');
+            Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('update-password');
+        });
         
         
         // Notificaciones
@@ -109,7 +111,14 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
         // ========================================
         // MÓDULO: MIS RESOLUCIONES
         // ========================================
-        Route::get('mis-resoluciones', [MisResolucionesController::class, 'index'])->name('mis-resoluciones.index');
+
+        // Mis Resoluciones - SIN MIDDLEWARE DE PERMISOS (acceso libre)
+        Route::prefix('mis-resoluciones')->name('mis-resoluciones.')->group(function () {
+            Route::get('/', [MisResolucionesController::class, 'index'])->name('index');
+            Route::get('/{resolucion}', [MisResolucionesController::class, 'show'])->name('show');
+            Route::get('/estadisticas/ajax', [MisResolucionesController::class, 'estadisticas'])->name('estadisticas');
+        });
+        
 
         // ========================================
         // MÓDULO: CHATBOT IA
@@ -165,7 +174,9 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
 
 
         // Unidades
-        Route::resource('unidades', UnidadController::class);
+        Route::resource('unidades', UnidadController::class)->parameters([
+            'unidades' => 'unidad'
+        ]);
         // ========================================
         // MÓDULO: USUARIOS
         // ========================================

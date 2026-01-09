@@ -29,9 +29,26 @@
 
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Código de Dependencia <span class="text-red-500">*</span>
+                </label>
+                <input type="text" 
+                       name="cod_dependencia" 
+                       value="{{ old('cod_dependencia', $dependencia->cod_dependencia) }}" 
+                       required
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('cod_dependencia') border-red-500 @enderror">
+                @error('cod_dependencia')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
                     Nombre de la Dependencia <span class="text-red-500">*</span>
                 </label>
-                <input type="text" name="nombre_dependencia" value="{{ old('nombre_dependencia', $dependencia->nombre_dependencia) }}" required
+                <input type="text" 
+                       name="nombre_dependencia" 
+                       value="{{ old('nombre_dependencia', $dependencia->nombre_dependencia) }}" 
+                       required
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('nombre_dependencia') border-red-500 @enderror">
                 @error('nombre_dependencia')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -40,7 +57,10 @@
 
             <div class="mb-4">
                 <label class="flex items-center">
-                    <input type="checkbox" name="i_active" value="1" {{ old('i_active', $dependencia->i_active) ? 'checked' : '' }}
+                    <input type="checkbox" 
+                           name="i_active" 
+                           value="1" 
+                           {{ old('i_active', $dependencia->i_active) ? 'checked' : '' }}
                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                     <span class="ml-2 text-sm text-gray-700">Dependencia Activa</span>
                 </label>

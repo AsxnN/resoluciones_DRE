@@ -189,7 +189,7 @@
                     @endcan
 
                     <!-- Tipos de Personal -->
-                    @can('tipos_personal.ver')
+                    @can('tipos-personal.ver')
                     <a href="{{ route('colaborador.tipos-personal.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.tipos-personal.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -436,7 +436,7 @@
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
          style="display: none;"></div>
-
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @stack('scripts')
 
 </body>

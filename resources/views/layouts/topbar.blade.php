@@ -89,11 +89,12 @@
             <!-- User Dropdown -->
             <div class="relative" x-data="{ open: false }">
                 <button @click="open = !open" 
+                        type="button"
                         class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors">
                     @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                         <img src="{{ Auth::user()->profile_photo_url }}" 
                              alt="{{ Auth::user()->name }}"
-                             class="w-9 h-9 rounded-full ring-2 ring-blue-500">
+                             class="w-9 h-9 rounded-full ring-2 ring-blue-500 object-cover">
                     @else
                         <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center ring-2 ring-blue-400">
                             <span class="text-sm font-bold text-white">{{ substr(Auth::user()->name, 0, 2) }}</span>
@@ -101,9 +102,13 @@
                     @endif
                     <div class="hidden md:block text-left">
                         <p class="text-sm font-medium text-gray-700">{{ Auth::user()->name }}</p>
-                        <p class="text-xs text-gray-500">{{ Auth::user()->email }}</p>
+                        <p class="text-xs text-gray-500">{{ Str::limit(Auth::user()->email, 25) }}</p>
                     </div>
-                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-gray-400 transition-transform" 
+                         :class="{ 'rotate-180': open }"
+                         fill="none" 
+                         stroke="currentColor" 
+                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
@@ -112,46 +117,74 @@
                 <div x-show="open" 
                      @click.away="open = false"
                      x-transition:enter="transition ease-out duration-200"
-                     x-transition:enter-start="opacity-0 scale-95"
-                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-150"
-                     x-transition:leave-start="opacity-100 scale-100"
-                     x-transition:leave-end="opacity-0 scale-95"
-                     class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-2xl py-2 z-50 border border-gray-200"
+                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+                     class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-50 border border-gray-200"
                      style="display: none;">
-                    <div class="px-4 py-3 border-b border-gray-200">
-                        <p class="text-sm font-medium text-gray-900">{{ Auth::user()->name }}</p>
-                        <p class="text-xs text-gray-500 mt-1">{{ Auth::user()->email }}</p>
+                    
+                    <!-- User Info Header -->
+                    <div class="px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                        <div class="flex items-center gap-3">
+                            @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
+                                <img src="{{ Auth::user()->profile_photo_url }}" 
+                                     alt="{{ Auth::user()->name }}"
+                                     class="w-10 h-10 rounded-full ring-2 ring-blue-400 object-cover">
+                            @else
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center ring-2 ring-blue-400">
+                                    <span class="text-sm font-bold text-white">{{ substr(Auth::user()->name, 0, 2) }}</span>
+                                </div>
+                            @endif
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-gray-900 truncate">{{ Auth::user()->name }}</p>
+                                <p class="text-xs text-gray-600 truncate">{{ Auth::user()->email }}</p>
+                            </div>
+                        </div>
                     </div>
                     
-                    <a href="{{ route('profile.show') }}" 
-                       class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-colors">
-                        <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        Mi Perfil
-                    </a>
+                    <!-- Menu Items -->
+                    <div class="py-2">
+                        <a href="{{ route('colaborador.profile.show') }}" 
+                           class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <span class="font-medium">Mi Perfil</span>
+                        </a>
 
-                    @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
-                    <a href="{{ route('api-tokens.index') }}" 
-                       class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-colors">
-                        <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                        </svg>
-                        API Tokens
-                    </a>
-                    @endif
+                        <a href="{{ route('colaborador.mis-resoluciones.index') }}" 
+                           class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span class="font-medium">Mis Resoluciones</span>
+                        </a>
 
+                        @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
+                        <a href="{{ route('api-tokens.index') }}" 
+                           class="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors">
+                            <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                            </svg>
+                            <span class="font-medium">API Tokens</span>
+                        </a>
+                        @endif
+                    </div>
+
+                    <!-- Divider -->
                     <div class="border-t border-gray-200 my-2"></div>
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <!-- Logout -->
+                    <form method="POST" action="{{ route('colaborador.logout') }}" class="px-2">
                         @csrf
                         <button type="submit" 
-                                class="w-full flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                class="w-full flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors rounded-lg">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                             </svg>
-                            Cerrar Sesión
+                            <span class="font-medium">Cerrar Sesión</span>
                         </button>
                     </form>
                 </div>
@@ -159,3 +192,12 @@
         </div>
     </div>
 </header>
+
+@push('scripts')
+<script>
+// Asegurar que Alpine.js esté disponible
+document.addEventListener('alpine:init', () => {
+    console.log('Alpine.js initialized');
+});
+</script>
+@endpush

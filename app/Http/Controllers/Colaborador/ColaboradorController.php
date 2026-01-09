@@ -73,7 +73,7 @@ class ColaboradorController extends Controller implements HasMiddleware
 
         // Datos para filtros - CORREGIDO
         $cargos = Cargo::where('i_active', true)->orderBy('nombre_cargo')->get();
-        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidades')->get(); // ← Cambiado
+        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidad')->get(); // ← Cambiado
         $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get();
         $dependencias = Dependencia::where('i_active', true)->orderBy('nombre_dependencia')->get();
         $especialidades = Especialidad::where('i_active', true)->orderBy('nombre_especialidad')->get();
@@ -97,7 +97,7 @@ class ColaboradorController extends Controller implements HasMiddleware
             ->get();
 
         $cargos = Cargo::where('i_active', true)->orderBy('nombre_cargo')->get();
-        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidades')->get(); // ← Cambiado
+        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidad')->get(); // ← Cambiado
         $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get();
         $dependencias = Dependencia::where('i_active', true)->orderBy('nombre_dependencia')->get();
         $especialidades = Especialidad::where('i_active', true)->orderBy('nombre_especialidad')->get();
@@ -155,7 +155,7 @@ class ColaboradorController extends Controller implements HasMiddleware
     {
         $personas = Persona::orderBy('apellido_paterno')->get();
         $cargos = Cargo::where('i_active', true)->orderBy('nombre_cargo')->get();
-        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidades')->get(); // ← Cambiado
+        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidad')->get(); // ← Cambiado
         $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get();
         $dependencias = Dependencia::where('i_active', true)->orderBy('nombre_dependencia')->get();
         $especialidades = Especialidad::where('i_active', true)->orderBy('nombre_especialidad')->get();

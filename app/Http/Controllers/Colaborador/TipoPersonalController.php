@@ -15,13 +15,12 @@ class TipoPersonalController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:tipos_personal.ver', only: ['index', 'show']),
-            new Middleware('permission:tipos_personal.crear', only: ['create', 'store']),
-            new Middleware('permission:tipos_personal.editar', only: ['edit', 'update']),
-            new Middleware('permission:tipos_personal.eliminar', only: ['destroy']),
+            new Middleware('permission:tipos-personal.ver', only: ['index', 'show']),
+            new Middleware('permission:tipos-personal.crear', only: ['create', 'store']),
+            new Middleware('permission:tipos-personal.editar', only: ['edit', 'update']),
+            new Middleware('permission:tipos-personal.eliminar', only: ['destroy']),
         ];
     }
-
     public function index(Request $request)
     {
         $query = TipoPersonal::query();
