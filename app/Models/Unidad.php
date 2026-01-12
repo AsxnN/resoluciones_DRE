@@ -1,4 +1,5 @@
 <?php
+// filepath: app/Models/Unidad.php
 
 namespace App\Models;
 
@@ -14,7 +15,7 @@ class Unidad extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'nombre_unidad',  // ← Cambiado de nombre_unidad a nombre_unidades
+        'nombre_unidad',
         'id_usuario',
         'i_active'
     ];
@@ -37,7 +38,8 @@ class Unidad extends Model
 
     public function colaboradores()
     {
-        return $this->hasMany(Colaborador::class, 'id_unidad', 'id_unidad');
+        // ← CORREGIR: El foreign key en colaborador se llama id_unidades (plural)
+        return $this->hasMany(Colaborador::class, 'id_unidades', 'id_unidad');
     }
 
     // Scopes

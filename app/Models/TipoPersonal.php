@@ -34,4 +34,9 @@ class TipoPersonal extends Model
     {
         return $query->where('i_active', true);
     }
+
+    public function getRouteKeyName()
+    {
+        return 'id_tipo_personal'; // o el nombre de tu primary key
+    }
 }

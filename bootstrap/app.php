@@ -35,11 +35,12 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Aliases de middlewares
         $middleware->alias([
-            'tipo_acceso' => CheckTipoAcceso::class,
+            'tipo_acceso' => CheckTipoAcceso::class, // ← Solo una vez, usando CheckTipoAcceso
             'permission' => CheckPermiso::class,
             'ensure_permission' => EnsureUserHasPermission::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'perfil.completo' => \App\Http\Middleware\VerificarPerfilCompleto::class, // ← Solo una vez
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

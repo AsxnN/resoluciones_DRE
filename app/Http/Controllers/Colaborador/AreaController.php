@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Colaborador;
 
 use App\Http\Controllers\Controller;
 use App\Models\Area;
+use App\Models\Colaborador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\HasMiddleware;

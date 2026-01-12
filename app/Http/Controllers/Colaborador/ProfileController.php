@@ -3,6 +3,13 @@
 namespace App\Http\Controllers\Colaborador;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cargo;
+use App\Models\Unidad;
+use App\Models\Direccion;
+use App\Models\Dependencia;
+use App\Models\Area;
+use App\Models\Especialidad;
+use App\Models\TipoPersonal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -18,8 +25,9 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $persona = $user->persona;
+        $colaborador = $persona?->colaborador;
         
-        return view('colaborador.profile.show', compact('user', 'persona'));
+        return view('colaborador.profile.show', compact('user', 'persona', 'colaborador'));
     }
 
     /**
@@ -29,18 +37,40 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         $persona = $user->persona;
+        $colaborador = $persona?->colaborador;
         
-        return view('colaborador.profile.edit', compact('user', 'persona'));
+        // Cargar listas para los selects
+        $cargos = Cargo::where('i_active', true)->orderBy('nombre_cargo')->get();
+        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidad')->get();
+        $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get(); // ← CAMBIAR A PLURAL
+        $dependencias = Dependencia::where('i_active', true)->orderBy('nombre_dependencia')->get(); // ← MANTENER SINGULAR
+        $areas = Area::where('i_active', true)->orderBy('nombre_area')->get();
+        $especialidades = Especialidad::where('i_active', true)->orderBy('nombre_especialidad')->get();
+        $tiposPersonal = TipoPersonal::where('i_active', true)->orderBy('nombre_tipo_personal')->get();
+        
+        return view('colaborador.profile.edit', compact(
+            'user', 
+            'persona', 
+            'colaborador',
+            'cargos',
+            'unidades',
+            'direcciones',
+            'dependencias',
+            'areas',
+            'especialidades',
+            'tiposPersonal'
+        ));
     }
 
     /**
      * Actualizar datos del perfil
-     * Sincroniza entre users y persona
+     * Sincroniza entre users, persona y colaborador
      */
     public function update(Request $request)
     {
         $user = Auth::user();
         $persona = $user->persona;
+        $colaborador = $persona?->colaborador;
 
         $validated = $request->validate([
             // Datos de Usuario (users)
@@ -55,9 +85,21 @@ class ProfileController extends Controller
             'telefono' => 'nullable|string|max:20',
             'whatsapp' => 'nullable|string|max:20',
             'direccion' => 'nullable|string',
+            
+            // Datos de Colaborador (colaborador)
+            'id_cargos' => 'required|exists:cargo,id_cargos',
+            'id_unidades' => 'required|exists:unidad,id_unidad',
+            'id_direcciones' => 'nullable|exists:direccion,id_direcciones',
+            'id_dependencia' => 'nullable|exists:dependencia,id_dependencias',
+            'id_area' => 'nullable|exists:area,id_area',
+            'id_especialidad' => 'nullable|exists:especialidad,id_especialidad',
+            'id_tipo_personal' => 'required|exists:tipo_personal,id_tipo_personal',
         ], [
             'num_documento.required' => 'El número de documento es obligatorio',
             'num_documento.unique' => 'Este documento ya está registrado',
+            'id_cargos.required' => 'El cargo es obligatorio',
+            'id_unidades.required' => 'La unidad es obligatoria',
+            'id_tipo_personal.required' => 'El tipo de personal es obligatorio',
         ]);
 
         DB::beginTransaction();
@@ -84,16 +126,40 @@ class ProfileController extends Controller
                 'direccion' => $validated['direccion'],
             ]);
 
+            // Actualizar Colaborador
+            if ($colaborador) {
+                $colaborador->update([
+                    'id_cargos' => $validated['id_cargos'],
+                    'id_unidades' => $validated['id_unidades'],
+                    'id_direcciones' => $validated['id_direcciones'],
+                    'id_dependencia' => $validated['id_dependencia'],
+                    'id_area' => $validated['id_area'],
+                    'id_especialidad' => $validated['id_especialidad'],
+                    'id_tipo_personal' => $validated['id_tipo_personal'],
+                ]);
+            }
+
             // Verificar si los datos están completos
-            if ($this->datosCompletos($persona)) {
-                $persona->update(['datos_completos' => true]);
+            if ($this->datosCompletos($persona, $colaborador)) {
+                // Marcar persona como completa
+                $persona->update([
+                    'datos_completos' => true,
+                    'i_active' => true // ← Activar persona
+                ]);
+                
+                // Activar colaborador
+                if ($colaborador) {
+                    $colaborador->update(['i_active' => true]);
+                }
+                
+                // Usuario ya está activo desde la creación
             }
 
             DB::commit();
 
             return redirect()
                 ->route('colaborador.profile.show')
-                ->with('success', '✅ Perfil actualizado correctamente');
+                ->with('success', '✅ Perfil actualizado correctamente. Ahora tienes acceso completo al sistema.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -125,15 +191,23 @@ class ProfileController extends Controller
     }
 
     /**
-     * Verificar si los datos de la persona están completos
+     * Verificar si los datos de la persona y colaborador están completos
      */
-    private function datosCompletos($persona): bool
+    private function datosCompletos($persona, $colaborador): bool
     {
-        return !empty($persona->tipo_documento) &&
-               !empty($persona->num_documento) &&
-               !empty($persona->nombres) &&
-               !empty($persona->apellido_paterno) &&
-               !empty($persona->correo) &&
-               !empty($persona->telefono);
+        $personaCompleta = !empty($persona->tipo_documento) &&
+                          !empty($persona->num_documento) &&
+                          $persona->num_documento !== 'TEMP-' . $persona->id_persona &&
+                          !empty($persona->nombres) &&
+                          !empty($persona->apellido_paterno) &&
+                          !empty($persona->correo) &&
+                          !empty($persona->telefono);
+        
+        $colaboradorCompleto = $colaborador && 
+                              !empty($colaborador->id_cargos) &&
+                              !empty($colaborador->id_unidades) &&
+                              !empty($colaborador->id_tipo_personal);
+        
+        return $personaCompleta && $colaboradorCompleto;
     }
 }

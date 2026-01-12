@@ -1,9 +1,12 @@
 <?php
+// filepath: app/Models/Direccion.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Direccion extends Model
 {
@@ -23,33 +26,41 @@ class Direccion extends Model
         'i_active' => 'boolean',
     ];
 
-    // Relaciones
-    public function personas()
-    {
-        return $this->hasMany(Persona::class, 'id_direcciones', 'id_direcciones');
-    }
+    // ========================================
+    // RELACIONES
+    // ========================================
 
-    public function areas()
-    {
-        return $this->hasMany(Area::class, 'id_direcciones', 'id_direcciones');
-    }
-
-    public function colaboradores()
+    /**
+     * Relación con Colaboradores
+     */
+    public function colaboradores(): HasMany
     {
         return $this->hasMany(Colaborador::class, 'id_direcciones', 'id_direcciones');
     }
 
-    public function usuario()
+    /**
+     * Relación con Usuario que creó/modificó
+     */
+    public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_usuario', 'id');
     }
 
-    // Scopes
+    // ========================================
+    // SCOPES
+    // ========================================
+
+    /**
+     * Scope para direcciones activas
+     */
     public function scopeActivas($query)
     {
         return $query->where('i_active', true);
     }
 
+    /**
+     * Scope para buscar por nombre
+     */
     public function scopeBuscar($query, $search)
     {
         return $query->where('nombre_direcciones', 'like', "%{$search}%");

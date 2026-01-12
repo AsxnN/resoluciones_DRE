@@ -1,76 +1,104 @@
 <?php
+// filepath: app/Observers/UserObserver.php
 
 namespace App\Observers;
 
 use App\Models\User;
 use App\Models\Persona;
+use App\Models\Colaborador as ColaboradorModel;
 use Illuminate\Support\Facades\DB;
 
 class UserObserver
 {
     /**
      * Handle the User "created" event.
-     * Crea automáticamente la persona cuando se registra un usuario
+     * Si se crea un usuario SIN persona asociada, crear persona y colaborador
      */
     public function created(User $user): void
     {
-        // Solo crear persona si no tiene una asignada
+        // Solo si NO tiene id_persona asignado
         if (!$user->id_persona) {
             DB::transaction(function () use ($user) {
-                // Extraer nombres del name (Nombre Apellido_Paterno Apellido_Materno)
+                // Extraer partes del nombre
                 $nombreCompleto = $user->name;
-                $partes = explode(' ', $nombreCompleto);
+                $partes = explode(' ', $nombreCompleto, 3);
                 
                 $nombres = $partes[0] ?? '';
                 $apellidoPaterno = $partes[1] ?? '';
-                $apellidoMaterno = isset($partes[2]) ? implode(' ', array_slice($partes, 2)) : null;
+                $apellidoMaterno = $partes[2] ?? null;
                 
-                // Crear persona
-                $persona = Persona::create([
-                    'tipo_persona' => 'colaborador', // Por defecto es colaborador
-                    'tipo_documento' => 'DNI',
-                    'num_documento' => '', // Se completará después en el perfil
-                    'nombres' => $nombres,
-                    'apellido_paterno' => $apellidoPaterno,
-                    'apellido_materno' => $apellidoMaterno,
-                    'correo' => $user->email,
-                    'telefono' => null,
-                    'whatsapp' => null,
-                    'direccion' => null,
-                    'datos_completos' => false,
-                    'i_active' => true,
-                ]);
+                // 1. Crear Persona sin disparar eventos
+                $persona = Persona::withoutEvents(function () use ($nombres, $apellidoPaterno, $apellidoMaterno, $user) {
+                    return Persona::create([
+                        'tipo_persona' => 'colaborador',
+                        'tipo_documento' => 'DNI',
+                        'num_documento' => 'TEMP-' . time(),
+                        'nombres' => $nombres,
+                        'apellido_paterno' => $apellidoPaterno,
+                        'apellido_materno' => $apellidoMaterno,
+                        'correo' => $user->email,
+                        'telefono' => null,
+                        'whatsapp' => null,
+                        'direccion' => null,
+                        'datos_completos' => false,
+                        'i_active' => true,
+                    ]);
+                });
                 
-                // Actualizar el user con el id_persona
+                // 2. Actualizar usuario con id_persona
                 $user->update(['id_persona' => $persona->id_persona]);
+                
+                // 3. Crear Colaborador vacío
+                ColaboradorModel::create([
+                    'id_colab_dis' => 'COL-' . str_pad($persona->id_persona, 6, '0', STR_PAD_LEFT),
+                    'id_persona' => $persona->id_persona,
+                    'id_usuario' => $user->id,
+                    'id_cargos' => null,
+                    'id_unidades' => null,
+                    'id_direcciones' => null,
+                    'id_dependencia' => null,
+                    'id_area' => null,
+                    'id_especialidad' => null,
+                    'id_tipo_personal' => null,
+                    'i_active' => false,
+                ]);
             });
         }
     }
 
     /**
      * Handle the User "updating" event.
-     * Sincroniza los cambios de user a persona
+     * Sincronizar cambios con persona
      */
     public function updating(User $user): void
     {
-        if ($user->persona && $user->isDirty(['name', 'email'])) {
-            // Sincronizar name y email a persona
-            $updates = [];
+        if ($user->isDirty(['name', 'email']) && $user->id_persona) {
+            $persona = Persona::find($user->id_persona);
             
-            if ($user->isDirty('email')) {
-                $updates['correo'] = $user->email;
-            }
-            
-            if ($user->isDirty('name')) {
-                // Parsear el nombre completo
-                $partes = explode(' ', $user->name);
-                $updates['nombres'] = $partes[0] ?? '';
-                $updates['apellido_paterno'] = $partes[1] ?? '';
-                $updates['apellido_materno'] = isset($partes[2]) ? implode(' ', array_slice($partes, 2)) : null;
-            }
-            
-            if (!empty($updates)) {
-                $user->persona->update($updates);
+            if ($persona) {
+                $updates = [];
+                
+                // Sincronizar email
+                if ($user->isDirty('email')) {
+                    $updates['correo'] = $user->email;
+                }
+                
+                // Sincronizar name
+                if ($user->isDirty('name')) {
+                    $nombreCompleto = $user->name;
+                    $partes = explode(' ', $nombreCompleto, 3);
+                    
+                    $updates['nombres'] = $partes[0] ?? '';
+                    $updates['apellido_paterno'] = $partes[1] ?? '';
+                    $updates['apellido_materno'] = $partes[2] ?? null;
+                }
+                
+                // Actualizar sin disparar eventos para evitar bucle
+                if (!empty($updates)) {
+                    Persona::withoutEvents(function () use ($persona, $updates) {
+                        $persona->update($updates);
+                    });
+                }
             }
         }
     }

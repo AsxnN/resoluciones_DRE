@@ -28,18 +28,18 @@
 
             <!-- Nombre -->
             <div>
-                <label for="nombre_unidades" class="block text-sm font-medium text-gray-700 mb-2">
+                <label for="nombre_unidad" class="block text-sm font-medium text-gray-700 mb-2">
                     Nombre de la Unidad <span class="text-red-500">*</span>
                 </label>
                 <input type="text" 
-                       id="nombre_unidades" 
-                       name="nombre_unidades" 
-                       value="{{ old('nombre_unidades') }}"
+                       id="nombre_unidad" 
+                       name="nombre_unidad" 
+                       value="{{ old('nombre_unidad') }}"
                        required
                        maxlength="100"
                        placeholder="Ej: Unidad de Gestión Pedagógica"
-                       class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('nombre_unidades') border-red-500 @enderror">
-                @error('nombre_unidades')
+                       class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('nombre_unidad') border-red-500 @enderror">
+                @error('nombre_unidad')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

@@ -27,14 +27,14 @@ class UnidadController extends Controller implements HasMiddleware
         $query = Unidad::query();
 
         if ($request->filled('search')) {
-            $query->where('nombre_unidades', 'like', '%' . $request->search . '%');
+            $query->where('nombre_unidad', 'like', '%' . $request->search . '%');
         }
 
         if ($request->filled('i_active')) {
             $query->where('i_active', $request->boolean('i_active'));
         }
 
-        $unidades = $query->orderBy('nombre_unidades')->paginate(20)->withQueryString();
+        $unidades = $query->orderBy('nombre_unidad')->paginate(20)->withQueryString();
 
         return view('colaborador.unidades.index', compact('unidades'));
     }
@@ -47,7 +47,7 @@ class UnidadController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre_unidades' => 'required|string|max:100|unique:unidad,nombre_unidades',
+            'nombre_unidad' => 'required|string|max:100|unique:unidad,nombre_unidad',
         ]);
 
         $validated['id_usuario'] = Auth::id();
@@ -74,7 +74,7 @@ class UnidadController extends Controller implements HasMiddleware
     public function update(Request $request, Unidad $unidad)
     {
         $validated = $request->validate([
-            'nombre_unidades' => 'required|string|max:100|unique:unidad,nombre_unidades,' . $unidad->id_unidad . ',id_unidad',
+            'nombre_unidad' => 'required|string|max:100|unique:unidad,nombre_unidad,' . $unidad->id_unidad . ',id_unidad',
             'i_active' => 'boolean',
         ]);
 

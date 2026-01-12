@@ -102,16 +102,10 @@ class DireccionController extends Controller implements HasMiddleware
 
     public function destroy(Direccion $direccion)
     {
-        // Verificar si tiene personas asignadas
-        if ($direccion->personas()->count() > 0) {
+        // Solo verificar si tiene colaboradores asociados
+        if ($direccion->colaboradores()->count() > 0) {
             return redirect()->back()
-                ->with('error', '❌ No se puede eliminar una dirección con ' . $direccion->personas()->count() . ' persona(s) asignada(s)');
-        }
-
-        // Verificar si tiene áreas
-        if ($direccion->areas()->count() > 0) {
-            return redirect()->back()
-                ->with('error', '❌ No se puede eliminar una dirección con ' . $direccion->areas()->count() . ' área(s) asignada(s)');
+                ->with('error', '❌ No se puede eliminar una dirección con ' . $direccion->colaboradores()->count() . ' colaborador(es) asignado(s)');
         }
 
         $direccion->delete();

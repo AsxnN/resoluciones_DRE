@@ -16,31 +16,31 @@
             </a>
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">✏️ Editar Unidad</h1>
-                <p class="text-gray-600 mt-1">Modificar información de: <strong>{{ $unidad->nombre_unidades }}</strong></p>
+                <p class="text-gray-600 mt-1">Modificar información de: <strong>{{ $unidad->nombre_unidad }}</strong></p>
             </div>
         </div>
     </div>
 
     <!-- Formulario -->
     <div class="bg-white rounded-lg shadow-lg p-8">
-            <form method="POST" action="{{ route('colaborador.unidades.update', $unidad) }}">
+        <form method="POST" action="{{ route('colaborador.unidades.update', $unidad) }}">
             @csrf
             @method('PUT')
 
             <div class="space-y-6">
                 <!-- Nombre -->
                 <div>
-                    <label for="nombre_unidades" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="nombre_unidad" class="block text-sm font-medium text-gray-700 mb-2">
                         Nombre de la Unidad <span class="text-red-500">*</span>
                     </label>
                     <input type="text" 
-                           id="nombre_unidades" 
-                           name="nombre_unidades" 
-                           value="{{ old('nombre_unidades', $unidad->nombre_unidades) }}"
+                           id="nombre_unidad" 
+                           name="nombre_unidad" 
+                           value="{{ old('nombre_unidad', $unidad->nombre_unidad) }}"
                            required
                            maxlength="100"
-                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('nombre_unidades') border-red-500 @enderror">
-                    @error('nombre_unidades')
+                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('nombre_unidad') border-red-500 @enderror">
+                    @error('nombre_unidad')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
