@@ -54,7 +54,43 @@ class MisResolucionesController extends Controller
 
         $estados = \App\Models\Estado::all();
 
-        return view('cliente.mis-resoluciones.index', compact('resoluciones', 'estados'));
+        return view('cliente.resoluciones.index', compact('resoluciones', 'estados'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $query = Resolucion::with(['estado', 'tipoResolucion', 'personasInvolucradas.persona'])
+            ->whereNotNull('archivo_firmado'); // Solo mostrar resoluciones firmadas públicamente
+
+        // Búsqueda por número de resolución
+        if ($request->filled('numero')) {
+            $query->where('num_resolucion', 'like', '%' . $request->numero . '%');
+        }
+
+        // Búsqueda por DNI
+        if ($request->filled('dni')) {
+            $query->whereHas('personasInvolucradas', function($q) use ($request) {
+                $q->where('persona.num_documento', $request->dni);
+            });
+        }
+
+        // Búsqueda por nombre
+        if ($request->filled('nombre')) {
+            $search = $request->nombre;
+            $query->whereHas('personasInvolucradas', function($q) use ($search) {
+                $q->where(function($subQuery) use ($search) {
+                    $subQuery->where('persona.nombres', 'like', "%{$search}%")
+                             ->orWhere('persona.apellido_paterno', 'like', "%{$search}%")
+                             ->orWhere('persona.apellido_materno', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        $resoluciones = $query->orderBy('fecha_resolucion', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('cliente.busqueda.index', compact('resoluciones'));
     }
 
     public function show(Resolucion $resolucion)
@@ -75,7 +111,7 @@ class MisResolucionesController extends Controller
             'personasInvolucradas',
         ]);
 
-        return view('cliente.mis-resoluciones.show', compact('resolucion'));
+        return view('cliente.resoluciones.show', compact('resolucion'));
     }
 
     public function descargar(Resolucion $resolucion)

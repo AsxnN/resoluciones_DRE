@@ -25,13 +25,13 @@ class DashboardController extends Controller
 
         // Estadísticas del cliente
         $stats = [
-            'mis_resoluciones' => Resolucion::whereHas('personasInvolucradas', function($q) use ($persona) {
+            'total_resoluciones' => Resolucion::whereHas('personasInvolucradas', function($q) use ($persona) {
                 $q->where('persona.id_persona', $persona->id_persona);
             })->count(),
 
-            'resoluciones_mes' => Resolucion::whereHas('personasInvolucradas', function($q) use ($persona) {
-                $q->where('persona.id_persona', $persona->id_persona);
-            })->whereMonth('fecha_resolucion', now()->month)->count(),
+            'ultima_consulta' => $user->ultima_sesion, // ← Agregar esta línea
+
+            'busquedas' => 0, // ← Agregar esta línea (puedes implementar lógica real después)
 
             'mis_quejas' => Queja::where('id_cliente', $cliente->id_cliente)->count(),
 
@@ -49,10 +49,9 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Quejas recientes
-        $quejasRecientes = Queja::with('estadoQueja')
-            ->where('id_cliente', $cliente->id_cliente)
-            ->orderBy('fecha_queja', 'desc')
+        // Quejas recientes - CORREGIDO: sin relación estadoQueja
+        $quejasRecientes = Queja::where('id_cliente', $cliente->id_cliente)
+            ->orderBy('fecha_creacion', 'desc')
             ->limit(5)
             ->get();
 

@@ -54,7 +54,11 @@
                 <div>
                     <p class="text-sm text-gray-600">Última Consulta</p>
                     <p class="text-3xl font-bold text-green-600">
-                        {{ $stats['ultima_consulta'] ? $stats['ultima_consulta']->diffForHumans() : 'N/A' }}
+                        @if($stats['ultima_consulta'])
+                            {{ \Carbon\Carbon::parse($stats['ultima_consulta'])->diffForHumans() }}
+                        @else
+                            Primera vez
+                        @endif
                     </p>
                 </div>
                 <div class="p-3 bg-green-100 rounded-full">
@@ -120,7 +124,7 @@
 
     <!-- Resoluciones Recientes -->
     @if(isset($resolucionesRecientes) && $resolucionesRecientes->count() > 0)
-    <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
         <h2 class="text-xl font-semibold text-gray-900 mb-4">📋 Resoluciones Recientes</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -172,7 +176,7 @@
     @endif
 
     <!-- Información de Ayuda -->
-    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
         <div class="flex items-start">
             <svg class="w-6 h-6 text-blue-600 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>

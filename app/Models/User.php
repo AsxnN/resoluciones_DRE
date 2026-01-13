@@ -72,6 +72,19 @@ class User extends Authenticatable
         );
     }
 
+    // Agregar esta relación:
+    public function cliente()
+    {
+        return $this->hasOneThrough(
+            Cliente::class,
+            Persona::class,
+            'id_persona', // FK en tabla persona
+            'id_persona', // FK en tabla cliente
+            'id_persona', // PK en tabla users
+            'id_persona'  // PK en tabla persona
+        );
+    }
+
     // Permisos metadata (auditoría custom)
     public function permisosMetadata()
     {

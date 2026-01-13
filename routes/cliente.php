@@ -31,7 +31,23 @@ Route::prefix('cliente')->name('cliente.')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // ========================================
-        // MÓDULO: MIS RESOLUCIONES
+        // MÓDULO: BÚSQUEDA DE RESOLUCIONES
+        // ========================================
+        Route::prefix('busqueda')->name('busqueda.')->group(function () {
+            Route::get('/', [MisResolucionesController::class, 'buscar'])->name('index');
+        });
+
+        // ========================================
+        // MÓDULO: MIS RESOLUCIONES (ALIAS)
+        // ========================================
+        Route::prefix('resoluciones')->name('resoluciones.')->group(function () {
+            Route::get('/', [MisResolucionesController::class, 'index'])->name('index');
+            Route::get('{resolucion}', [MisResolucionesController::class, 'show'])->name('show');
+            Route::get('{resolucion}/descargar', [MisResolucionesController::class, 'descargar'])->name('descargar');
+        });
+
+        // ========================================
+        // MÓDULO: MIS RESOLUCIONES (RUTA ORIGINAL - MANTENER POR COMPATIBILIDAD)
         // ========================================
         Route::prefix('mis-resoluciones')->name('mis-resoluciones.')->group(function () {
             Route::get('/', [MisResolucionesController::class, 'index'])->name('index');

@@ -14,22 +14,34 @@ use Illuminate\Support\Facades\DB;
 class MisResolucionesController extends Controller
 {
     /**
-     * Mostrar solo las resoluciones creadas por el usuario
+     * Mostrar solo las resoluciones creadas por el usuario o donde está involucrado
      * NO REQUIERE PERMISOS - Acceso libre para todos los colaboradores
      */
     public function index(Request $request)
     {
         $userId = Auth::id();
+        $user = Auth::user();
+        $personaId = $user->id_persona; // ID de la persona asociada al usuario
         
-        // Query base: resoluciones creadas por el usuario o donde es firmante
+        // Query base: resoluciones donde el usuario está relacionado
         $query = Resolucion::with([
             'estado',
             'tipoResolucion',
             'usuarioCreador',
             'usuarioFirmante'
-        ])->where(function($q) use ($userId) {
+        ])->where(function($q) use ($userId, $personaId) {
+            // 1. Resoluciones creadas por el usuario
             $q->where('id_usuario', $userId)
+              // 2. Resoluciones firmadas por el usuario
               ->orWhere('id_usuario_firma', $userId);
+            
+            // 3. Resoluciones donde la persona está relacionada (involucrado/notificado/firmante)
+            if ($personaId) {
+                $q->orWhereHas('personas', function($query) use ($personaId) {
+                    $query->where('persona.id_persona', $personaId)
+                          ->where('persona_resolucion.i_active', true);
+                });
+            }
         });
 
         // Filtros
@@ -81,96 +93,164 @@ class MisResolucionesController extends Controller
             $query->whereDate('fecha_resolucion', '<=', $request->fecha_hasta);
         }
 
+        // Filtro por tipo de relación (opcional)
+        if ($request->filled('relacion') && $personaId) {
+            $relacion = $request->relacion;
+            $query->whereHas('personas', function($q) use ($personaId, $relacion) {
+                $q->where('persona.id_persona', $personaId)
+                  ->where('persona_resolucion.tipo_relacion', $relacion);
+            });
+        }
+
         $resoluciones = $query->orderBy('fecha_resolucion', 'desc')
-            ->orderBy('fecha_creacion', 'desc')
             ->paginate(15)
             ->withQueryString();
 
-        // Estadísticas del usuario
-        $stats = [
-            'total' => Resolucion::where(function($q) use ($userId) {
-                $q->where('id_usuario', $userId)
-                  ->orWhere('id_usuario_firma', $userId);
-            })->count(),
-            
-            'borradores' => Resolucion::where('id_usuario', $userId)
-                ->whereHas('estado', fn($q) => $q->where('nombre_estado', 'Borrador'))
-                ->count(),
-            
-            'pendientes_firma' => Resolucion::where('id_usuario', $userId)
-                ->whereHas('estado', fn($q) => $q->where('nombre_estado', 'Pendiente de Firma'))
-                ->count(),
-            
-            'firmadas' => Resolucion::where(function($q) use ($userId) {
-                $q->where('id_usuario', $userId)
-                  ->orWhere('id_usuario_firma', $userId);
-            })
-                ->whereNotNull('archivo_firmado')
-                ->whereNotNull('fecha_firma')
-                ->count(),
-            
-            'publicadas' => Resolucion::where('id_usuario', $userId)
-                ->whereHas('estado', fn($q) => $q->where('nombre_estado', 'Publicada'))
-                ->count(),
-            
-            'revision' => Resolucion::where('id_usuario', $userId)
-                ->whereHas('estado', fn($q) => $q->where('nombre_estado', 'En Revisión'))
-                ->count(),
-            
-            'mes_actual' => Resolucion::where('id_usuario', $userId)
-                ->whereMonth('fecha_resolucion', now()->month)
-                ->whereYear('fecha_resolucion', now()->year)
-                ->count(),
-        ];
+        // Datos para filtros
+        $estados = Estado::all();
+        $tipos = TipoResolucion::where('i_active', true)->get();
 
-        // CAMBIO: Sin filtro i_active
-        $estados = Estado::orderBy('nombre_estado')->get();
-        $tipos = TipoResolucion::where('i_active', true)->orderBy('nombre_tipo_resolucion')->get();
+        // Estadísticas
+        $stats = $this->obtenerEstadisticas($userId, $personaId);
 
-        return view('colaborador.mis-resoluciones.index', compact('resoluciones', 'stats', 'estados', 'tipos'));
+        return view('colaborador.mis-resoluciones.index', compact('resoluciones', 'estados', 'tipos', 'stats'));
     }
 
     /**
-     * Mostrar detalle de una resolución del usuario
+     * Mostrar detalles de una resolución
      */
     public function show(Resolucion $resolucion)
     {
         $userId = Auth::id();
-        
+        $personaId = Auth::user()->id_persona;
+
         // Verificar que el usuario tenga acceso a esta resolución
-        if ($resolucion->id_usuario !== $userId && $resolucion->id_usuario_firma !== $userId) {
+        $tieneAcceso = $resolucion->id_usuario === $userId
+            || $resolucion->id_usuario_firma === $userId
+            || ($personaId && $resolucion->personas()->where('persona.id_persona', $personaId)->exists());
+
+        if (!$tieneAcceso) {
             abort(403, 'No tiene acceso a esta resolución');
         }
 
         $resolucion->load([
             'estado',
             'tipoResolucion',
-            'usuarioCreador',
-            'usuarioFirmante',
-            'personas'
+            'usuarioCreador.persona',
+            'usuarioFirmante.persona',
+            'personas',
+            'colaFirmas.estadoFirma',
+            'historialFirmas.usuario.persona',
         ]);
 
         return view('colaborador.mis-resoluciones.show', compact('resolucion'));
     }
 
     /**
-     * Obtener estadísticas en tiempo real (AJAX)
+     * Obtener estadísticas del usuario
      */
-    public function estadisticas()
+    private function obtenerEstadisticas($userId, $personaId)
+    {
+        $baseQuery = function() use ($userId, $personaId) {
+            return Resolucion::where(function($q) use ($userId, $personaId) {
+                $q->where('id_usuario', $userId)
+                  ->orWhere('id_usuario_firma', $userId);
+                
+                if ($personaId) {
+                    $q->orWhereHas('personas', function($query) use ($personaId) {
+                        $query->where('persona.id_persona', $personaId)
+                              ->where('persona_resolucion.i_active', true);
+                    });
+                }
+            });
+        };
+
+        return [
+            'total' => $baseQuery()->count(),
+            'creadas' => Resolucion::where('id_usuario', $userId)->count(),
+            'involucrado' => $personaId 
+                ? Resolucion::whereHas('personas', function($q) use ($personaId) {
+                    $q->where('persona.id_persona', $personaId)
+                      ->where('persona_resolucion.tipo_relacion', 'involucrado');
+                })->count() 
+                : 0,
+            'firmadas' => Resolucion::where('id_usuario_firma', $userId)->count(),
+            'pendientes' => $baseQuery()->whereHas('estado', function($q) {
+                $q->where('nombre_estado', 'Pendiente');
+            })->count(),
+            'este_mes' => $baseQuery()->whereMonth('fecha_resolucion', now()->month)
+                                      ->whereYear('fecha_resolucion', now()->year)
+                                      ->count(),
+        ];
+    }
+
+    /**
+     * Estadísticas en formato JSON (para gráficos)
+     */
+    public function estadisticas(Request $request)
     {
         $userId = Auth::id();
+        $personaId = Auth::user()->id_persona;
+
+        // Resoluciones por mes (últimos 6 meses)
+        $porMes = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $fecha = now()->subMonths($i);
+            $count = Resolucion::where(function($q) use ($userId, $personaId) {
+                $q->where('id_usuario', $userId)
+                  ->orWhere('id_usuario_firma', $userId);
+                
+                if ($personaId) {
+                    $q->orWhereHas('personas', function($query) use ($personaId) {
+                        $query->where('persona.id_persona', $personaId);
+                    });
+                }
+            })->whereMonth('fecha_resolucion', $fecha->month)
+              ->whereYear('fecha_resolucion', $fecha->year)
+              ->count();
+
+            $porMes[] = [
+                'mes' => $fecha->format('M Y'),
+                'cantidad' => $count
+            ];
+        }
+
+        // Resoluciones por estado
+        $porEstado = Estado::withCount(['resoluciones' => function($query) use ($userId, $personaId) {
+            $query->where(function($q) use ($userId, $personaId) {
+                $q->where('id_usuario', $userId)
+                  ->orWhere('id_usuario_firma', $userId);
+                
+                if ($personaId) {
+                    $q->orWhereHas('personas', function($query) use ($personaId) {
+                        $query->where('persona.id_persona', $personaId);
+                    });
+                }
+            });
+        }])->get()->map(function($estado) {
+            return [
+                'estado' => $estado->nombre_estado,
+                'cantidad' => $estado->resoluciones_count,
+                'color' => $this->getEstadoColor($estado->nombre_estado),
+            ];
+        });
 
         return response()->json([
-            'total' => Resolucion::where('id_usuario', $userId)->count(),
-            'borradores' => Resolucion::where('id_usuario', $userId)
-                ->whereHas('estado', fn($q) => $q->where('nombre_estado', 'Borrador'))
-                ->count(),
-            'firmadas' => Resolucion::where('id_usuario_firma', $userId)
-                ->whereNotNull('archivo_firmado')
-                ->count(),
-            'publicadas' => Resolucion::where('id_usuario', $userId)
-                ->whereHas('estado', fn($q) => $q->where('nombre_estado', 'Publicada'))
-                ->count(),
+            'por_mes' => $porMes,
+            'por_estado' => $porEstado,
         ]);
+    }
+
+    private function getEstadoColor($nombreEstado)
+    {
+        $colores = [
+            'Aprobado' => '#10B981',
+            'Pendiente' => '#F59E0B',
+            'Rechazado' => '#EF4444',
+            'Borrador' => '#6B7280',
+            'En Proceso' => '#3B82F6',
+        ];
+
+        return $colores[$nombreEstado] ?? '#6B7280';
     }
 }

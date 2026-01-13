@@ -103,7 +103,7 @@ class ResolucionObserver
                 'id_resolucion' => $resolucion->id_resolucion,
                 'titulo_notificacion' => 'Cambio de estado de resolución',
                 'mensaje_notificacion' => "La resolución {$resolucion->num_resolucion} cambió a estado: {$resolucion->estado->nombre_estado}",
-                'tipo_notificacion' => 'cambio_estado',
+                'tipo_notificacion' => 'resolucion_enviada', // CHANGED
                 'i_leido' => false,
             ]);
         }
@@ -116,7 +116,7 @@ class ResolucionObserver
                     'id_resolucion' => $resolucion->id_resolucion,
                     'titulo_notificacion' => 'Actualización de resolución',
                     'mensaje_notificacion' => "La resolución {$resolucion->num_resolucion} en la que está involucrado cambió de estado a: {$resolucion->estado->nombre_estado}",
-                    'tipo_notificacion' => 'actualizacion',
+                    'tipo_notificacion' => 'mencion', // CHANGED
                     'i_leido' => false,
                 ]);
             }
@@ -135,7 +135,7 @@ class ResolucionObserver
                 'id_resolucion' => $resolucion->id_resolucion,
                 'titulo_notificacion' => '✅ Resolución firmada',
                 'mensaje_notificacion' => "La resolución {$resolucion->num_resolucion} ha sido firmada digitalmente",
-                'tipo_notificacion' => 'firma_exitosa',
+                'tipo_notificacion' => 'resolucion_firmada', // CHANGED
                 'i_leido' => false,
             ]);
         }
@@ -148,10 +148,12 @@ class ResolucionObserver
                     'id_resolucion' => $resolucion->id_resolucion,
                     'titulo_notificacion' => '📄 Resolución disponible',
                     'mensaje_notificacion' => "La resolución {$resolucion->num_resolucion} ya está firmada y disponible para descarga",
-                    'tipo_notificacion' => 'documento_disponible',
+                    'tipo_notificacion' => 'resolucion_firmada', // CHANGED
                     'i_leido' => false,
                 ]);
             }
         }
     }
+
+
 }

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class QuejaController extends Controller
 {
+
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -21,26 +22,30 @@ class QuejaController extends Controller
             abort(403);
         }
 
-        $query = Queja::with('estadoQueja')
-            ->where('id_cliente', $cliente->id_cliente);
+        $query = Queja::where('id_cliente', $cliente->id_cliente);
 
+        // Filtro por estado (es un ENUM, no FK)
         if ($request->filled('estado')) {
-            $query->where('id_estado_queja', $request->estado);
+            $query->where('estado', $request->estado);  // ← Cambiar id_estado_queja por estado
         }
 
+        // Búsqueda
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('asunto_queja', 'like', "%{$search}%")
-                  ->orWhere('descripcion_queja', 'like', "%{$search}%");
-            });
+            $query->where('descripcion', 'like', "%{$search}%");  // ← Cambiar a descripcion (campo real)
         }
 
-        $quejas = $query->orderBy('fecha_queja', 'desc')
+        $quejas = $query->orderBy('fecha_creacion', 'desc')  // ← Cambiar fecha_queja por fecha_creacion
             ->paginate(15)
             ->withQueryString();
 
-        $estados = EstadoQueja::all();
+        // Los estados son valores ENUM, no una tabla
+        $estados = [
+            'pendiente' => 'Pendiente',
+            'en_revision' => 'En Revisión',
+            'resuelta' => 'Resuelta',
+            'rechazada' => 'Rechazada'
+        ];
 
         return view('cliente.quejas.index', compact('quejas', 'estados'));
     }

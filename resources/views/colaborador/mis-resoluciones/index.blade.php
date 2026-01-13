@@ -10,7 +10,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-gray-900">📑 Mis Resoluciones</h1>
-                <p class="text-gray-600 mt-1">Resoluciones creadas por mí</p>
+                <p class="text-gray-600 mt-1">Resoluciones donde estoy involucrado</p>
             </div>
             <div class="flex items-center gap-3">
                 <!-- Filtro rápido -->
@@ -36,15 +36,15 @@
                 </div>
                 <div class="text-right">
                     <p class="text-blue-100 text-sm font-medium">Total</p>
-                    <p class="text-4xl font-bold">{{ $stats['total'] }}</p>
+                    <p class="text-4xl font-bold">{{ $stats['total'] ?? 0 }}</p>
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-blue-400">
-                <p class="text-xs text-blue-100">Resoluciones creadas</p>
+                <p class="text-xs text-blue-100">Todas mis resoluciones</p>
             </div>
         </div>
 
-        <!-- Borradores -->
+        <!-- Creadas por mí -->
         <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-yellow-500">
             <div class="flex items-center justify-between">
                 <div class="p-3 bg-yellow-100 rounded-lg">
@@ -53,25 +53,25 @@
                     </svg>
                 </div>
                 <div class="text-right">
-                    <p class="text-gray-600 text-sm font-medium">Borradores</p>
-                    <p class="text-3xl font-bold text-yellow-600">{{ $stats['borradores'] }}</p>
-                    <p class="text-xs text-gray-500 mt-1">Pendientes</p>
+                    <p class="text-gray-600 text-sm font-medium">Creadas</p>
+                    <p class="text-3xl font-bold text-yellow-600">{{ $stats['creadas'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Por mí</p>
                 </div>
             </div>
         </div>
 
-        <!-- En Revisión -->
+        <!-- Involucrado -->
         <div class="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-500">
             <div class="flex items-center justify-between">
                 <div class="p-3 bg-blue-100 rounded-lg">
                     <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
                 </div>
                 <div class="text-right">
-                    <p class="text-gray-600 text-sm font-medium">En Revisión</p>
-                    <p class="text-3xl font-bold text-blue-600">{{ $stats['revision'] }}</p>
-                    <p class="text-xs text-gray-500 mt-1">Proceso</p>
+                    <p class="text-gray-600 text-sm font-medium">Involucrado</p>
+                    <p class="text-3xl font-bold text-blue-600">{{ $stats['involucrado'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Como parte</p>
                 </div>
             </div>
         </div>
@@ -86,8 +86,8 @@
                 </div>
                 <div class="text-right">
                     <p class="text-gray-600 text-sm font-medium">Firmadas</p>
-                    <p class="text-3xl font-bold text-green-600">{{ $stats['firmadas'] }}</p>
-                    <p class="text-xs text-gray-500 mt-1">Completadas</p>
+                    <p class="text-3xl font-bold text-green-600">{{ $stats['firmadas'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Por mí</p>
                 </div>
             </div>
         </div>
@@ -102,7 +102,7 @@
                 </div>
                 <div class="text-right">
                     <p class="text-gray-600 text-sm font-medium">Este Mes</p>
-                    <p class="text-3xl font-bold text-purple-600">{{ $stats['mes_actual'] }}</p>
+                    <p class="text-3xl font-bold text-purple-600">{{ $stats['este_mes'] ?? 0 }}</p>
                     <p class="text-xs text-gray-500 mt-1">{{ now()->format('M Y') }}</p>
                 </div>
             </div>
@@ -111,7 +111,7 @@
 
     <!-- Filtros -->
     <div class="bg-white rounded-lg shadow mb-6 p-6">
-        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
                 <input type="text" 
@@ -145,7 +145,18 @@
                 </select>
             </div>
 
-            <div class="md:col-span-4 flex gap-2">
+            <!-- Filtro por tipo de relación (NUEVO) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Mi Relación</label>
+                <select name="relacion" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Todas</option>
+                    <option value="involucrado" {{ request('relacion') === 'involucrado' ? 'selected' : '' }}>Involucrado</option>
+                    <option value="notificado" {{ request('relacion') === 'notificado' ? 'selected' : '' }}>Notificado</option>
+                    <option value="firmante" {{ request('relacion') === 'firmante' ? 'selected' : '' }}>Firmante</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-5 flex gap-2">
                 <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
                     🔍 Filtrar
                 </button>
@@ -165,17 +176,67 @@
                 <div class="flex-1">
                     <div class="flex items-center gap-3 mb-2">
                         <h3 class="text-lg font-bold text-gray-900">{{ $resolucion->num_resolucion }}</h3>
+                        
+                        <!-- Badge de Estado -->
                         <span class="px-3 py-1 text-xs rounded-full font-semibold
                             {{ $resolucion->estado->nombre_estado === 'Firmada' ? 'bg-green-100 text-green-800' : 
                                ($resolucion->estado->nombre_estado === 'Borrador' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800') }}">
                             {{ $resolucion->estado->nombre_estado }}
                         </span>
+                        
+                        <!-- Badge de Tipo -->
                         <span class="px-3 py-1 text-xs rounded-full bg-purple-100 text-purple-800 font-semibold">
                             {{ $resolucion->tipoResolucion->nombre_tipo_resolucion }}
                         </span>
+
+                        <!-- Badge de Relación del Usuario (NUEVO) -->
+                        @php
+                            $userId = auth()->id();
+                            $personaId = auth()->user()->id_persona;
+                            $esCreador = $resolucion->id_usuario === $userId;
+                            $esFirmante = $resolucion->id_usuario_firma === $userId;
+                            $relacionPersona = null;
+                            
+                            if ($personaId && $resolucion->personas) {
+                                $persona = $resolucion->personas->firstWhere('id_persona', $personaId);
+                                if ($persona) {
+                                    $relacionPersona = $persona->pivot->tipo_relacion;
+                                }
+                            }
+                        @endphp
+
+                        @if($esCreador)
+                        <span class="px-3 py-1 text-xs rounded-full bg-orange-100 text-orange-800 font-semibold">
+                            👤 Creador
+                        </span>
+                        @endif
+
+                        @if($esFirmante)
+                        <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 font-semibold">
+                            ✍️ Firmante
+                        </span>
+                        @endif
+
+                        @if($relacionPersona)
+                        <span class="px-3 py-1 text-xs rounded-full bg-cyan-100 text-cyan-800 font-semibold">
+                            @if($relacionPersona === 'involucrado')
+                                👥 Involucrado
+                            @elseif($relacionPersona === 'notificado')
+                                🔔 Notificado
+                            @elseif($relacionPersona === 'firmante')
+                                📝 Firmante Asignado
+                            @endif
+                        </span>
+                        @endif
                     </div>
+                    
                     <p class="text-gray-700 mb-2">{{ $resolucion->asunto_resolucion }}</p>
-                    <p class="text-sm text-gray-500">📅 {{ $resolucion->fecha_resolucion->format('d/m/Y') }}</p>
+                    <div class="flex items-center gap-4 text-sm text-gray-500">
+                        <span>📅 {{ $resolucion->fecha_resolucion->format('d/m/Y') }}</span>
+                        @if($resolucion->usuarioCreador)
+                        <span>👤 Creado por: {{ $resolucion->usuarioCreador->name }}</span>
+                        @endif
+                    </div>
                 </div>
                 <div class="flex gap-2">
                     <a href="{{ route('colaborador.mis-resoluciones.show', $resolucion->id_resolucion) }}" 
@@ -183,10 +244,9 @@
                         👁️ Ver
                     </a>
                     @if($resolucion->archivo_firmado)
-                    <a href="{{ Storage::url($resolucion->archivo_firmado) }}" 
-                       target="_blank"
+                    <a href="{{ route('colaborador.resoluciones.descargar-firmado', $resolucion) }}" 
                        class="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition text-sm font-medium">
-                        📥
+                        📥 Descargar
                     </a>
                     @endif
                 </div>
@@ -198,7 +258,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
             <h3 class="text-lg font-medium text-gray-900 mb-2">No tienes resoluciones</h3>
-            <p class="text-gray-500">Aún no has creado ninguna resolución</p>
+            <p class="text-gray-500">Aún no tienes resoluciones creadas ni estás involucrado en ninguna</p>
         </div>
         @endforelse
     </div>

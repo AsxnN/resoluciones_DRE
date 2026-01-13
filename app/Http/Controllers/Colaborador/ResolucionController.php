@@ -607,4 +607,122 @@ class ResolucionController extends Controller implements HasMiddleware
                 ->with('error', '❌ Error al crear resolución: ' . $e->getMessage());
         }
     }
+
+    public function revisarFirma(Request $request)
+    {
+        // Obtener IDs desde query string (GET) o desde body (POST)
+        $idsJson = $request->input('resoluciones_ids');
+        
+        if (!$idsJson) {
+            return redirect()->route('colaborador.resoluciones.index')->with('error', '❌ No se seleccionaron resoluciones');
+        }
+        
+        $ids = json_decode($idsJson, true);
+        
+        if (empty($ids) || !is_array($ids)) {
+            return redirect()->route('colaborador.resoluciones.index')->with('error', '❌ No se seleccionaron resoluciones');
+        }
+
+        $resoluciones = Resolucion::with(['estado', 'tipoResolucion', 'usuarioCreador.persona', 'personasInvolucradas'])
+            ->whereIn('id_resolucion', $ids)
+            ->whereNull('archivo_firmado') // Solo no firmadas
+            ->get();
+
+        if ($resoluciones->isEmpty()) {
+            return redirect()->route('colaborador.resoluciones.index')->with('error', '❌ No hay resoluciones válidas para firmar');
+        }
+
+        return view('colaborador.resoluciones.revisar-firma', compact('resoluciones'));
+    }
+
+    public function firmarMasivo(Request $request)
+    {
+        $request->validate([
+            'resoluciones_ids' => 'required|json',
+            'enviar_whatsapp' => 'nullable|boolean',
+            'enviar_correo' => 'nullable|boolean',
+        ]);
+
+        $ids = json_decode($request->resoluciones_ids);
+        
+        if (empty($ids)) {
+            return redirect()->back()->with('error', '❌ No se seleccionaron resoluciones');
+        }
+
+        DB::beginTransaction();
+        try {
+            $firmadas = 0;
+            
+            // Obtener el estado "Firmado" de la tabla estados_firma
+            $estadoFirmado = \App\Models\EstadoFirma::where('nombre_estado', 'Firmado')->first();
+            
+            if (!$estadoFirmado) {
+                throw new \Exception('No se encontró el estado "Firmado" en la tabla estados_firma');
+            }
+            
+            foreach ($ids as $id) {
+                $resolucion = Resolucion::find($id);
+                
+                if ($resolucion && !$resolucion->archivo_firmado) {
+                    // Actualizar resolución
+                    $resolucion->update([
+                        'archivo_firmado' => 'firmado',  // Marcador temporal
+                        'fecha_firma' => now(),
+                        'id_usuario_firma' => Auth::id(),
+                    ]);
+                    
+                    // Crear registro en cola_firma
+                    \App\Models\ColaFirma::create([
+                        'id_resolucion' => $resolucion->id_resolucion,
+                        'id_usuario_solicita' => $resolucion->id_usuario,
+                        'id_usuario_firmante' => Auth::id(),
+                        'id_estado_firma' => $estadoFirmado->id_estado_firma,
+                        'prioridad' => 'media',
+                        'fecha_firma' => now(),
+                        'observaciones' => 'Firmado mediante firma masiva',
+                    ]);
+                    
+                    // Enviar notificaciones si están marcadas
+                    if ($request->boolean('enviar_whatsapp') || $request->boolean('enviar_correo')) {
+                        // Cargar personas involucradas
+                        $resolucion->load('personasInvolucradas');
+                        
+                        foreach ($resolucion->personasInvolucradas as $persona) {
+                            if ($request->boolean('enviar_correo') && $persona->correo) {
+                                try {
+                                    Mail::to($persona->correo)->send(new \App\Mail\ResolucionNotificacion($resolucion, $persona));
+                                } catch (\Exception $e) {
+                                    \Log::error('Error enviando correo: ' . $e->getMessage());
+                                }
+                            }
+                            
+                            // TODO: Implementar envío por WhatsApp
+                            if ($request->boolean('enviar_whatsapp') && $persona->whatsapp) {
+                                // Lógica de WhatsApp aquí
+                            }
+                        }
+                    }
+                    
+                    $firmadas++;
+                }
+            }
+
+            DB::commit();
+
+            $mensaje = "✅ Se firmaron {$firmadas} resolución(es) correctamente.";
+            
+            if ($request->boolean('enviar_whatsapp') || $request->boolean('enviar_correo')) {
+                $mensaje .= " Se enviaron las notificaciones correspondientes.";
+            }
+
+            return redirect()
+                ->route('colaborador.resoluciones-firmadas.index')
+                ->with('success', $mensaje);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', '❌ Error al firmar resoluciones: ' . $e->getMessage());
+        }
+    }
+
 }
