@@ -82,7 +82,14 @@ class Resolucion extends Model
 
     public function personasInvolucradas()
     {
-        return $this->personas()->wherePivot('tipo_relacion', 'involucrado');
+        return $this->belongsToMany(
+            Persona::class,
+            'persona_resolucion',
+            'id_resolucion',
+            'id_persona',
+            'id_resolucion',
+            'id_persona'
+        )->withPivot('tipo_relacion')->withTimestamps();
     }
 
     public function personasNotificadas()
@@ -362,5 +369,22 @@ class Resolucion extends Model
             'prioridad' => $prioridad,
             'fecha_limite' => now()->addDays(3), // 3 días para firmar
         ]);
+    }
+
+    public function personasRelacionadasDatos()
+    {
+        return $this->hasMany(PersonaResolucionDatos::class, 'id_resolucion', 'id_resolucion')
+                    ->orderBy('fecha_creacion', 'asc');
+    }
+
+    public function getPersonasAttribute()
+    {
+        return $this->personasRelacionadasDatos;
+    }
+
+    // Nueva relación para persona_resolucion_datos
+    public function personasRelacionadas()
+    {
+        return $this->hasMany(PersonaResolucionDatos::class, 'id_resolucion', 'id_resolucion');
     }
 }

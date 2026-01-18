@@ -4,6 +4,8 @@
 namespace App\Http\Controllers\Cliente;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Persona;
 use App\Models\Resolucion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,25 +16,22 @@ class MisResolucionesController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $cliente = $user->cliente;
-
-        if (!$cliente) {
-            abort(403);
-        }
-
-        $persona = $cliente->persona;
-
+        
+        // Obtener resoluciones asignadas al usuario actual
         $query = Resolucion::with(['estado', 'tipoResolucion'])
-            ->whereHas('personasInvolucradas', function($q) use ($persona) {
-                $q->where('persona.id_persona', $persona->id_persona);
-            });
+            ->whereHas('personasRelacionadas', function($q) use ($user) {
+                $q->where('id_user', $user->id)
+                ->where('es_interna', false)
+                ->where('asignado_a_cliente', true); // Solo las que están asignadas
+            })
+            ->whereNotNull('archivo_firmado'); // Solo resoluciones firmadas
 
         // Filtros
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('num_resolucion', 'like', "%{$search}%")
-                  ->orWhere('asunto_resolucion', 'like', "%{$search}%");
+                ->orWhere('asunto_resolucion', 'like', "%{$search}%");
             });
         }
 
@@ -96,41 +95,62 @@ class MisResolucionesController extends Controller
     public function show(Resolucion $resolucion)
     {
         $user = Auth::user();
-        $cliente = $user->cliente;
-        $persona = $cliente->persona;
 
-        // Verificar que el cliente esté involucrado
-        if (!$resolucion->personasInvolucradas->contains('id_persona', $persona->id_persona)) {
+        // Verificar que el cliente esté asignado a esta resolución
+        $personaRelacionada = $resolucion->personasRelacionadas()
+            ->where('id_user', $user->id)
+            ->where('es_interna', false)
+            ->where('asignado_a_cliente', true)
+            ->first();
+
+        if (!$personaRelacionada) {
             abort(403, 'No tiene acceso a esta resolución');
         }
 
         $resolucion->load([
             'estado',
             'tipoResolucion',
-            'usuarioCreador.persona',
-            'personasInvolucradas',
+            'usuarioCreador',
+            'personasRelacionadas' => function($query) use ($user) {
+                $query->where('id_user', $user->id);
+            }
         ]);
 
-        return view('cliente.resoluciones.show', compact('resolucion'));
+        return view('cliente.resoluciones.show', compact('resolucion', 'personaRelacionada'));
     }
 
     public function descargar(Resolucion $resolucion)
     {
         $user = Auth::user();
-        $cliente = $user->cliente;
-        $persona = $cliente->persona;
 
-        if (!$resolucion->personasInvolucradas->contains('id_persona', $persona->id_persona)) {
-            abort(403);
+        // Verificar que el cliente esté asignado a esta resolución
+        $tieneAcceso = $resolucion->personasRelacionadas()
+            ->where('id_user', $user->id)
+            ->where('es_interna', false)
+            ->where('asignado_a_cliente', true)
+            ->exists();
+
+        if (!$tieneAcceso) {
+            abort(403, 'No tiene acceso a esta resolución');
         }
 
-        // Descargar archivo firmado si existe, sino el original
-        $archivo = $resolucion->archivo_firmado ?? $resolucion->archivo_resolucion;
+        // Descargar archivo firmado (las resoluciones del cliente siempre están firmadas)
+        $archivo = $resolucion->archivo_firmado;
 
         if (!$archivo || !Storage::disk('public')->exists($archivo)) {
             abort(404, 'Archivo no encontrado');
         }
 
+        // Registrar descarga en auditoría (opcional)
+        \App\Helpers\AuditoriaHelper::registrar(
+            'Descarga de resolución',
+            'resolucion',
+            $resolucion->id_resolucion,
+            null,
+            ['num_resolucion' => $resolucion->num_resolucion]
+        );
+
         return Storage::disk('public')->download($archivo, $resolucion->num_resolucion . '.pdf');
     }
+
 }

@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    
+    'reniec' => [
+        'url' => env('RENIEC_API_URL', 'https://apiperu.dev/api/dni'),
+        'token' => env('RENIEC_API_TOKEN'),
+    ],
 
 ];

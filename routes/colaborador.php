@@ -43,6 +43,8 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
             Route::put('/update', [ProfileController::class, 'update'])->name('update');
             Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('update-password');
         });
+
+        Route::post('reniec/consultar-dni', [ResolucionController::class, 'consultarReniec'])->name('reniec.consultar');
         
         // ========================================
         // TODAS LAS DEMÁS RUTAS REQUIEREN PERFIL COMPLETO
@@ -72,6 +74,9 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
             Route::post('resoluciones/crear/guardar', [ResolucionController::class, 'storeFinal'])->name('resoluciones.store-final');
             Route::post('resoluciones/firmar-masivo', [ResolucionController::class, 'firmarMasivo'])->name('resoluciones.firmarMasivo');
             Route::get('resoluciones/revisar-firma', [ResolucionController::class, 'revisarFirma'])->name('resoluciones.revisar-firma');
+            Route::get('resoluciones/buscar-usuario', [ResolucionController::class, 'buscarUsuario'])->name('resoluciones.buscar-usuario');
+            Route::post('resoluciones/{resolucion}/asignar-cliente/{personaResolucionDatos}', [ResolucionController::class, 'asignarCliente'])
+            ->name('resoluciones.asignar-cliente');
 
             Route::resource('resoluciones', ResolucionController::class)->parameters(['resoluciones' => 'resolucion']);
             
@@ -79,6 +84,9 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
             Route::get('resoluciones/{resolucion}/descargar-firmado', [ResolucionController::class, 'descargarFirmado'])->name('resoluciones.descargar-firmado');
             Route::patch('resoluciones/{resolucion}/cambiar-estado', [ResolucionController::class, 'cambiarEstado'])->name('resoluciones.cambiar-estado');
             Route::post('resoluciones/generar-numero', [ResolucionController::class, 'generarNumero'])->name('resoluciones.generar-numero');
+            Route::post('resoluciones/personas/{personaResolucionDatos}/enviar-credenciales', 
+                [ResolucionController::class, 'enviarCredenciales']
+            )->name('resoluciones.enviar-credenciales');
 
             Route::prefix('reportes')->name('reportes.')->group(function () {
             Route::get('personas-resoluciones', [ReporteController::class, 'personasConMasResoluciones'])->name('personas-resoluciones');
@@ -96,6 +104,9 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
             // RESOLUCIONES FIRMADAS
             Route::prefix('resoluciones-firmadas')->name('resoluciones-firmadas.')->group(function () {
                 Route::get('/', [ResolucionFirmadaController::class, 'index'])->name('index');
+                Route::get('buscar-usuario', [ResolucionFirmadaController::class, 'buscarUsuario'])->name('buscar-usuario'); // AGREGAR ESTA LÍNEA
+                Route::get('{resolucion}/enviar-correo', [ResolucionFirmadaController::class, 'mostrarEnviarCorreo'])->name('enviar-correo');
+                Route::post('{resolucion}/enviar-correos', [ResolucionFirmadaController::class, 'enviarCorreos'])->name('enviar-correos');
                 Route::get('cola-firma/{colaFirma}/firmar', [ResolucionFirmadaController::class, 'mostrarFormularioFirma'])->name('mostrar-firma');
                 Route::post('cola-firma/{colaFirma}/firmar', [ResolucionFirmadaController::class, 'firmar'])->name('firmar');
                 Route::post('cola-firma/{colaFirma}/rechazar', [ResolucionFirmadaController::class, 'rechazar'])->name('rechazar');
@@ -103,7 +114,6 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
                 Route::get('resoluciones/{resolucion}/historial', [ResolucionFirmadaController::class, 'historial'])->name('historial');
                 Route::get('resoluciones/{resolucion}/verificar-firma', [ResolucionFirmadaController::class, 'verificarFirma'])->name('verificar-firma');
             });
-
             // MIS RESOLUCIONES
             Route::prefix('mis-resoluciones')->name('mis-resoluciones.')->group(function () {
                 Route::get('/', [MisResolucionesController::class, 'index'])->name('index');

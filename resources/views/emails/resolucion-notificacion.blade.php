@@ -101,16 +101,24 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>📋 Nueva Resolución Emitida</h1>
+            <h1>📋 {{ $resolucion->archivo_firmado ? 'Resolución Firmada' : 'Nueva Resolución Emitida' }}</h1>
             <p>{{ $resolucion->num_resolucion }}</p>
         </div>
         
         <div class="content">
             <div class="greeting">
-                <p>Estimado(a) <strong>{{ $persona->apellido_paterno }} {{ $persona->apellido_materno }}, {{ $persona->nombres }}</strong>,</p>
+                @if($persona)
+                    <p>Estimado(a) <strong>{{ $persona->apellido_paterno }} {{ $persona->apellido_materno }}, {{ $persona->nombres }}</strong>,</p>
+                @else
+                    <p>Estimado(a) usuario,</p>
+                @endif
             </div>
             
-            <p>Le informamos que se ha emitido una nueva <strong>Resolución</strong> en la que usted está relacionado(a).</p>
+            @if($resolucion->archivo_firmado)
+                <p>Le informamos que la siguiente <strong>Resolución</strong> ha sido <strong style="color: #10b981;">firmada oficialmente</strong> y se encuentra disponible para su conocimiento.</p>
+            @else
+                <p>Le informamos que se ha emitido una nueva <strong>Resolución</strong>{{ $persona ? ' en la que usted está relacionado(a)' : '' }}.</p>
+            @endif
             
             <div class="info-box">
                 <div class="info-row">
@@ -129,6 +137,12 @@
                     <strong>Estado:</strong> 
                     <span>{{ $resolucion->estado->nombre_estado ?? 'N/A' }}</span>
                 </div>
+                @if($resolucion->archivo_firmado && $resolucion->fecha_firma)
+                <div class="info-row">
+                    <strong>Fecha Firma:</strong> 
+                    <span style="color: #10b981; font-weight: bold;">{{ \Carbon\Carbon::parse($resolucion->fecha_firma)->format('d/m/Y H:i') }}</span>
+                </div>
+                @endif
             </div>
 
             @if($resolucion->visto_resolucion)
@@ -143,16 +157,16 @@
                 <p style="margin: 10px 0 0 0;">{{ $resolucion->asunto_resolucion }}</p>
             </div>
 
-            @if($resolucion->archivo_resolucion)
+            @if($resolucion->archivo_firmado || $resolucion->archivo_resolucion)
             <div class="attachment-notice">
-                <strong>📎 Se adjunta el documento oficial de la resolución en formato PDF</strong>
+                <strong>📎 Se adjunta el documento oficial de la resolución{{ $resolucion->archivo_firmado ? ' firmada' : '' }} en formato PDF</strong>
             </div>
             @endif
             
             <p style="margin-top: 30px;">Para más información, consultas o aclaraciones sobre esta resolución, por favor contacte con la administración correspondiente.</p>
             
             <p style="margin-top: 20px; color: #6b7280; font-size: 14px;">
-                <em>Este documento tiene carácter informativo. Conserve este correo para futuras referencias.</em>
+                <em>Este documento tiene carácter {{ $resolucion->archivo_firmado ? 'oficial' : 'informativo' }}. Conserve este correo para futuras referencias.</em>
             </p>
         </div>
         

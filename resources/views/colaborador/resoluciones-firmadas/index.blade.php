@@ -244,6 +244,14 @@
                                 </a>
                                 @endif
 
+                                <a href="{{ route('colaborador.resoluciones-firmadas.enviar-correo', $resolucion) }}" 
+                                   class="text-indigo-600 hover:text-indigo-900 p-2 rounded-lg hover:bg-indigo-50 transition" 
+                                   title="Enviar por Correo">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                </a>
+
                                 <button onclick="verDetallesFirma({{ $resolucion->id_resolucion }})" 
                                         class="text-purple-600 hover:text-purple-900 p-2 rounded-lg hover:bg-purple-50 transition" 
                                         title="Detalles de Firma">

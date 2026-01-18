@@ -77,7 +77,7 @@
                 <!-- N° Resolución -->
                 <div>
                     <label for="num_resolucion" class="block text-sm font-medium text-gray-700 mb-2">
-                        N° RESOLUCIÓN <span class="text-red-500">*</span>
+                        N° Resolución <span class="text-red-500">*</span>
                     </label>
                     <input type="text" 
                            id="num_resolucion" 
@@ -94,12 +94,12 @@
                 <!-- Fecha de Resolución -->
                 <div>
                     <label for="fecha_resolucion" class="block text-sm font-medium text-gray-700 mb-2">
-                        FECHA DE RESOLUCIÓN <span class="text-red-500">*</span>
+                        Fecha <span class="text-red-500">*</span>
                     </label>
                     <input type="date" 
                            id="fecha_resolucion" 
                            name="fecha_resolucion" 
-                           value="{{ old('fecha_resolucion', now()->format('Y-m-d')) }}"
+                           value="{{ old('fecha_resolucion', date('Y-m-d')) }}"
                            required
                            class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 @error('fecha_resolucion') border-red-500 @enderror">
                     @error('fecha_resolucion')
@@ -110,7 +110,7 @@
                 <!-- Estado -->
                 <div>
                     <label for="id_estado" class="block text-sm font-medium text-gray-700 mb-2">
-                        ESTADO <span class="text-red-500">*</span>
+                        Estado <span class="text-red-500">*</span>
                     </label>
                     <select id="id_estado" 
                             name="id_estado" 
@@ -131,7 +131,7 @@
                 <!-- Tipo de Resolución -->
                 <div>
                     <label for="id_tipo_resolucion" class="block text-sm font-medium text-gray-700 mb-2">
-                        TIPO DE RESOLUCIÓN <span class="text-red-500">*</span>
+                        Tipo <span class="text-red-500">*</span>
                     </label>
                     <select id="id_tipo_resolucion" 
                             name="id_tipo_resolucion" 
@@ -152,15 +152,15 @@
                 <!-- Dependencia UGEL -->
                 <div class="md:col-span-2">
                     <label for="id_dependencia" class="block text-sm font-medium text-gray-700 mb-2">
-                        DEPENDENCIA-UGEL
+                        Dependencia UGEL
                     </label>
                     <select id="id_dependencia" 
                             name="id_dependencia"
                             class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="">Seleccione una dependencia...</option>
+                        <option value="">Sin dependencia</option>
                         @foreach($dependencias as $dependencia)
                             <option value="{{ $dependencia->id_dependencias }}" {{ old('id_dependencia') == $dependencia->id_dependencias ? 'selected' : '' }}>
-                                {{ $dependencia->nombre_dependencia }} ({{ $dependencia->cod_dependencia }})
+                                {{ $dependencia->nombre_dependencia }}
                             </option>
                         @endforeach
                     </select>
@@ -168,70 +168,342 @@
             </div>
         </div>
 
-        <!-- Card: Relacionar Personas -->
+        <!-- Card: Personas Relacionadas -->
         <div class="bg-white rounded-lg shadow-md p-6">
-            <div class="bg-gray-800 text-white px-4 py-3 rounded-t-lg -mx-6 -mt-6 mb-6">
-                <h2 class="text-lg font-semibold">RELACIONAR</h2>
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-semibold text-gray-900">👥 Personas Relacionadas</h2>
+                <button type="button" 
+                        id="btn-toggle-formulario"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Agregar Persona
+                </button>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Selector de personas -->
-                <div class="lg:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        PERSONA
-                    </label>
-                    <select id="persona-select" 
-                            class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4">
-                        <option value="">Seleccione opción</option>
-                        @foreach($personas as $persona)
-                            <option value="{{ $persona->id_persona }}" 
-                                    data-nombre="{{ $persona->apellido_paterno }} {{ $persona->apellido_materno }}, {{ $persona->nombres }}"
-                                    data-dni="{{ $persona->num_documento }}"
-                                    data-telefono="{{ $persona->telefono ?? 'N/A' }}"
-                                    data-email="{{ $persona->correo ?? 'N/A' }}">
-                                {{ $persona->apellido_paterno }} {{ $persona->apellido_materno }}, {{ $persona->nombres }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <input type="text" 
-                           id="buscar-dni"
-                           class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
-                           placeholder="Buscar por DNI">
-
+            <!-- Formulario de Persona (Oculto inicialmente) -->
+            <div id="formulario-persona" class="hidden mb-6 border-2 border-blue-200 rounded-lg p-6 bg-blue-50">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-md font-semibold text-blue-900">Nueva Persona</h3>
                     <button type="button" 
-                            id="btn-agregar"
-                            class="w-full px-4 py-3 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-lg transition-colors">
-                        Agregar
+                            id="btn-cerrar-formulario"
+                            class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
                     </button>
                 </div>
 
-                <!-- Tabla de personas relacionadas -->
-                <div class="lg:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        PERSONAS RELACIONADAS
-                    </label>
-                    <div class="bg-gray-50 rounded-lg border border-gray-300 overflow-hidden">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-800 text-white">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium uppercase">Id</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium uppercase">Persona</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium uppercase">DNI</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium uppercase">Teléfono</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium uppercase">Email</th>
-                                    <th class="px-4 py-3 text-center text-xs font-medium uppercase">Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-personas" class="bg-white divide-y divide-gray-200">
-                                <tr id="mensaje-vacio">
-                                    <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                                        No hay personas relacionadas
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <!-- Selector: Interna / Externa -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Tipo de Persona</label>
+                    <div class="flex gap-4">
+                        <button type="button" 
+                                id="btn-persona-interna"
+                                class="flex-1 px-6 py-4 border-2 border-green-500 bg-green-50 text-green-700 rounded-lg font-semibold hover:bg-green-100 transition-colors">
+                            👔 Interna (Trabaja en DRE)
+                        </button>
+                        <button type="button" 
+                                id="btn-persona-externa"
+                                class="flex-1 px-6 py-4 border-2 border-gray-300 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
+                            🌐 Externa (No trabaja en DRE)
+                        </button>
                     </div>
+                </div>
+
+                <!-- Formulario Persona INTERNA -->
+                <div id="formulario-interna" class="space-y-4">
+                    <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-4">
+                        <p class="text-sm text-green-800">
+                            💡 Busque al trabajador por DNI o nombre para agregarlo
+                        </p>
+                    </div>
+
+                    <!-- Búsqueda -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Buscar por DNI</label>
+                            <div class="flex gap-2">
+                                <input type="text" 
+                                       id="buscar_dni_interno"
+                                       placeholder="Ingrese DNI"
+                                       maxlength="8"
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                <button type="button" 
+                                        id="btn-buscar-dni-interno"
+                                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium">
+                                    Buscar
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Buscar por Nombre</label>
+                            <div class="flex gap-2">
+                                <input type="text" 
+                                       id="buscar_nombre_interno"
+                                       placeholder="Ingrese nombre"
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                                <button type="button" 
+                                        id="btn-buscar-nombre-interno"
+                                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium">
+                                    Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resultado búsqueda -->
+                    <div id="resultado-busqueda-interna" class="hidden"></div>
+
+                    <!-- Tipo de Relación -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Tipo de Relación <span class="text-red-500">*</span>
+                        </label>
+                        <select id="tipo_relacion_interna" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                            <option value="beneficiario">Beneficiario</option>
+                            <option value="afectado">Afectado</option>
+                            <option value="involucrado">Involucrado</option>
+                            <option value="testigo">Testigo</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Descripción de la Relación</label>
+                        <input type="text" 
+                               id="descripcion_relacion_interna" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                               placeholder="Breve descripción (opcional)">
+                    </div>
+                </div>
+
+                <!-- Formulario Persona EXTERNA -->
+                <div id="formulario-externa" class="hidden space-y-4">
+                    <!-- Tabs: Manual / RENIEC -->
+                    <div class="mb-4">
+                        <div class="flex border-b border-gray-300">
+                            <button type="button" 
+                                    id="tab-manual"
+                                    class="tab-button px-6 py-2 font-medium text-blue-600 border-b-2 border-blue-600">
+                                ✍️ Manual
+                            </button>
+                            <button type="button" 
+                                    id="tab-reniec"
+                                    class="tab-button px-6 py-2 font-medium text-gray-500 hover:text-blue-600">
+                                🆔 Consultar RENIEC
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Contenido Tab Manual -->
+                    <div id="contenido-manual" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Documento</label>
+                                <select id="tipo_documento_manual" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <option value="DNI">DNI</option>
+                                    <option value="Carnet de Extranjería">Carnet de Extranjería</option>
+                                    <option value="Pasaporte">Pasaporte</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">N° Documento (opcional)</label>
+                                <input type="text" 
+                                       id="num_documento_manual"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Opcional">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Nombres <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" 
+                                       id="nombres_manual"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Nombres">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Apellido Paterno <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" 
+                                       id="apellido_paterno_manual"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Apellido Paterno">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Apellido Materno</label>
+                                <input type="text" 
+                                       id="apellido_materno_manual"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Apellido Materno">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Relación <span class="text-red-500">*</span></label>
+                                <select id="tipo_relacion_manual" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <option value="beneficiario">Beneficiario</option>
+                                    <option value="afectado">Afectado</option>
+                                    <option value="involucrado">Involucrado</option>
+                                    <option value="testigo">Testigo</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción de la Relación</label>
+                            <input type="text" 
+                                   id="descripcion_relacion_manual" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                   placeholder="Breve descripción (opcional)">
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="button" 
+                                    id="btn-agregar-manual"
+                                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors">
+                                ✓ Agregar Persona Externa
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Contenido Tab RENIEC -->
+                    <div id="contenido-reniec" class="hidden space-y-4">
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                            <p class="text-sm text-yellow-800">
+                                💡 Ingrese el DNI y los datos se completarán automáticamente desde RENIEC
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    DNI <span class="text-red-500">*</span>
+                                </label>
+                                <div class="flex gap-2">
+                                    <input type="text" 
+                                           id="dni_reniec"
+                                           maxlength="8"
+                                           class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                           placeholder="Ingrese DNI de 8 dígitos">
+                                    <button type="button" 
+                                            id="btn-consultar-reniec"
+                                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">
+                                        Consultar
+                                    </button>
+                                </div>
+                                <div id="loading-reniec" class="hidden mt-2 text-sm text-blue-600">
+                                    ⏳ Consultando RENIEC...
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nombres</label>
+                                <input type="text" 
+                                       id="nombres_reniec"
+                                       readonly
+                                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Apellido Paterno</label>
+                                <input type="text" 
+                                       id="apellido_paterno_reniec"
+                                       readonly
+                                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Apellido Materno</label>
+                                <input type="text" 
+                                       id="apellido_materno_reniec"
+                                       readonly
+                                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Relación <span class="text-red-500">*</span></label>
+                                <select id="tipo_relacion_reniec" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <option value="beneficiario">Beneficiario</option>
+                                    <option value="afectado">Afectado</option>
+                                    <option value="involucrado">Involucrado</option>
+                                    <option value="testigo">Testigo</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción de la Relación</label>
+                            <input type="text" 
+                                   id="descripcion_relacion_reniec" 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                   placeholder="Breve descripción (opcional)">
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="button" 
+                                    id="btn-agregar-reniec"
+                                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors">
+                                ✓ Agregar Persona Externa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla Personas INTERNAS -->
+            <div class="mb-6">
+                <h3 class="text-md font-semibold text-green-700 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    👔 Personas Internas (Trabajadores DRE)
+                </h3>
+                <div class="overflow-x-auto max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-green-50 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">DNI</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre Completo</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo Relación</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-personas-internas" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="5" class="px-4 py-8 text-center text-gray-500">
+                                    No hay personas internas agregadas
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tabla Personas EXTERNAS -->
+            <div>
+                <h3 class="text-md font-semibold text-blue-700 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                    🌐 Personas Externas
+                </h3>
+                <div class="overflow-x-auto max-h-64 overflow-y-auto border border-gray-200 rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-blue-50 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Documento</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre Completo</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo Relación</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Origen</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-personas-externas" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                    No hay personas externas agregadas
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -243,7 +515,7 @@
         <div class="flex justify-end">
             <button type="submit" 
                     class="px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-lg transition-colors text-lg shadow-lg">
-                Siguiente
+                Siguiente →
             </button>
         </div>
     </form>
@@ -252,113 +524,494 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let personasRelacionadas = [];
-    const tablaPersonas = document.getElementById('tabla-personas');
-    const btnAgregar = document.getElementById('btn-agregar');
-    const personaSelect = document.getElementById('persona-select');
-    const buscarDni = document.getElementById('buscar-dni');
-    const contenedorInputs = document.getElementById('contenedor-personas-input');
+    let personasInternas = [];
+    let personasExternas = [];
+    let tipoPersonaActual = 'interna'; // 'interna' o 'externa'
+    let usuarioInternoSeleccionado = null;
 
-    // Función para agregar persona
-    btnAgregar.addEventListener('click', function() {
-        const selectedOption = personaSelect.options[personaSelect.selectedIndex];
+    const formularioPersona = document.getElementById('formulario-persona');
+    const formularioInterna = document.getElementById('formulario-interna');
+    const formularioExterna = document.getElementById('formulario-externa');
+    
+    // Toggle formulario principal
+    document.getElementById('btn-toggle-formulario').addEventListener('click', function() {
+        formularioPersona.classList.toggle('hidden');
+        if (!formularioPersona.classList.contains('hidden')) {
+            // Por defecto mostrar interna
+            mostrarFormularioInterna();
+        }
+    });
+    
+    document.getElementById('btn-cerrar-formulario').addEventListener('click', function() {
+        formularioPersona.classList.add('hidden');
+        limpiarFormularios();
+    });
+
+    // Botones Interna/Externa
+    document.getElementById('btn-persona-interna').addEventListener('click', function() {
+        tipoPersonaActual = 'interna';
+        mostrarFormularioInterna();
+    });
+
+    document.getElementById('btn-persona-externa').addEventListener('click', function() {
+        tipoPersonaActual = 'externa';
+        mostrarFormularioExterna();
+    });
+
+    function mostrarFormularioInterna() {
+        document.getElementById('btn-persona-interna').className = 'flex-1 px-6 py-4 border-2 border-green-500 bg-green-50 text-green-700 rounded-lg font-semibold hover:bg-green-100 transition-colors';
+        document.getElementById('btn-persona-externa').className = 'flex-1 px-6 py-4 border-2 border-gray-300 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors';
+        formularioInterna.classList.remove('hidden');
+        formularioExterna.classList.add('hidden');
+    }
+
+    function mostrarFormularioExterna() {
+        document.getElementById('btn-persona-externa').className = 'flex-1 px-6 py-4 border-2 border-blue-500 bg-blue-50 text-blue-700 rounded-lg font-semibold hover:bg-blue-100 transition-colors';
+        document.getElementById('btn-persona-interna').className = 'flex-1 px-6 py-4 border-2 border-gray-300 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors';
+        formularioExterna.classList.remove('hidden');
+        formularioInterna.classList.add('hidden');
+    }
+
+    // ==================== PERSONA INTERNA ====================
+
+    // Buscar por DNI
+    document.getElementById('btn-buscar-dni-interno').addEventListener('click', async function() {
+        const dni = document.getElementById('buscar_dni_interno').value.trim();
         
-        if (!selectedOption.value) {
-            alert('Por favor, seleccione una persona');
+        if (dni.length !== 8) {
+            alert('Por favor ingrese un DNI válido de 8 dígitos');
+            return;
+        }
+
+        buscarUsuarioInterno('dni', dni);
+    });
+
+    // Buscar por Nombre
+    document.getElementById('btn-buscar-nombre-interno').addEventListener('click', async function() {
+        const nombre = document.getElementById('buscar_nombre_interno').value.trim();
+        
+        if (nombre.length < 3) {
+            alert('Por favor ingrese al menos 3 caracteres');
+            return;
+        }
+
+        buscarUsuarioInterno('nombre', nombre);
+    });
+
+    async function buscarUsuarioInterno(tipo, valor) {
+        try {
+            const url = tipo === 'dni' 
+                ? `/colaborador/resoluciones/buscar-usuario?dni=${valor}`
+                : `/colaborador/resoluciones/buscar-usuario?nombre=${valor}`;
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (response.ok) {
+                mostrarResultadoInterno(data);
+            } else {
+                alert(data.message || 'No se encontró el usuario');
+                document.getElementById('resultado-busqueda-interna').classList.add('hidden');
+            }
+        } catch (error) {
+            alert('Error al buscar: ' + error.message);
+        }
+    }
+
+    function mostrarResultadoInterno(usuario) {
+        const contenedor = document.getElementById('resultado-busqueda-interna');
+        usuarioInternoSeleccionado = usuario;
+        
+        const html = `
+            <div class="bg-white border-2 border-green-300 rounded-lg p-4 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="h-14 w-14 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                            ${usuario.iniciales || usuario.nombre_completo.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 text-lg">${usuario.nombre_completo}</p>
+                            <p class="text-sm text-gray-600">DNI: ${usuario.num_documento}</p>
+                            <p class="text-sm text-green-600 font-medium">✓ Trabajador de la DRE</p>
+                        </div>
+                    </div>
+                    <button type="button" 
+                            onclick="agregarPersonaInterna()"
+                            class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-200">
+                        ✓ Agregar
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        contenedor.innerHTML = html;
+        contenedor.classList.remove('hidden');
+    }
+
+    window.agregarPersonaInterna = function() {
+        if (!usuarioInternoSeleccionado) {
+            alert('No hay usuario seleccionado');
+            return;
+        }
+
+        // Verificar duplicado
+        if (personasInternas.some(p => p.num_documento === usuarioInternoSeleccionado.num_documento)) {
+            alert('Esta persona ya está en la lista de internas');
             return;
         }
 
         const persona = {
-            id: selectedOption.value,
-            nombre: selectedOption.dataset.nombre,
-            dni: selectedOption.dataset.dni,
-            telefono: selectedOption.dataset.telefono || 'N/A',
-            email: selectedOption.dataset.email || 'N/A'
+            id_user: usuarioInternoSeleccionado.id_user,
+            num_documento: usuarioInternoSeleccionado.num_documento,
+            nombre_completo: usuarioInternoSeleccionado.nombre_completo,
+            correo: usuarioInternoSeleccionado.correo,
+            tipo_relacion: document.getElementById('tipo_relacion_interna').value,
+            descripcion_relacion: document.getElementById('descripcion_relacion_interna').value.trim(),
+            es_interna: true
         };
 
-        // Verificar si ya está agregada
-        if (personasRelacionadas.some(p => p.id === persona.id)) {
-            alert('Esta persona ya está en la lista');
+        personasInternas.push(persona);
+        actualizarTablaInternas();
+        actualizarInputsHidden();
+        limpiarFormularios();
+        formularioPersona.classList.add('hidden');
+        
+        alert('✅ Trabajador agregado correctamente');
+    };
+
+    // ==================== PERSONA EXTERNA ====================
+
+    // Tabs Manual/RENIEC
+    const tabManual = document.getElementById('tab-manual');
+    const tabReniec = document.getElementById('tab-reniec');
+    const contenidoManual = document.getElementById('contenido-manual');
+    const contenidoReniec = document.getElementById('contenido-reniec');
+
+    tabManual.addEventListener('click', function() {
+        tabManual.className = 'tab-button px-6 py-2 font-medium text-blue-600 border-b-2 border-blue-600';
+        tabReniec.className = 'tab-button px-6 py-2 font-medium text-gray-500 hover:text-blue-600';
+        contenidoManual.classList.remove('hidden');
+        contenidoReniec.classList.add('hidden');
+    });
+
+    tabReniec.addEventListener('click', function() {
+        tabReniec.className = 'tab-button px-6 py-2 font-medium text-blue-600 border-b-2 border-blue-600';
+        tabManual.className = 'tab-button px-6 py-2 font-medium text-gray-500 hover:text-blue-600';
+        contenidoReniec.classList.remove('hidden');
+        contenidoManual.classList.add('hidden');
+    });
+
+    // Agregar Manual
+    document.getElementById('btn-agregar-manual').addEventListener('click', function() {
+        const nombres = document.getElementById('nombres_manual').value.trim();
+        const apellidoPaterno = document.getElementById('apellido_paterno_manual').value.trim();
+        const apellidoMaterno = document.getElementById('apellido_materno_manual').value.trim();
+        const tipoDocumento = document.getElementById('tipo_documento_manual').value;
+        const numDocumento = document.getElementById('num_documento_manual').value.trim();
+        const tipoRelacion = document.getElementById('tipo_relacion_manual').value;
+        const descripcionRelacion = document.getElementById('descripcion_relacion_manual').value.trim();
+
+        if (!nombres || !apellidoPaterno) {
+            alert('Por favor, complete los campos obligatorios (Nombres, Apellido Paterno)');
             return;
         }
 
-        personasRelacionadas.push(persona);
-        actualizarTabla();
+        const docFinal = numDocumento || `TEMP-${Date.now()}`;
+
+        // Verificar duplicado solo si hay documento
+        if (numDocumento && personasExternas.some(p => p.num_documento === numDocumento)) {
+            alert('Esta persona ya está en la lista de externas');
+            return;
+        }
+
+        const persona = {
+            tipo_documento: tipoDocumento,
+            num_documento: docFinal,
+            nombres: nombres,
+            apellido_paterno: apellidoPaterno,
+            apellido_materno: apellidoMaterno,
+            tipo_relacion: tipoRelacion,
+            descripcion_relacion: descripcionRelacion,
+            obtenido_reniec: false,
+            es_interna: false
+        };
+
+        personasExternas.push(persona);
+        actualizarTablaExternas();
         actualizarInputsHidden();
-        personaSelect.value = '';
+        limpiarFormularios();
+        formularioPersona.classList.add('hidden');
+        
+        alert('✅ Persona externa agregada correctamente');
     });
 
-    // Buscar por DNI
-    buscarDni.addEventListener('input', function() {
-        const dni = this.value.toLowerCase();
-        const options = personaSelect.options;
+    // Consultar RENIEC
+    document.getElementById('btn-consultar-reniec').addEventListener('click', async function() {
+        const dni = document.getElementById('dni_reniec').value.trim();
+        const loadingReniec = document.getElementById('loading-reniec');
+        
+        if (dni.length !== 8 || isNaN(dni)) {
+            alert('Por favor, ingrese un DNI válido de 8 dígitos');
+            return;
+        }
 
-        for (let i = 1; i < options.length; i++) {
-            const option = options[i];
-            const optionDni = option.dataset.dni.toLowerCase();
-            
-            if (dni && optionDni.includes(dni)) {
-                personaSelect.value = option.value;
-                break;
+        loadingReniec.classList.remove('hidden');
+        this.disabled = true;
+        
+        try {
+            const response = await fetch('{{ route("colaborador.reniec.consultar") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ dni: dni })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                document.getElementById('nombres_reniec').value = data.nombres || '';
+                document.getElementById('apellido_paterno_reniec').value = data.apellido_paterno || '';
+                document.getElementById('apellido_materno_reniec').value = data.apellido_materno || '';
+                
+                loadingReniec.innerHTML = '✅ Datos obtenidos correctamente';
+                loadingReniec.classList.add('text-green-600');
+                loadingReniec.classList.remove('text-blue-600');
+            } else {
+                alert(data.message || 'No se encontraron datos en RENIEC');
+                document.getElementById('nombres_reniec').value = '';
+                document.getElementById('apellido_paterno_reniec').value = '';
+                document.getElementById('apellido_materno_reniec').value = '';
             }
+        } catch (error) {
+            alert('Error al consultar RENIEC. Por favor, intente nuevamente.');
+        } finally {
+            setTimeout(() => {
+                loadingReniec.classList.add('hidden');
+                loadingReniec.innerHTML = '⏳ Consultando RENIEC...';
+                loadingReniec.classList.remove('text-green-600');
+                loadingReniec.classList.add('text-blue-600');
+            }, 2000);
+            this.disabled = false;
         }
     });
 
-    // Función para actualizar tabla
-    function actualizarTabla() {
-        if (personasRelacionadas.length === 0) {
-            tablaPersonas.innerHTML = '<tr id="mensaje-vacio"><td colspan="6" class="px-4 py-8 text-center text-gray-500">No hay personas relacionadas</td></tr>';
+    // Agregar RENIEC
+    document.getElementById('btn-agregar-reniec').addEventListener('click', function() {
+        const dni = document.getElementById('dni_reniec').value.trim();
+        const nombres = document.getElementById('nombres_reniec').value.trim();
+        const apellidoPaterno = document.getElementById('apellido_paterno_reniec').value.trim();
+        const apellidoMaterno = document.getElementById('apellido_materno_reniec').value.trim();
+        const tipoRelacion = document.getElementById('tipo_relacion_reniec').value;
+        const descripcionRelacion = document.getElementById('descripcion_relacion_reniec').value.trim();
+
+        if (!dni || !nombres || !apellidoPaterno) {
+            alert('Por favor, consulte el DNI primero y asegúrese de que los datos estén completos');
+            return;
+        }
+
+        // Verificar duplicado
+        if (personasExternas.some(p => p.num_documento === dni)) {
+            alert('Esta persona ya está en la lista de externas');
+            return;
+        }
+
+        const persona = {
+            tipo_documento: 'DNI',
+            num_documento: dni,
+            nombres: nombres,
+            apellido_paterno: apellidoPaterno,
+            apellido_materno: apellidoMaterno,
+            tipo_relacion: tipoRelacion,
+            descripcion_relacion: descripcionRelacion,
+            obtenido_reniec: true,
+            es_interna: false
+        };
+
+        personasExternas.push(persona);
+        actualizarTablaExternas();
+        actualizarInputsHidden();
+        limpiarFormularios();
+        formularioPersona.classList.add('hidden');
+        
+        alert('✅ Persona externa agregada correctamente desde RENIEC');
+    });
+
+    // ==================== ACTUALIZAR TABLAS ====================
+
+    function actualizarTablaInternas() {
+        const tabla = document.getElementById('tabla-personas-internas');
+        
+        if (personasInternas.length === 0) {
+            tabla.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">No hay personas internas agregadas</td></tr>';
             return;
         }
 
         let html = '';
-        personasRelacionadas.forEach((persona, index) => {
+        personasInternas.forEach((persona, index) => {
+            const badgeRelacion = {
+                'beneficiario': 'bg-green-100 text-green-800',
+                'afectado': 'bg-red-100 text-red-800',
+                'involucrado': 'bg-blue-100 text-blue-800',
+                'testigo': 'bg-yellow-100 text-yellow-800',
+                'otro': 'bg-gray-100 text-gray-800'
+            };
+
             html += `
                 <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 text-sm">${index + 1}</td>
-                    <td class="px-4 py-3 text-sm">${persona.nombre}</td>
-                    <td class="px-4 py-3 text-sm">${persona.dni}</td>
-                    <td class="px-4 py-3 text-sm">${persona.telefono}</td>
-                    <td class="px-4 py-3 text-sm">${persona.email}</td>
-                    <td class="px-4 py-3 text-center">
+                    <td class="px-4 py-3 text-sm text-gray-900">${index + 1}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${persona.num_documento}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="font-medium">${persona.nombre_completo}</div>
+                        ${persona.descripcion_relacion ? `<div class="text-xs text-gray-500">${persona.descripcion_relacion}</div>` : ''}
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${badgeRelacion[persona.tipo_relacion] || 'bg-gray-100 text-gray-800'}">
+                            ${persona.tipo_relacion.charAt(0).toUpperCase() + persona.tipo_relacion.slice(1)}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-center">
                         <button type="button" 
-                                onclick="eliminarPersona(${index})"
-                                class="text-red-600 hover:text-red-800">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
+                                onclick="eliminarPersonaInterna(${index})"
+                                class="text-red-600 hover:text-red-800 font-medium">
+                            🗑️ Eliminar
                         </button>
                     </td>
                 </tr>
             `;
         });
 
-        tablaPersonas.innerHTML = html;
+        tabla.innerHTML = html;
     }
 
-    // Función para actualizar inputs hidden
-    function actualizarInputsHidden() {
-        // Limpiar contenedor
-        contenedorInputs.innerHTML = '';
+    function actualizarTablaExternas() {
+        const tabla = document.getElementById('tabla-personas-externas');
+        
+        if (personasExternas.length === 0) {
+            tabla.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No hay personas externas agregadas</td></tr>';
+            return;
+        }
 
-        // Crear inputs hidden para cada persona
-        personasRelacionadas.forEach((persona, index) => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = `personas_relacionadas[${index}][id_persona]`;
-            input.value = persona.id;
-            contenedorInputs.appendChild(input);
+        let html = '';
+        personasExternas.forEach((persona, index) => {
+            const nombreCompleto = `${persona.nombres} ${persona.apellido_paterno} ${persona.apellido_materno}`.trim();
+            const badgeRelacion = {
+                'beneficiario': 'bg-green-100 text-green-800',
+                'afectado': 'bg-red-100 text-red-800',
+                'involucrado': 'bg-blue-100 text-blue-800',
+                'testigo': 'bg-yellow-100 text-yellow-800',
+                'otro': 'bg-gray-100 text-gray-800'
+            };
+
+            html += `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 text-sm text-gray-900">${index + 1}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="font-medium">${persona.tipo_documento}</div>
+                        <div class="text-gray-500">${persona.num_documento}</div>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-gray-900">
+                        <div class="font-medium">${nombreCompleto}</div>
+                        ${persona.descripcion_relacion ? `<div class="text-xs text-gray-500">${persona.descripcion_relacion}</div>` : ''}
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 rounded-full text-xs font-medium ${badgeRelacion[persona.tipo_relacion] || 'bg-gray-100 text-gray-800'}">
+                            ${persona.tipo_relacion.charAt(0).toUpperCase() + persona.tipo_relacion.slice(1)}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm text-center">
+                        ${persona.obtenido_reniec ? '<span class="text-blue-600 font-medium">🆔 RENIEC</span>' : '<span class="text-gray-600">✍️ Manual</span>'}
+                    </td>
+                    <td class="px-4 py-3 text-sm text-center">
+                        <button type="button" 
+                                onclick="eliminarPersonaExterna(${index})"
+                                class="text-red-600 hover:text-red-800 font-medium">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `;
         });
 
-        console.log('✅ Inputs hidden actualizados:', personasRelacionadas.length, 'personas');
-        console.log('📋 Datos:', personasRelacionadas);
+        tabla.innerHTML = html;
     }
 
-    // Función global para eliminar persona
-    window.eliminarPersona = function(index) {
+    // Actualizar inputs hidden
+    function actualizarInputsHidden() {
+        const contenedor = document.getElementById('contenedor-personas-input');
+        contenedor.innerHTML = '';
+
+        // Personas Internas
+        personasInternas.forEach((persona, index) => {
+            const fields = ['id_user', 'num_documento', 'nombre_completo', 'correo', 'tipo_relacion', 'descripcion_relacion', 'es_interna'];
+            fields.forEach(field => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `personas_internas[${index}][${field}]`;
+                // Manejar valores booleanos correctamente
+                input.value = persona[field] !== undefined && persona[field] !== null ? persona[field] : '';
+                contenedor.appendChild(input);
+            });
+        });
+
+        // Personas Externas
+        personasExternas.forEach((persona, index) => {
+            const fields = ['tipo_documento', 'num_documento', 'nombres', 'apellido_paterno', 'apellido_materno', 'tipo_relacion', 'descripcion_relacion', 'obtenido_reniec', 'es_interna'];
+            fields.forEach(field => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = `personas_externas[${index}][${field}]`;
+                // Manejar valores booleanos correctamente
+                input.value = persona[field] !== undefined && persona[field] !== null ? persona[field] : '';
+                contenedor.appendChild(input);
+            });
+        });
+
+        console.log('✅ Inputs actualizados:', personasInternas.length, 'internas,', personasExternas.length, 'externas');
+    }
+
+    // Limpiar formularios
+    function limpiarFormularios() {
+        // Interna
+        document.getElementById('buscar_dni_interno').value = '';
+        document.getElementById('buscar_nombre_interno').value = '';
+        document.getElementById('tipo_relacion_interna').value = 'beneficiario';
+        document.getElementById('descripcion_relacion_interna').value = '';
+        document.getElementById('resultado-busqueda-interna').classList.add('hidden');
+        usuarioInternoSeleccionado = null;
+
+        // Externa - Manual
+        document.getElementById('tipo_documento_manual').value = 'DNI';
+        document.getElementById('num_documento_manual').value = '';
+        document.getElementById('nombres_manual').value = '';
+        document.getElementById('apellido_paterno_manual').value = '';
+        document.getElementById('apellido_materno_manual').value = '';
+        document.getElementById('tipo_relacion_manual').value = 'beneficiario';
+        document.getElementById('descripcion_relacion_manual').value = '';
+
+        // Externa - RENIEC
+        document.getElementById('dni_reniec').value = '';
+        document.getElementById('nombres_reniec').value = '';
+        document.getElementById('apellido_paterno_reniec').value = '';
+        document.getElementById('apellido_materno_reniec').value = '';
+        document.getElementById('tipo_relacion_reniec').value = 'beneficiario';
+        document.getElementById('descripcion_relacion_reniec').value = '';
+    }
+
+    // Funciones globales para eliminar
+    window.eliminarPersonaInterna = function(index) {
+        if (confirm('¿Está seguro de eliminar este trabajador?')) {
+            personasInternas.splice(index, 1);
+            actualizarTablaInternas();
+            actualizarInputsHidden();
+        }
+    };
+
+    window.eliminarPersonaExterna = function(index) {
         if (confirm('¿Está seguro de eliminar esta persona?')) {
-            personasRelacionadas.splice(index, 1);
-            actualizarTabla();
+            personasExternas.splice(index, 1);
+            actualizarTablaExternas();
             actualizarInputsHidden();
         }
     };

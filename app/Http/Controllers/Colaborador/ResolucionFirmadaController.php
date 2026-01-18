@@ -362,4 +362,102 @@ class ResolucionFirmadaController extends Controller implements HasMiddleware
             ]);
         }
     }
+
+    /**
+     * Mostrar vista para enviar correos
+     */
+    public function mostrarEnviarCorreo(Resolucion $resolucion)
+    {
+        if (!$resolucion->archivo_firmado) {
+            return redirect()
+                ->route('colaborador.resoluciones-firmadas.index')
+                ->with('error', '❌ Esta resolución no está firmada');
+        }
+
+        $resolucion->load(['tipoResolucion', 'usuarioFirmante', 'estado']);
+
+        return view('colaborador.resoluciones-firmadas.enviar-correo', compact('resolucion'));
+    }
+
+    /**
+     * Enviar correos de resolución firmada a usuarios adicionales
+     */
+    public function enviarCorreos(Request $request, Resolucion $resolucion)
+    {
+        $request->validate([
+            'usuarios' => 'required|array|min:1',
+            'usuarios.*' => 'exists:users,id',
+        ]);
+
+        if (!$resolucion->archivo_firmado) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La resolución no está firmada',
+            ], 400);
+        }
+
+        try {
+            $usuariosNotificados = 0;
+
+            foreach ($request->usuarios as $userId) {
+                $user = \App\Models\User::find($userId);
+                
+                if ($user && $user->email) {
+                    \Illuminate\Support\Facades\Mail::to($user->email)
+                        ->send(new \App\Mail\ResolucionNotificacion($resolucion));
+                    $usuariosNotificados++;
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => "✅ Correos enviados exitosamente a {$usuariosNotificados} usuario(s)",
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => '❌ Error al enviar correos: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function buscarUsuario(Request $request)
+    {
+        $request->validate([
+            'dni' => 'required|digits:8'
+        ]);
+
+        $persona = \App\Models\Persona::where('num_documento', $request->dni)
+                        ->where('i_active', true)
+                        ->first();
+
+        if (!$persona || !$persona->user) {
+            return response()->json([
+                'message' => 'Usuario no encontrado o no tiene cuenta en el sistema'
+            ], 404);
+        }
+
+        $user = $persona->user;
+        
+        // Generar iniciales
+        $nombres = explode(' ', trim($persona->nombres ?? ''));
+        $apellidos = explode(' ', trim($persona->apellido_paterno ?? ''));
+        $iniciales = strtoupper(
+            (isset($nombres[0]) ? substr($nombres[0], 0, 1) : '') . 
+            (isset($apellidos[0]) ? substr($apellidos[0], 0, 1) : '')
+        );
+        
+        if (strlen($iniciales) < 2) {
+            $iniciales = strtoupper(substr($persona->nombres ?? 'ND', 0, 2));
+        }
+
+        return response()->json([
+            'id_user' => $user->id,
+            'nombre_completo' => trim($persona->apellido_paterno . ' ' . $persona->apellido_materno . ', ' . $persona->nombres),
+            'num_documento' => $persona->num_documento,
+            'correo' => $user->email,
+            'iniciales' => $iniciales
+        ]);
+    }
 }

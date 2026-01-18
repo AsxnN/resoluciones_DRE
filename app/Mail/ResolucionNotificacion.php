@@ -18,7 +18,7 @@ class ResolucionNotificacion extends Mailable
 
     public function __construct(
         public Resolucion $resolucion,
-        public Persona $persona
+        public ?Persona $persona = null  // ← HACER OPCIONAL
     ) {}
 
     public function envelope(): Envelope
@@ -43,14 +43,20 @@ class ResolucionNotificacion extends Mailable
     {
         $attachments = [];
 
-        // Adjuntar PDF si existe
-        if ($this->resolucion->archivo_resolucion) {
-            $fullPath = storage_path('app/public/' . $this->resolucion->archivo_resolucion);
+        // Adjuntar PDF si existe (priorizar archivo firmado)
+        $archivoAdjuntar = $this->resolucion->archivo_firmado ?? $this->resolucion->archivo_resolucion;
+        
+        if ($archivoAdjuntar) {
+            $fullPath = storage_path('app/public/' . $archivoAdjuntar);
             
             // Verificar que el archivo realmente existe en el sistema de archivos
             if (file_exists($fullPath) && is_readable($fullPath)) {
+                $nombreArchivo = $this->resolucion->archivo_firmado 
+                    ? $this->resolucion->num_resolucion . '_firmado.pdf'
+                    : $this->resolucion->num_resolucion . '.pdf';
+                    
                 $attachments[] = Attachment::fromPath($fullPath)
-                    ->as($this->resolucion->num_resolucion . '.pdf')
+                    ->as($nombreArchivo)
                     ->withMime('application/pdf');
             }
         }

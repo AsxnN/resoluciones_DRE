@@ -162,6 +162,104 @@
                     </label>
                 </div>
 
+                <!-- Buscar Usuarios Adicionales por DNI -->
+                <div class="bg-white rounded-lg shadow-lg mb-6 overflow-hidden">
+                    <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
+                        <h3 class="text-white font-bold text-lg flex items-center gap-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            ENVIAR POR CORREO A USUARIOS ADICIONALES
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-sm text-gray-600 mb-4">
+                            Busca usuarios por DNI para enviarles las resoluciones firmadas por correo electrónico
+                        </p>
+
+                        <!-- Formulario de búsqueda -->
+                        <div class="mb-6 bg-gray-50 border-2 border-gray-200 rounded-lg p-4">
+                            <div class="flex gap-3">
+                                <div class="flex-1">
+                                    <label for="dni_buscar" class="block text-sm font-medium text-gray-700 mb-2">
+                                        Buscar por DNI
+                                    </label>
+                                    <input type="text" 
+                                           id="dni_buscar" 
+                                           placeholder="Ingrese DNI de 8 dígitos"
+                                           maxlength="8"
+                                           class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+                                <div class="flex items-end">
+                                    <button type="button" 
+                                            id="btn-buscar-usuario"
+                                            class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        </svg>
+                                        Buscar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Resultado de búsqueda -->
+                            <div id="resultado-busqueda" class="hidden mt-4 p-4 bg-white border border-gray-300 rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-gray-900" id="usuario-nombre"></p>
+                                            <p class="text-sm text-gray-600" id="usuario-dni"></p>
+                                            <p class="text-sm text-gray-500" id="usuario-email"></p>
+                                        </div>
+                                    </div>
+                                    <button type="button" 
+                                            id="btn-agregar-usuario"
+                                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Agregar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Mensaje de no encontrado -->
+                            <div id="mensaje-no-encontrado" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                                <div class="flex items-center gap-2 text-red-700">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="font-medium">No se encontró usuario con ese DNI</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista de usuarios seleccionados -->
+                        <div>
+                            <h4 class="text-sm font-semibold text-gray-700 mb-3">
+                                Usuarios adicionales a notificar (<span id="contador-usuarios">0</span>)
+                            </h4>
+                            <div id="lista-usuarios-notificar" class="space-y-2">
+                                <!-- Se llenará dinámicamente con JavaScript -->
+                            </div>
+                            <div id="mensaje-sin-usuarios" class="text-center py-8 text-gray-500">
+                                <svg class="mx-auto h-12 w-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                </svg>
+                                <p class="text-sm">No hay usuarios adicionales seleccionados</p>
+                            </div>
+                        </div>
+
+                        <!-- Inputs ocultos para enviar los IDs -->
+                        <div id="inputs-usuarios-notificar"></div>
+                    </div>
+                </div>
+
                 <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
                     <div class="flex items-start">
                         <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
@@ -199,9 +297,143 @@
 
 @push('scripts')
 <script>
+// Array para almacenar usuarios seleccionados
+let usuariosNotificar = [];
+
 function toggleCheckbox(id) {
     const checkbox = document.getElementById(id);
     checkbox.checked = !checkbox.checked;
+}
+
+// Buscar usuario por DNI
+document.getElementById('btn-buscar-usuario').addEventListener('click', async function() {
+    const dni = document.getElementById('dni_buscar').value.trim();
+    
+    if (!dni) {
+        alert('⚠️ Ingrese un DNI para buscar');
+        return;
+    }
+    
+    if (dni.length !== 8 || !/^\d+$/.test(dni)) {
+        alert('⚠️ El DNI debe tener 8 dígitos numéricos');
+        return;
+    }
+    
+    // Ocultar mensajes previos
+    document.getElementById('resultado-busqueda').classList.add('hidden');
+    document.getElementById('mensaje-no-encontrado').classList.add('hidden');
+    
+    try {
+        const response = await fetch(`{{ route('colaborador.resoluciones.buscar-usuario') }}?dni=${dni}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            // Verificar si ya está agregado
+            if (usuariosNotificar.find(u => u.id === data.usuario.id)) {
+                alert('⚠️ Este usuario ya fue agregado a la lista');
+                return;
+            }
+            
+            // Mostrar resultado
+            document.getElementById('usuario-nombre').textContent = data.usuario.nombre_completo;
+            document.getElementById('usuario-dni').textContent = `DNI: ${data.usuario.dni}`;
+            document.getElementById('usuario-email').textContent = `📧 ${data.usuario.email}`;
+            document.getElementById('resultado-busqueda').classList.remove('hidden');
+            
+            // Guardar temporalmente el usuario encontrado
+            document.getElementById('btn-agregar-usuario').setAttribute('data-usuario', JSON.stringify(data.usuario));
+        } else {
+            document.getElementById('mensaje-no-encontrado').classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error al buscar usuario. Intente nuevamente.');
+    }
+});
+
+// Agregar usuario a la lista
+document.getElementById('btn-agregar-usuario').addEventListener('click', function() {
+    const usuarioData = this.getAttribute('data-usuario');
+    if (!usuarioData) return;
+    
+    const usuario = JSON.parse(usuarioData);
+    
+    // Agregar al array
+    usuariosNotificar.push(usuario);
+    
+    // Actualizar vista
+    actualizarListaUsuarios();
+    
+    // Limpiar búsqueda
+    document.getElementById('dni_buscar').value = '';
+    document.getElementById('resultado-busqueda').classList.add('hidden');
+});
+
+// Actualizar lista de usuarios
+function actualizarListaUsuarios() {
+    const lista = document.getElementById('lista-usuarios-notificar');
+    const mensaje = document.getElementById('mensaje-sin-usuarios');
+    const contador = document.getElementById('contador-usuarios');
+    
+    contador.textContent = usuariosNotificar.length;
+    
+    if (usuariosNotificar.length === 0) {
+        lista.innerHTML = '';
+        mensaje.classList.remove('hidden');
+        actualizarInputsOcultos();
+        return;
+    }
+    
+    mensaje.classList.add('hidden');
+    
+    lista.innerHTML = usuariosNotificar.map((usuario, index) => `
+        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+                    ${usuario.nombre_completo.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                </div>
+                <div>
+                    <p class="font-semibold text-gray-900">${usuario.nombre_completo}</p>
+                    <div class="flex gap-3 text-sm text-gray-600">
+                        <span>DNI: ${usuario.dni}</span>
+                        <span>•</span>
+                        <span>📧 ${usuario.email}</span>
+                    </div>
+                </div>
+            </div>
+            <button type="button" 
+                    onclick="eliminarUsuario(${index})"
+                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Eliminar">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </button>
+        </div>
+    `).join('');
+    
+    actualizarInputsOcultos();
+}
+
+// Eliminar usuario de la lista
+function eliminarUsuario(index) {
+    usuariosNotificar.splice(index, 1);
+    actualizarListaUsuarios();
+}
+
+// Actualizar inputs ocultos para enviar con el formulario
+function actualizarInputsOcultos() {
+    const container = document.getElementById('inputs-usuarios-notificar');
+    container.innerHTML = usuariosNotificar.map((usuario, index) => 
+        `<input type="hidden" name="usuarios_notificar_adicionales[${index}]" value="${usuario.id}">`
+    ).join('');
 }
 </script>
 @endpush

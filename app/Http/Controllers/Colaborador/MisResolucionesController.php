@@ -32,16 +32,22 @@ class MisResolucionesController extends Controller
         ])->where(function($q) use ($userId, $personaId) {
             // 1. Resoluciones creadas por el usuario
             $q->where('id_usuario', $userId)
-              // 2. Resoluciones firmadas por el usuario
-              ->orWhere('id_usuario_firma', $userId);
+            // 2. Resoluciones firmadas por el usuario
+            ->orWhere('id_usuario_firma', $userId);
             
-            // 3. Resoluciones donde la persona está relacionada (involucrado/notificado/firmante)
+            // 3. Resoluciones donde la persona está relacionada en persona_resolucion (tabla antigua)
             if ($personaId) {
                 $q->orWhereHas('personas', function($query) use ($personaId) {
                     $query->where('persona.id_persona', $personaId)
-                          ->where('persona_resolucion.i_active', true);
+                        ->where('persona_resolucion.i_active', true);
                 });
             }
+            
+            // 4. ← AGREGAR: Resoluciones donde el usuario está relacionado en persona_resolucion_datos
+            $q->orWhereHas('personasRelacionadas', function($query) use ($userId) {
+                $query->where('persona_resolucion_datos.id_user', $userId)
+                    ->where('persona_resolucion_datos.es_interna', true);
+            });
         });
 
         // Filtros

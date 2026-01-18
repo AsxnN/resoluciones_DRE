@@ -70,7 +70,7 @@
     <!-- Filtros -->
     <div class="bg-white rounded-lg shadow-md mb-6 p-6">
         <form method="GET" action="{{ route('colaborador.resoluciones.index') }}" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                 <!-- Búsqueda -->
                 <div class="lg:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
@@ -107,13 +107,40 @@
                     </select>
                 </div>
 
-                <!-- Filtro de Firmadas -->
+                <!-- Año -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Firma</label>
-                    <select name="firmadas" class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-                        <option value="">Todas</option>
-                        <option value="0" {{ request('firmadas') === '0' ? 'selected' : '' }}>Sin Firmar</option>
-                        <option value="1" {{ request('firmadas') === '1' ? 'selected' : '' }}>Firmadas</option>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Año</label>
+                    <select name="anio" class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option value="">Todos</option>
+                        @php
+                            $currentYear = now()->year;
+                            $startYear = 2020; // Año inicial
+                        @endphp
+                        @for($year = $currentYear; $year >= $startYear; $year--)
+                            <option value="{{ $year }}" {{ request('anio') == $year ? 'selected' : '' }}>
+                                {{ $year }}
+                            </option>
+                        @endfor
+                    </select>
+                </div>
+
+                <!-- Mes -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mes</label>
+                    <select name="mes" class="w-full rounded-lg border-gray-300 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                        <option value="">Todos</option>
+                        <option value="1" {{ request('mes') == '1' ? 'selected' : '' }}>Enero</option>
+                        <option value="2" {{ request('mes') == '2' ? 'selected' : '' }}>Febrero</option>
+                        <option value="3" {{ request('mes') == '3' ? 'selected' : '' }}>Marzo</option>
+                        <option value="4" {{ request('mes') == '4' ? 'selected' : '' }}>Abril</option>
+                        <option value="5" {{ request('mes') == '5' ? 'selected' : '' }}>Mayo</option>
+                        <option value="6" {{ request('mes') == '6' ? 'selected' : '' }}>Junio</option>
+                        <option value="7" {{ request('mes') == '7' ? 'selected' : '' }}>Julio</option>
+                        <option value="8" {{ request('mes') == '8' ? 'selected' : '' }}>Agosto</option>
+                        <option value="9" {{ request('mes') == '9' ? 'selected' : '' }}>Septiembre</option>
+                        <option value="10" {{ request('mes') == '10' ? 'selected' : '' }}>Octubre</option>
+                        <option value="11" {{ request('mes') == '11' ? 'selected' : '' }}>Noviembre</option>
+                        <option value="12" {{ request('mes') == '12' ? 'selected' : '' }}>Diciembre</option>
                     </select>
                 </div>
             </div>
@@ -158,25 +185,23 @@
                         @endcan
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Resolución</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Resolución</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Creación</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asunto</th>
-                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Firmada</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($resoluciones as $resolucion)
                     <tr class="hover:bg-gray-50 transition">
-                        <!-- Checkbox de selección (solo si no está firmada) -->
+                        <!-- Checkbox de selección -->
                         @can('resoluciones.firmar')
                         <td class="px-6 py-4">
-                            @if(!$resolucion->archivo_firmado)
                             <input type="checkbox" 
                                    class="checkbox-resolucion rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
                                    value="{{ $resolucion->id_resolucion }}"
                                    onchange="actualizarContador()">
-                            @endif
                         </td>
                         @endcan
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -189,26 +214,22 @@
                             <span class="text-sm text-gray-600">{{ $resolucion->fecha_resolucion->format('d/m/Y') }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-gray-900">{{ $resolucion->fecha_creacion->format('d/m/Y') }}</span>
+                                <span class="text-xs text-gray-500">{{ $resolucion->fecha_creacion->format('H:i') }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
                             <span class="px-3 py-1 text-xs font-semibold rounded-full
                                 {{ $resolucion->estado->nombre_estado === 'Aprobado' ? 'bg-green-100 text-green-800' : '' }}
                                 {{ $resolucion->estado->nombre_estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                {{ $resolucion->estado->nombre_estado === 'Rechazado' ? 'bg-red-100 text-red-800' : '' }}">
+                                {{ $resolucion->estado->nombre_estado === 'Rechazado' ? 'bg-red-100 text-red-800' : '' }}
+                                {{ $resolucion->estado->nombre_estado === 'Borrador' ? 'bg-gray-100 text-gray-800' : '' }}">
                                 {{ $resolucion->estado->nombre_estado }}
                             </span>
                         </td>
                         <td class="px-6 py-4">
                             <span class="text-sm text-gray-600 line-clamp-2">{{ Str::limit($resolucion->asunto_resolucion, 50) }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            @if($resolucion->archivo_firmado)
-                                <span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
-                                    ✓ Firmada
-                                </span>
-                            @else
-                                <span class="px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded-full">
-                                    Sin Firmar
-                                </span>
-                            @endif
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <div class="flex items-center justify-end gap-2">
@@ -221,14 +242,12 @@
                                 </a>
                                 
                                 @can('resoluciones.editar')
-                                    @if(!$resolucion->archivo_firmado)
-                                    <a href="{{ route('colaborador.resoluciones.edit', $resolucion) }}" 
-                                       class="text-yellow-600 hover:text-yellow-900" title="Editar">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </a>
-                                    @endif
+                                <a href="{{ route('colaborador.resoluciones.edit', $resolucion) }}" 
+                                   class="text-yellow-600 hover:text-yellow-900" title="Editar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                    </svg>
+                                </a>
                                 @endcan
                             </div>
                         </td>
@@ -240,8 +259,8 @@
                                 <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
-                                <p class="text-lg font-medium">No se encontraron resoluciones</p>
-                                <p class="text-sm mt-1">Intenta ajustar los filtros de búsqueda</p>
+                                <p class="text-lg font-medium">No hay resoluciones disponibles</p>
+                                <p class="text-sm mt-1">Las resoluciones creadas aparecerán aquí</p>
                             </div>
                         </td>
                     </tr>
