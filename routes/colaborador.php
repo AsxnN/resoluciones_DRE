@@ -22,6 +22,7 @@ use App\Http\Controllers\Colaborador\UnidadController;
 use App\Http\Controllers\Colaborador\RolController;
 use App\Http\Controllers\Colaborador\TipoResolucionController;
 use App\Http\Controllers\Colaborador\ReporteController;
+use App\Http\Controllers\Colaborador\RegistroFirmaEntregaController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('colaborador')->name('colaborador.')->group(function () {
@@ -88,6 +89,17 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
                 [ResolucionController::class, 'enviarCredenciales']
             )->name('resoluciones.enviar-credenciales');
 
+            // REGISTRO DE FIRMAS PARA ENTREGA (después de la sección de firmas)
+            Route::prefix('registro-firma-entrega')->name('registro-firma-entrega.')->group(function () {
+                Route::get('/', [RegistroFirmaEntregaController::class, 'index'])->name('index');
+                Route::get('/resolucion/{resolucion}/crear', [RegistroFirmaEntregaController::class, 'create'])->name('create');
+                Route::post('/resolucion/{resolucion}', [RegistroFirmaEntregaController::class, 'store'])->name('store');
+                Route::get('/{registro}', [RegistroFirmaEntregaController::class, 'show'])->name('show');
+                Route::post('/{registro}/firmar', [RegistroFirmaEntregaController::class, 'firmar'])->name('firmar');
+                Route::post('/{registro}/registrar-entrega', [RegistroFirmaEntregaController::class, 'registrarEntrega'])->name('registrar-entrega');
+                Route::get('/resolucion/{resolucion}/registros', [RegistroFirmaEntregaController::class, 'porResolucion'])->name('por-resolucion');
+            });
+
             Route::prefix('reportes')->name('reportes.')->group(function () {
             Route::get('personas-resoluciones', [ReporteController::class, 'personasConMasResoluciones'])->name('personas-resoluciones');
             Route::get('personas-resoluciones/exportar', [ReporteController::class, 'exportarPersonasResoluciones'])->name('personas-resoluciones.exportar');
@@ -104,7 +116,8 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
             // RESOLUCIONES FIRMADAS
             Route::prefix('resoluciones-firmadas')->name('resoluciones-firmadas.')->group(function () {
                 Route::get('/', [ResolucionFirmadaController::class, 'index'])->name('index');
-                Route::get('buscar-usuario', [ResolucionFirmadaController::class, 'buscarUsuario'])->name('buscar-usuario'); // AGREGAR ESTA LÍNEA
+                Route::get('resolucion/{resolucion}/historial-firmas', [ResolucionFirmadaController::class, 'historialFirmas'])->name('historial-firmas');
+                Route::get('buscar-usuario', [ResolucionFirmadaController::class, 'buscarUsuario'])->name('buscar-usuario');
                 Route::get('{resolucion}/enviar-correo', [ResolucionFirmadaController::class, 'mostrarEnviarCorreo'])->name('enviar-correo');
                 Route::post('{resolucion}/enviar-correos', [ResolucionFirmadaController::class, 'enviarCorreos'])->name('enviar-correos');
                 Route::get('cola-firma/{colaFirma}/firmar', [ResolucionFirmadaController::class, 'mostrarFormularioFirma'])->name('mostrar-firma');
@@ -118,6 +131,7 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
             Route::prefix('mis-resoluciones')->name('mis-resoluciones.')->group(function () {
                 Route::get('/', [MisResolucionesController::class, 'index'])->name('index');
                 Route::get('/{resolucion}', [MisResolucionesController::class, 'show'])->name('show');
+                Route::get('/{resolucion}/descargar', [MisResolucionesController::class, 'descargar'])->name('descargar');
                 Route::get('/estadisticas/ajax', [MisResolucionesController::class, 'estadisticas'])->name('estadisticas');
             });
 

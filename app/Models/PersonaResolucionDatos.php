@@ -77,4 +77,20 @@ class PersonaResolucionDatos extends Model
     {
         return $this->enviosCredenciales()->latest('fecha_envio')->first();
     }
+    /**
+     * Registros de firmas para entregas a esta persona
+     */
+    public function registrosFirmaEntrega()
+    {
+        return $this->hasMany(RegistroFirmaEntrega::class, 'id_persona_resolucion_datos');
+    }
+
+    /**
+     * Último registro de firma
+     */
+    public function ultimoRegistroFirma()
+    {
+        return $this->hasOne(RegistroFirmaEntrega::class, 'id_persona_resolucion_datos')
+                    ->latestOfMany('fecha_solicitud');
+    }
 }

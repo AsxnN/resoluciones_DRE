@@ -548,12 +548,12 @@
                             </p>
                         </div>
                     </div>
-                    @endif  <!-- Cierre de personasExternas -->
-                </div>      <!-- Cierre de p-4 bg-gray-50 -->
-            </div>          <!-- Cierre de border-2 border-purple-200 -->
-            @endif          <!-- Cierre de if($totalPersonas > 0) -->
-        </div>              <!-- Cierre de p-6 -->
-    </div>                  <!-- Cierre de bg-white rounded-lg shadow-lg -->
+                    @endif
+                </div>
+            </div>
+            @endif
+        </div>
+    </div>
 
     <!-- Botones de acción inferiores -->
     <div class="mt-6 flex flex-wrap gap-3">
@@ -596,63 +596,5 @@
             @endif
         @endcan
     </div>
-
-    <!-- Botón de Asignar Resolución (solo si tiene usuario y resolución está firmada) -->
-    @if($tieneUsuario && $resolucion->archivo_firmado)
-    <div class="mt-3 pt-3 border-t-2 border-blue-200">
-        <form action="{{ route('colaborador.resoluciones.asignar-cliente', [$resolucion, $persona->id_persona_resolucion_datos]) }}" 
-              method="POST"
-              onsubmit="return confirm('¿Confirmar asignación de esta resolución al cliente?\n\nPodrá verla en su módulo Mis Resoluciones.')">
-            @csrf
-            
-            @if($persona->asignado_a_cliente ?? false)
-            <div class="bg-green-100 border border-green-300 rounded-lg p-2 mb-2">
-                <p class="text-xs text-green-800 font-semibold flex items-center gap-1.5">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    Ya asignado
-                </p>
-                @if($persona->fecha_asignacion)
-                <p class="text-xs text-green-700 mt-1">
-                    Asignado el {{ \Carbon\Carbon::parse($persona->fecha_asignacion)->format('d/m/Y H:i') }}
-                </p>
-                @endif
-            </div>
-            @endif
-            
-            <button type="submit" 
-                    @if($persona->asignado_a_cliente ?? false) disabled @endif
-                    class="w-full px-4 py-2 {{ ($persona->asignado_a_cliente ?? false) ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700' }} text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                </svg>
-                {{ ($persona->asignado_a_cliente ?? false) ? 'Resolución Asignada' : 'Asignar Resolución al Cliente' }}
-            </button>
-        </form>
-    </div>
-    @elseif(!$tieneUsuario)
-    <div class="mt-3 pt-3 border-t-2 border-blue-200">
-        <div class="bg-gray-100 border border-gray-300 rounded-lg p-2">
-            <p class="text-xs text-gray-600 text-center">
-                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-                Envía credenciales primero para poder asignar la resolución
-            </p>
-        </div>
-    </div>
-    @elseif(!$resolucion->archivo_firmado)
-    <div class="mt-3 pt-3 border-t-2 border-blue-200">
-        <div class="bg-gray-100 border border-gray-300 rounded-lg p-2">
-            <p class="text-xs text-gray-600 text-center">
-                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-                La resolución debe estar firmada antes de asignarla
-            </p>
-        </div>
-    </div>
-    @endif
 </div>
 @endsection

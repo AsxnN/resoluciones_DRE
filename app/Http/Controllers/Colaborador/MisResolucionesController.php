@@ -9,48 +9,46 @@ use App\Models\Estado;
 use App\Models\TipoResolucion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class MisResolucionesController extends Controller
 {
     /**
-     * Mostrar solo las resoluciones creadas por el usuario o donde está involucrado
-     * NO REQUIERE PERMISOS - Acceso libre para todos los colaboradores
+     * Mostrar resoluciones según el tipo de acceso del usuario
+     * - Colaboradores/Admin: ven resoluciones donde están relacionados (es_interna=true)
+     * - Clientes externos: solo ven resoluciones asignadas (asignado_a_cliente=true) y firmadas
      */
     public function index(Request $request)
     {
-        $userId = Auth::id();
         $user = Auth::user();
-        $personaId = $user->id_persona; // ID de la persona asociada al usuario
+        $userId = $user->id;
+        $tipoAcceso = $user->tipo_acceso; // 'colaborador', 'admin', 'cliente'
         
-        // Query base: resoluciones donde el usuario está relacionado
+        // Query base con relaciones
         $query = Resolucion::with([
             'estado',
             'tipoResolucion',
-            'usuarioCreador',
-            'usuarioFirmante'
-        ])->where(function($q) use ($userId, $personaId) {
-            // 1. Resoluciones creadas por el usuario
-            $q->where('id_usuario', $userId)
-            // 2. Resoluciones firmadas por el usuario
-            ->orWhere('id_usuario_firma', $userId);
-            
-            // 3. Resoluciones donde la persona está relacionada en persona_resolucion (tabla antigua)
-            if ($personaId) {
-                $q->orWhereHas('personas', function($query) use ($personaId) {
-                    $query->where('persona.id_persona', $personaId)
-                        ->where('persona_resolucion.i_active', true);
-                });
-            }
-            
-            // 4. ← AGREGAR: Resoluciones donde el usuario está relacionado en persona_resolucion_datos
-            $q->orWhereHas('personasRelacionadas', function($query) use ($userId) {
-                $query->where('persona_resolucion_datos.id_user', $userId)
-                    ->where('persona_resolucion_datos.es_interna', true);
-            });
-        });
+            'usuarioCreador.persona',
+            'usuarioFirmante.persona'
+        ]);
 
-        // Filtros
+        // Filtrar según tipo de usuario
+        if ($tipoAcceso === 'cliente') {
+            // EXTERNOS: Solo resoluciones asignadas y firmadas
+            $query->whereHas('personasRelacionadas', function($q) use ($userId) {
+                $q->where('persona_resolucion_datos.id_user', $userId)
+                  ->where('persona_resolucion_datos.es_interna', false)
+                  ->where('persona_resolucion_datos.asignado_a_cliente', true);
+            })->whereNotNull('archivo_firmado');
+        } else {
+            // INTERNOS (colaborador/admin): Todas las relacionadas con es_interna=true
+            $query->whereHas('personasRelacionadas', function($q) use ($userId) {
+                $q->where('persona_resolucion_datos.id_user', $userId)
+                  ->where('persona_resolucion_datos.es_interna', true);
+            });
+        }
+
+        // Filtros adicionales
         if ($request->filled('estado')) {
             $query->where('id_estado', $request->estado);
         }
@@ -67,30 +65,6 @@ class MisResolucionesController extends Controller
             });
         }
 
-        // Filtro por período
-        if ($request->filled('periodo')) {
-            $periodo = $request->periodo;
-            switch ($periodo) {
-                case 'hoy':
-                    $query->whereDate('fecha_resolucion', today());
-                    break;
-                case 'semana':
-                    $query->whereBetween('fecha_resolucion', [now()->startOfWeek(), now()->endOfWeek()]);
-                    break;
-                case 'mes':
-                    $query->whereMonth('fecha_resolucion', now()->month)
-                          ->whereYear('fecha_resolucion', now()->year);
-                    break;
-                case 'trimestre':
-                    $query->whereBetween('fecha_resolucion', [now()->startOfQuarter(), now()->endOfQuarter()]);
-                    break;
-                case 'año':
-                    $query->whereYear('fecha_resolucion', now()->year);
-                    break;
-            }
-        }
-
-        // Filtros de rango de fechas
         if ($request->filled('fecha_desde')) {
             $query->whereDate('fecha_resolucion', '>=', $request->fecha_desde);
         }
@@ -99,27 +73,21 @@ class MisResolucionesController extends Controller
             $query->whereDate('fecha_resolucion', '<=', $request->fecha_hasta);
         }
 
-        // Filtro por tipo de relación (opcional)
-        if ($request->filled('relacion') && $personaId) {
-            $relacion = $request->relacion;
-            $query->whereHas('personas', function($q) use ($personaId, $relacion) {
-                $q->where('persona.id_persona', $personaId)
-                  ->where('persona_resolucion.tipo_relacion', $relacion);
-            });
-        }
-
         $resoluciones = $query->orderBy('fecha_resolucion', 'desc')
             ->paginate(15)
             ->withQueryString();
 
         // Datos para filtros
         $estados = Estado::all();
-        $tipos = TipoResolucion::where('i_active', true)->get();
+        $tiposResolucion = TipoResolucion::where('i_active', true)->get();
 
-        // Estadísticas
-        $stats = $this->obtenerEstadisticas($userId, $personaId);
-
-        return view('colaborador.mis-resoluciones.index', compact('resoluciones', 'estados', 'tipos', 'stats'));
+        // Pasar tipo de acceso a la vista
+        return view('colaborador.mis-resoluciones.index', compact(
+            'resoluciones', 
+            'estados', 
+            'tiposResolucion',
+            'tipoAcceso'
+        ));
     }
 
     /**
@@ -127,13 +95,25 @@ class MisResolucionesController extends Controller
      */
     public function show(Resolucion $resolucion)
     {
-        $userId = Auth::id();
-        $personaId = Auth::user()->id_persona;
+        $user = Auth::user();
+        $userId = $user->id;
+        $tipoAcceso = $user->tipo_acceso;
 
-        // Verificar que el usuario tenga acceso a esta resolución
-        $tieneAcceso = $resolucion->id_usuario === $userId
-            || $resolucion->id_usuario_firma === $userId
-            || ($personaId && $resolucion->personas()->where('persona.id_persona', $personaId)->exists());
+        // Verificar acceso según tipo de usuario
+        if ($tipoAcceso === 'cliente') {
+            // Externos: solo si está asignado y la resolución está firmada
+            $tieneAcceso = $resolucion->personasRelacionadas()
+                ->where('persona_resolucion_datos.id_user', $userId)
+                ->where('persona_resolucion_datos.es_interna', false)
+                ->where('persona_resolucion_datos.asignado_a_cliente', true)
+                ->exists() && $resolucion->archivo_firmado;
+        } else {
+            // Internos: si está relacionado con es_interna=true
+            $tieneAcceso = $resolucion->personasRelacionadas()
+                ->where('persona_resolucion_datos.id_user', $userId)
+                ->where('persona_resolucion_datos.es_interna', true)
+                ->exists();
+        }
 
         if (!$tieneAcceso) {
             abort(403, 'No tiene acceso a esta resolución');
@@ -144,119 +124,66 @@ class MisResolucionesController extends Controller
             'tipoResolucion',
             'usuarioCreador.persona',
             'usuarioFirmante.persona',
-            'personas',
+            'personasRelacionadas.usuario.persona',
             'colaFirmas.estadoFirma',
             'historialFirmas.usuario.persona',
         ]);
 
-        return view('colaborador.mis-resoluciones.show', compact('resolucion'));
+        return view('colaborador.mis-resoluciones.show', compact('resolucion', 'tipoAcceso'));
     }
 
     /**
-     * Obtener estadísticas del usuario
+     * Descargar archivo de resolución
+     * - Clientes: solo archivo_firmado
+     * - Colaboradores: archivo_firmado o archivo_resolucion
      */
-    private function obtenerEstadisticas($userId, $personaId)
+    public function descargar(Resolucion $resolucion)
     {
-        $baseQuery = function() use ($userId, $personaId) {
-            return Resolucion::where(function($q) use ($userId, $personaId) {
-                $q->where('id_usuario', $userId)
-                  ->orWhere('id_usuario_firma', $userId);
-                
-                if ($personaId) {
-                    $q->orWhereHas('personas', function($query) use ($personaId) {
-                        $query->where('persona.id_persona', $personaId)
-                              ->where('persona_resolucion.i_active', true);
-                    });
-                }
-            });
-        };
+        $user = Auth::user();
+        $userId = $user->id;
+        $tipoAcceso = $user->tipo_acceso;
 
-        return [
-            'total' => $baseQuery()->count(),
-            'creadas' => Resolucion::where('id_usuario', $userId)->count(),
-            'involucrado' => $personaId 
-                ? Resolucion::whereHas('personas', function($q) use ($personaId) {
-                    $q->where('persona.id_persona', $personaId)
-                      ->where('persona_resolucion.tipo_relacion', 'involucrado');
-                })->count() 
-                : 0,
-            'firmadas' => Resolucion::where('id_usuario_firma', $userId)->count(),
-            'pendientes' => $baseQuery()->whereHas('estado', function($q) {
-                $q->where('nombre_estado', 'Pendiente');
-            })->count(),
-            'este_mes' => $baseQuery()->whereMonth('fecha_resolucion', now()->month)
-                                      ->whereYear('fecha_resolucion', now()->year)
-                                      ->count(),
-        ];
-    }
-
-    /**
-     * Estadísticas en formato JSON (para gráficos)
-     */
-    public function estadisticas(Request $request)
-    {
-        $userId = Auth::id();
-        $personaId = Auth::user()->id_persona;
-
-        // Resoluciones por mes (últimos 6 meses)
-        $porMes = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $fecha = now()->subMonths($i);
-            $count = Resolucion::where(function($q) use ($userId, $personaId) {
-                $q->where('id_usuario', $userId)
-                  ->orWhere('id_usuario_firma', $userId);
-                
-                if ($personaId) {
-                    $q->orWhereHas('personas', function($query) use ($personaId) {
-                        $query->where('persona.id_persona', $personaId);
-                    });
-                }
-            })->whereMonth('fecha_resolucion', $fecha->month)
-              ->whereYear('fecha_resolucion', $fecha->year)
-              ->count();
-
-            $porMes[] = [
-                'mes' => $fecha->format('M Y'),
-                'cantidad' => $count
-            ];
+        // Verificar acceso (reutilizamos la misma lógica de show)
+        if ($tipoAcceso === 'cliente') {
+            $tieneAcceso = $resolucion->personasRelacionadas()
+                ->where('persona_resolucion_datos.id_user', $userId)
+                ->where('persona_resolucion_datos.es_interna', false)
+                ->where('persona_resolucion_datos.asignado_a_cliente', true)
+                ->exists() && $resolucion->archivo_firmado;
+        } else {
+            $tieneAcceso = $resolucion->personasRelacionadas()
+                ->where('persona_resolucion_datos.id_user', $userId)
+                ->where('persona_resolucion_datos.es_interna', true)
+                ->exists();
         }
 
-        // Resoluciones por estado
-        $porEstado = Estado::withCount(['resoluciones' => function($query) use ($userId, $personaId) {
-            $query->where(function($q) use ($userId, $personaId) {
-                $q->where('id_usuario', $userId)
-                  ->orWhere('id_usuario_firma', $userId);
-                
-                if ($personaId) {
-                    $q->orWhereHas('personas', function($query) use ($personaId) {
-                        $query->where('persona.id_persona', $personaId);
-                    });
-                }
-            });
-        }])->get()->map(function($estado) {
-            return [
-                'estado' => $estado->nombre_estado,
-                'cantidad' => $estado->resoluciones_count,
-                'color' => $this->getEstadoColor($estado->nombre_estado),
-            ];
-        });
+        if (!$tieneAcceso) {
+            abort(403, 'No tiene acceso a esta resolución');
+        }
 
-        return response()->json([
-            'por_mes' => $porMes,
-            'por_estado' => $porEstado,
-        ]);
-    }
+        // Determinar qué archivo descargar
+        if ($tipoAcceso === 'cliente') {
+            // Clientes solo pueden descargar el archivo firmado
+            if (!$resolucion->archivo_firmado) {
+                abort(404, 'Archivo firmado no disponible');
+            }
+            $archivo = $resolucion->archivo_firmado;
+            $nombreArchivo = "RES_FIRMADA_{$resolucion->num_resolucion}.pdf";
+        } else {
+            // Colaboradores pueden descargar firmado o el original
+            $archivo = $resolucion->archivo_firmado ?? $resolucion->archivo_resolucion;
+            if (!$archivo) {
+                abort(404, 'Archivo no disponible');
+            }
+            $tipo = $resolucion->archivo_firmado ? 'FIRMADA' : 'ORIGINAL';
+            $nombreArchivo = "RES_{$tipo}_{$resolucion->num_resolucion}.pdf";
+        }
 
-    private function getEstadoColor($nombreEstado)
-    {
-        $colores = [
-            'Aprobado' => '#10B981',
-            'Pendiente' => '#F59E0B',
-            'Rechazado' => '#EF4444',
-            'Borrador' => '#6B7280',
-            'En Proceso' => '#3B82F6',
-        ];
+        // Verificar que el archivo existe en storage
+        if (!Storage::disk('public')->exists($archivo)) {
+            abort(404, 'El archivo no existe en el servidor');
+        }
 
-        return $colores[$nombreEstado] ?? '#6B7280';
+        return Storage::disk('public')->download($archivo, $nombreArchivo);
     }
 }

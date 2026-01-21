@@ -387,4 +387,28 @@ class Resolucion extends Model
     {
         return $this->hasMany(PersonaResolucionDatos::class, 'id_resolucion', 'id_resolucion');
     }
+
+    /**
+     * Registros de firmas para entrega a personas externas
+     */
+    public function registrosFirmaEntrega()
+    {
+        return $this->hasMany(RegistroFirmaEntrega::class, 'id_resolucion');
+    }
+
+    /**
+     * Registros de firma pendientes
+     */
+    public function registrosFirmaPendientes()
+    {
+        return $this->registrosFirmaEntrega()->pendientes();
+    }
+
+    /**
+     * Registros de firma completados
+     */
+    public function registrosFirmaCompletados()
+    {
+        return $this->registrosFirmaEntrega()->firmados();
+    }
 }
