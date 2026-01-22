@@ -28,8 +28,12 @@ class PersonaObserver
                 
                 // 2. Crear Usuario con contraseña por defecto "Contraseña123"
                 $usuario = User::withoutEvents(function () use ($persona, $nombreCompleto) {
+                    // Generar username a partir del DNI o primeras letras del nombre
+                    $username = strtolower($persona->num_documento ?? 'user' . $persona->id_persona);
+                    
                     return User::create([
                         'name' => $nombreCompleto,
+                        'username' => $username,
                         'email' => $persona->correo ?? 'user' . $persona->id_persona . '@temp.com',
                         'password' => Hash::make('Contraseña123'),
                         'id_persona' => $persona->id_persona,
@@ -43,7 +47,7 @@ class PersonaObserver
                     'id_persona' => $persona->id_persona,
                     'id_usuario' => $usuario->id,
                     'id_cargos' => null,
-                    'id_unidades' => null,
+                    'id_unidad' => null,
                     'id_direcciones' => null,
                     'id_dependencia' => null,
                     'id_area' => null,

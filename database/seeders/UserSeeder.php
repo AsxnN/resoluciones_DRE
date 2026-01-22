@@ -15,23 +15,26 @@ class UserSeeder extends Seeder
         // ========================================
         // 1. CREAR PERSONA ADMINISTRADOR
         // ========================================
-        $personaAdmin = Persona::create([
-            'tipo_persona' => 'colaborador',
-            'tipo_documento' => 'DNI',
-            'num_documento' => '12345678',
-            'nombres' => 'Administrador',
-            'apellido_paterno' => 'Sistema',
-            'apellido_materno' => 'Principal',
-            'correo' => 'admin@resoluciones.gob.pe',
-            'telefono' => '999888777',
-            'datos_completos' => true,
-            'i_active' => true,
-        ]);
+        $personaAdmin = Persona::withoutEvents(function () {
+            return Persona::create([
+                'tipo_persona' => 'colaborador',
+                'tipo_documento' => 'DNI',
+                'num_documento' => '12345678',
+                'nombres' => 'Administrador',
+                'apellido_paterno' => 'Sistema',
+                'apellido_materno' => 'Principal',
+                'correo' => 'admin@resoluciones.gob.pe',
+                'telefono' => '999888777',
+                'datos_completos' => true,
+                'i_active' => true,
+            ]);
+        });
 
-        // 2. CREAR USUARIO ADMINISTRADOR
+        // 2. CREAR USUARIO ADMINISTRADOR MANUALMENTE
         $admin = User::create([
             'id_persona' => $personaAdmin->id_persona,
             'name' => 'Administrador Sistema',
+            'username' => 'admin',
             'email' => 'admin@resoluciones.gob.pe',
             'password' => Hash::make('Admin123456'),
             'tipo_acceso' => 'admin',
@@ -41,23 +44,26 @@ class UserSeeder extends Seeder
         // ========================================
         // 3. CREAR PERSONA COLABORADOR DE PRUEBA
         // ========================================
-        $personaColab = Persona::create([
-            'tipo_persona' => 'colaborador',
-            'tipo_documento' => 'DNI',
-            'num_documento' => '87654321',
-            'nombres' => 'Juan Carlos',
-            'apellido_paterno' => 'Pérez',
-            'apellido_materno' => 'García',
-            'correo' => 'colaborador@resoluciones.gob.pe',
-            'telefono' => '999777666',
-            'datos_completos' => true,
-            'i_active' => true,
-        ]);
+        $personaColab = Persona::withoutEvents(function () {
+            return Persona::create([
+                'tipo_persona' => 'colaborador',
+                'tipo_documento' => 'DNI',
+                'num_documento' => '87654321',
+                'nombres' => 'Juan Carlos',
+                'apellido_paterno' => 'Pérez',
+                'apellido_materno' => 'García',
+                'correo' => 'colaborador@resoluciones.gob.pe',
+                'telefono' => '999777666',
+                'datos_completos' => true,
+                'i_active' => true,
+            ]);
+        });
 
-        // 4. CREAR USUARIO COLABORADOR
+        // 4. CREAR USUARIO COLABORADOR MANUALMENTE
         $colaborador = User::create([
             'id_persona' => $personaColab->id_persona,
             'name' => 'Juan Pérez',
+            'username' => 'jperez',
             'email' => 'colaborador@resoluciones.gob.pe',
             'password' => Hash::make('Colab123456'),
             'tipo_acceso' => 'colaborador',
@@ -93,6 +99,7 @@ class UserSeeder extends Seeder
         User::create([
             'id_persona' => $personaCliente->id_persona,
             'name' => 'María López',
+            'username' => 'mlopez',
             'email' => 'cliente@gmail.com',
             'password' => Hash::make('Cliente123456'),
             'tipo_acceso' => 'cliente',
@@ -100,8 +107,8 @@ class UserSeeder extends Seeder
         ]);
 
         $this->command->info('✅ Usuarios creados:');
-        $this->command->info('   📧 Admin: admin@resoluciones.gob.pe / Admin123456');
-        $this->command->info('   📧 Colaborador: colaborador@resoluciones.gob.pe / Colab123456');
-        $this->command->info('   📧 Cliente: cliente@gmail.com / Cliente123456');
+        $this->command->info('   👤 Admin: admin / Admin123456');
+        $this->command->info('   👔 Colaborador: jperez / Colab123456');
+        $this->command->info('   👨‍💼 Cliente: mlopez / Cliente123456');
     }
 }

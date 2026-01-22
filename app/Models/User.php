@@ -26,6 +26,7 @@ class User extends Authenticatable
         'id_persona',
         'tipo_acceso',
         'name',
+        'username',
         'email',
         'email_alternativo',
         'password',

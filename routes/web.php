@@ -21,7 +21,7 @@ Route::get('/', function () {
             default => 'login',
         });
     }
-    return redirect('/colaborador/login'); // Por defecto login colaborador
+    return redirect()->route('login'); // Redirige al login unificado
 });
 
 // Logout universal

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('id_rol')->references('id_rol')->on('roles_organizacionales')->nullOnDelete()->cascadeOnUpdate();
             
             $table->foreignId('id_cargos')->nullable()->constrained('cargo', 'id_cargos')->nullOnDelete()->cascadeOnUpdate();
-            $table->foreignId('id_unidades')->nullable()->constrained('unidad', 'id_unidades')->nullOnDelete()->cascadeOnUpdate();
+            $table->foreignId('id_unidad')->nullable()->constrained('unidad', 'id_unidad')->nullOnDelete()->cascadeOnUpdate();
             $table->foreignId('id_direcciones')->nullable()->constrained('direccion', 'id_direcciones')->nullOnDelete()->cascadeOnUpdate();
             $table->foreignId('id_dependencia')->nullable()->constrained('dependencia', 'id_dependencias')->nullOnDelete()->cascadeOnUpdate();
             $table->foreignId('id_area')->nullable()->constrained('area', 'id_area')->nullOnDelete()->cascadeOnUpdate();
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->index('id_persona');
             $table->index('id_rol');
             $table->index('id_cargos');
-            $table->index('id_unidades');
+            $table->index('id_unidad');
         });
     }
 
