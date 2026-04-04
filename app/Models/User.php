@@ -32,6 +32,7 @@ class User extends Authenticatable
         'password',
         'i_active',
         'ultima_sesion',
+        'id_rol', 
     ];
 
     protected $hidden = [
@@ -55,6 +56,12 @@ class User extends Authenticatable
     // ========================================
     // RELACIONES
     // ========================================
+
+    // Relación con rol organizacional
+    public function rolOrganizacional()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
+    }
 
     public function persona()
     {

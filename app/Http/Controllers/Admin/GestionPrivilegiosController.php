@@ -18,6 +18,7 @@ class GestionPrivilegiosController extends Controller
     public function index()
     {
         $usuarios = User::with(['persona', 'permissions'])
+            ->whereIn('tipo_acceso', ['admin', 'colaborador'])
             ->orderBy('name')
             ->paginate(20);
 

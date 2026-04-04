@@ -79,6 +79,12 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-medium text-gray-500">Username</label>
+                        <p class="mt-1 text-lg font-mono text-gray-900 bg-gray-100 px-3 py-2 rounded">{{ $usuario->username }}</p>
+                        <p class="text-xs text-gray-500 mt-1">Para iniciar sesión</p>
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-medium text-gray-500">Correo Electrónico</label>
                         <p class="mt-1 text-lg text-gray-900">{{ $usuario->email }}</p>
                         @if($usuario->email_verified_at)
@@ -89,6 +95,25 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Rol Organizacional -->
+            @if($usuario->rolOrganizacional)
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">👔 Rol Organizacional</h3>
+                
+                <div class="flex items-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <svg class="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <div>
+                        <p class="text-lg font-semibold text-gray-900">{{ $usuario->rolOrganizacional->nombre_rol }}</p>
+                        @if($usuario->rolOrganizacional->descripcion)
+                        <p class="text-sm text-gray-600 mt-1">{{ $usuario->rolOrganizacional->descripcion }}</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @endif
 
             <!-- Persona Asociada -->
             @if($usuario->persona)

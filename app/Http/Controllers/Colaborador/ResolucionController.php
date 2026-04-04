@@ -1111,17 +1111,14 @@ class ResolucionController extends Controller implements HasMiddleware
             ]);
 
             // Registrar auditoría
-            AuditoriaHelper::registrar(
-                'Resolución asignada',
-                'resolucion',
-                $resolucion->id_resolucion,
-                null,
-                [
-                    'num_resolucion' => $resolucion->num_resolucion,
-                    'persona' => $personaResolucionDatos->nombre_completo,
-                    'id_user' => $personaResolucionDatos->id_user
-                ]
-            );
+            \App\Models\Auditoria::create([
+                'tabla_afectada' => 'resolucion',
+                'id_registro'    => $resolucion->id_resolucion,
+                'accion'         => 'asignar_cliente',
+                'id_usuario'     => Auth::id(),
+                'ip_address'     => request()->ip(),
+                'descripcion'    => "Resolución {$resolucion->num_resolucion} asignada a {$personaResolucionDatos->nombre_completo} (id_user: {$personaResolucionDatos->id_user})",
+            ]);
 
             // Opcional: Enviar notificación por correo
             $usuario = User::find($personaResolucionDatos->id_user);

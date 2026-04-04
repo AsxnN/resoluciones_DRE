@@ -12,9 +12,7 @@ return new class extends Migration
             $table->string('id_colab_dis', 50)->primary();
             $table->foreignId('id_persona')->unique()->constrained('persona', 'id_persona')->cascadeOnDelete()->cascadeOnUpdate();
             
-            // AGREGAR REFERENCIA A ROL ORGANIZACIONAL
-            $table->unsignedBigInteger('id_rol')->nullable();
-            $table->foreign('id_rol')->references('id_rol')->on('roles_organizacionales')->nullOnDelete()->cascadeOnUpdate();
+            // ROL ORGANIZACIONAL MOVIDO A TABLA USERS
             
             $table->foreignId('id_cargos')->nullable()->constrained('cargo', 'id_cargos')->nullOnDelete()->cascadeOnUpdate();
             $table->foreignId('id_unidad')->nullable()->constrained('unidad', 'id_unidad')->nullOnDelete()->cascadeOnUpdate();
@@ -29,7 +27,6 @@ return new class extends Migration
             $table->timestamp('fecha_actualizacion')->useCurrent()->useCurrentOnUpdate();
             
             $table->index('id_persona');
-            $table->index('id_rol');
             $table->index('id_cargos');
             $table->index('id_unidad');
         });

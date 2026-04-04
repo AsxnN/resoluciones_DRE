@@ -230,11 +230,14 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
                             @foreach($datosPaso1['personas_internas'] as $index => $interno)
+                            @php
+                                $userInterno = \App\Models\User::find($interno['id_user'] ?? null);
+                            @endphp
                             <tr class="hover:bg-gray-50">
                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-semibold text-gray-900 sm:pl-6">{{ $index + 1 }}</td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-600 font-mono">{{ $interno['dni'] ?? 'N/A' }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-600 font-mono">{{ $interno['num_documento'] ?? 'N/A' }}</td>
                                 <td class="px-3 py-4 text-sm font-medium text-gray-900">{{ $interno['nombre_completo'] ?? 'N/A' }}</td>
-                                <td class="px-3 py-4 text-sm text-gray-600">{{ $interno['email'] ?? 'N/A' }}</td>
+                                <td class="px-3 py-4 text-sm text-gray-600">{{ $userInterno->username ?? ($interno['correo'] ?? 'N/A') }}</td>
                             </tr>
                             @endforeach
                         </tbody>

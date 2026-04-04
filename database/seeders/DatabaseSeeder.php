@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             EstadoSeeder::class,
             EstadoFirmaSeeder::class,
             TipoResolucionSeeder::class,
+            CatalogosSeeder::class,
         ]);
 
         // 4. Usuario Admin inicial

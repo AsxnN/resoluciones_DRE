@@ -160,11 +160,11 @@
                     </div>
                     <div>
                         <span class="text-gray-500">Fecha de Registro:</span>
-                        <span class="ml-2 text-gray-900">{{ $persona->created_at->format('d/m/Y H:i') }}</span>
+                        <span class="ml-2 text-gray-900">{{ $persona->created_at ? $persona->created_at->format('d/m/Y H:i') : 'N/A' }}</span>
                     </div>
                     <div>
                         <span class="text-gray-500">Última Actualización:</span>
-                        <span class="ml-2 text-gray-900">{{ $persona->updated_at->format('d/m/Y H:i') }}</span>
+                        <span class="ml-2 text-gray-900">{{ $persona->updated_at ? $persona->updated_at->format('d/m/Y H:i') : 'N/A' }}</span>
                     </div>
                     <div>
                         <span class="text-gray-500">Datos Completos:</span>

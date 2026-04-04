@@ -95,6 +95,6 @@ class AdminLoginController extends Controller
             'descripcion' => 'Logout administrador',
         ]);
 
-        return redirect('/admin/login');
+        return redirect()->route('login');
     }
 }

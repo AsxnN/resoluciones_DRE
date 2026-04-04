@@ -106,10 +106,9 @@
                 </div>
             </div>
 
-            <!-- Registro -->
             <div class="text-center">
-                <a href="#" class="text-green-600 hover:text-green-800 font-semibold text-sm">
-                    📝 Solicitar acceso como cliente
+                <a href="{{ route('cliente.register') }}" class="text-green-600 hover:text-green-800 font-semibold text-sm">
+                    📝 Crear cuenta como cliente
                 </a>
             </div>
         </div>

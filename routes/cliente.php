@@ -22,6 +22,10 @@ Route::prefix('cliente')->name('cliente.')->group(function () {
     Route::post('login', [ClienteLoginController::class, 'login']);
     Route::post('logout', [ClienteLoginController::class, 'logout'])->name('logout');
 
+    // Auto-registro de cliente (público, sin auth)
+    Route::get('register', [\App\Http\Controllers\Auth\ClienteRegisterController::class, 'showForm'])->name('register');
+    Route::post('register', [\App\Http\Controllers\Auth\ClienteRegisterController::class, 'register']);
+
     // ========================================
     // RUTAS PROTEGIDAS (CLIENTE)
     // ========================================

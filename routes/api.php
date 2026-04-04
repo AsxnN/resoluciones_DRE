@@ -3,6 +3,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReniecController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,4 +25,9 @@ Route::post('webhooks/firma-peru', function (Request $request) {
     // Procesar callback de Firma Perú
     \Log::info('Webhook Firma Perú:', $request->all());
     return response()->json(['status' => 'received']);
+});
+
+// RENIEC - Usar auth:web en lugar de auth:sanctum para usuarios web autenticados
+Route::middleware(['auth:web'])->group(function () {
+    Route::get('/reniec/consultar-dni/{dni}', [ReniecController::class, 'consultarDni']);
 });

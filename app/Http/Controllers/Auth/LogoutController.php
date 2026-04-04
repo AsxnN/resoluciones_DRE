@@ -35,11 +35,6 @@ class LogoutController extends Controller
         }
 
         // Redirigir según tipo
-        return redirect()->route(match($tipoAcceso) {
-            'admin' => 'admin.login',
-            'colaborador' => 'colaborador.login',
-            'cliente' => 'cliente.login',
-            default => 'login',
-        });
+        return redirect()->route('login');
     }
 }

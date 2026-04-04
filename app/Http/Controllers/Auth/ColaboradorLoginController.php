@@ -76,6 +76,6 @@ class ColaboradorLoginController extends Controller
             'descripcion' => 'Logout colaborador',
         ]);
 
-        return redirect('/colaborador/login');
+        return redirect()->route('login');
     }
 }

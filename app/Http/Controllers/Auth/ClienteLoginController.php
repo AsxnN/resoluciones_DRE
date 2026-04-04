@@ -84,6 +84,6 @@ class ClienteLoginController extends Controller
             'descripcion' => 'Logout cliente',
         ]);
 
-        return redirect('/cliente/login');
+        return redirect()->route('login');
     }
 }

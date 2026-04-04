@@ -13,15 +13,29 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('id_persona')->nullable()->unique()->constrained('persona', 'id_persona')->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('name');
             $table->string('username')->unique();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('tipo_acceso')->default('colaborador'); // admin, colaborador, cliente
+            $table->boolean('i_active')->default(true);
+            $table->unsignedBigInteger('id_rol')->nullable();
+            $table->timestamp('ultima_sesion')->nullable();
             $table->rememberToken();
             $table->foreignId('current_team_id')->nullable();
             $table->string('profile_photo_path', 2048)->nullable();
             $table->timestamps();
+            
+            // Foreign key para rol organizacional
+            $table->foreign('id_rol')->references('id_rol')->on('roles_organizacionales')->nullOnDelete()->cascadeOnUpdate();
+            
+            // Índices
+            $table->index('id_persona');
+            $table->index('id_rol');
+            $table->index('tipo_acceso');
+            $table->index('i_active');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
