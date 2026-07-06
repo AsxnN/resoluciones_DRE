@@ -29,18 +29,10 @@ class ResolucionFirmadaController extends Controller implements HasMiddleware
      */
     public function index(Request $request)
     {
-        // Obtener resoluciones que tienen registros de firma
-        $query = Resolucion::with(['tipoResolucion', 'estado'])
-            ->whereHas('registrosFirmaEntrega')
-            ->withCount([
-                'registrosFirmaEntrega',
-                'registrosFirmaEntrega as registros_firmados_count' => function($q) {
-                    $q->where('firmado', true);
-                },
-                'registrosFirmaEntrega as registros_entregados_count' => function($q) {
-                    $q->whereNotNull('fecha_entrega');
-                }
-            ]);
+        // Solo resoluciones realmente firmadas (con archivo de firma real)
+        $query = Resolucion::with(['tipoResolucion', 'estado', 'usuarioFirmante', 'personaEntrega'])
+            ->withCount('entregas')
+            ->whereNotNull('archivo_firmado');
 
         // Filtros
         if ($request->filled('search')) {
@@ -52,29 +44,25 @@ class ResolucionFirmadaController extends Controller implements HasMiddleware
         }
 
         if ($request->filled('fecha_desde')) {
-            $query->whereHas('registrosFirmaEntrega', function($q) use ($request) {
-                $q->where('fecha_solicitud', '>=', $request->fecha_desde);
-            });
+            $query->where('fecha_firma', '>=', $request->fecha_desde);
         }
 
         if ($request->filled('fecha_hasta')) {
-            $query->whereHas('registrosFirmaEntrega', function($q) use ($request) {
-                $q->where('fecha_solicitud', '<=', $request->fecha_hasta);
-            });
+            $query->where('fecha_firma', '<=', $request->fecha_hasta);
         }
 
-        // Cambiar el ordenamiento a fecha_creacion en lugar de updated_at
-        $resoluciones = $query->orderBy('fecha_creacion', 'desc')
+        $resoluciones = $query->orderBy('fecha_firma', 'desc')
             ->paginate(20)
             ->withQueryString();
 
         // Estadísticas
-        $totalRegistros = \App\Models\RegistroFirmaEntrega::count();
-        $registrosEsteMes = \App\Models\RegistroFirmaEntrega::whereMonth('fecha_solicitud', now()->month)
-            ->whereYear('fecha_solicitud', now()->year)
+        $base = Resolucion::whereNotNull('archivo_firmado');
+        $totalRegistros = $base->clone()->count();
+        $registrosEsteMes = $base->clone()->whereMonth('fecha_firma', now()->month)
+            ->whereYear('fecha_firma', now()->year)
             ->count();
-        $registrosEstaSemana = \App\Models\RegistroFirmaEntrega::whereBetween('fecha_solicitud', [now()->startOfWeek(), now()->endOfWeek()])->count();
-        $registrosHoy = \App\Models\RegistroFirmaEntrega::whereDate('fecha_solicitud', today())->count();
+        $registrosEstaSemana = $base->clone()->whereBetween('fecha_firma', [now()->startOfWeek(), now()->endOfWeek()])->count();
+        $registrosHoy = $base->clone()->whereDate('fecha_firma', today())->count();
 
         return view('colaborador.resoluciones-firmadas.index', compact(
             'resoluciones',
@@ -487,15 +475,18 @@ class ResolucionFirmadaController extends Controller implements HasMiddleware
 
     public function historialFirmas(Resolucion $resolucion)
     {
-        $registros = $resolucion->registrosFirmaEntrega()
-            ->with([
-                'personaExterna',
-                'usuarioFirmante.persona',
-                'usuarioSolicita.persona'
-            ])
-            ->orderBy('fecha_solicitud', 'desc')
+        if (!$resolucion->archivo_firmado) {
+            return redirect()
+                ->route('colaborador.resoluciones-firmadas.index')
+                ->with('error', '❌ Esta resolución todavía no ha sido firmada.');
+        }
+
+        $resolucion->load(['tipoResolucion', 'estado']);
+
+        $entregas = $resolucion->entregas()
+            ->with(['personaEntrega.user', 'usuarioFirma'])
             ->get();
 
-        return view('colaborador.resoluciones-firmadas.historial', compact('resolucion', 'registros'));
+        return view('colaborador.resoluciones-firmadas.historial', compact('resolucion', 'entregas'));
     }
 }

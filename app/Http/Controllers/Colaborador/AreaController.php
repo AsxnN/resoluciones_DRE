@@ -37,7 +37,13 @@ class AreaController extends Controller implements HasMiddleware
 
         $areas = $query->orderBy('nombre_area')->paginate(20)->withQueryString();
 
-        return view('colaborador.areas.index', compact('areas'));
+        $stats = [
+            'total' => Area::count(),
+            'activas' => Area::where('i_active', true)->count(),
+            'inactivas' => Area::where('i_active', false)->count(),
+        ];
+
+        return view('colaborador.areas.index', compact('areas', 'stats'));
     }
 
     public function create()
@@ -70,8 +76,9 @@ class AreaController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'nombre_area' => 'required|string|max:100|unique:area,nombre_area,' . $area->id_area . ',id_area',
             'descripcion' => 'nullable|string|max:255',
-            'i_active' => 'required|boolean',
         ]);
+
+        $validated['i_active'] = $request->has('i_active') ? 1 : 0;
 
         $area->update($validated);
 

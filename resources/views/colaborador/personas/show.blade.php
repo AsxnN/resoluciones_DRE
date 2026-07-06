@@ -1,5 +1,5 @@
 {{-- filepath: resources/views/colaborador/personas/show.blade.php --}}
-@extends('layouts.app')
+@extends('layouts.colaborador')
 
 @section('title', 'Ver Persona')
 
@@ -16,15 +16,15 @@
                     </svg>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">👤 Detalles de Persona</h1>
+                    <h1 class="text-3xl font-bold text-gray-900">Detalles de Persona</h1>
                     <p class="text-gray-600 mt-1">Información completa del registro</p>
                 </div>
             </div>
             
-            @can('editar_personas')
+            @can('personas.editar')
             <a href="{{ route('colaborador.personas.edit', $persona) }}" 
                class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg transition">
-                ✏️ Editar
+                Editar
             </a>
             @endcan
         </div>
@@ -183,14 +183,14 @@
 
     <!-- Acciones adicionales -->
     <div class="mt-6 flex gap-4">
-        @can('editar_personas')
+        @can('personas.editar')
         <a href="{{ route('colaborador.personas.edit', $persona) }}" 
            class="flex-1 px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg text-center transition">
-            ✏️ Editar Información
+            Editar Información
         </a>
         @endcan
         
-        @can('eliminar_personas')
+        @can('personas.eliminar')
         <form method="POST" 
               action="{{ route('colaborador.personas.destroy', $persona) }}" 
               onsubmit="return confirm('¿Está seguro de eliminar esta persona? Esta acción no se puede deshacer.')"
@@ -199,7 +199,7 @@
             @method('DELETE')
             <button type="submit" 
                     class="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition">
-                🗑️ Eliminar Persona
+                Eliminar Persona
             </button>
         </form>
         @endcan

@@ -15,10 +15,10 @@ class TipoResolucionController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:tipos_resolucion.ver', only: ['index', 'show']),
-            new Middleware('permission:tipos_resolucion.crear', only: ['create', 'store']),
-            new Middleware('permission:tipos_resolucion.editar', only: ['edit', 'update']),
-            new Middleware('permission:tipos_resolucion.eliminar', only: ['destroy']),
+            new Middleware('permission:tipos-resolucion.ver', only: ['index', 'show']),
+            new Middleware('permission:tipos-resolucion.crear', only: ['create', 'store']),
+            new Middleware('permission:tipos-resolucion.editar', only: ['edit', 'update']),
+            new Middleware('permission:tipos-resolucion.eliminar', only: ['destroy']),
         ];
     }
 

@@ -38,7 +38,7 @@
                         </x-nav-link>
                         @endcan
 
-                        @can('usar_asistente_ia')
+                        @can('asistente-ia.usar')
                         <x-nav-link href="{{ route('colaborador.chatbot.index') }}" :active="request()->routeIs('colaborador.chatbot.*')">
                             {{ __('Asistente IA') }}
                         </x-nav-link>

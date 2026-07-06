@@ -62,6 +62,14 @@ class PermisoSeeder extends Seeder
             ], 'especial');
         }
 
+        // PERMISOS ASISTENTE IA
+        $moduloIA = DB::table('modulos')->where('slug', 'asistente-ia')->first();
+        if ($moduloIA) {
+            $this->crearPermisos($moduloIA->id_modulo, 'asistente-ia', [
+                'usar' => 'Acceder y usar el asistente de IA',
+            ], 'especial');
+        }
+
         // PERMISOS SOLO LECTURA: RESOLUCIONES FIRMADAS
         $moduloFirmadas = DB::table('modulos')->where('slug', 'resoluciones-firmadas')->first();
         

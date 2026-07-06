@@ -17,7 +17,7 @@ class DashboardController extends Controller
         $cliente = $user->cliente;
 
         if (!$cliente) {
-            return redirect()->route('cliente.login')
+            return redirect()->route('login')
                 ->with('error', '❌ No tiene perfil de cliente asociado');
         }
 

@@ -99,10 +99,6 @@
                     <label class="text-sm font-medium text-gray-500">Teléfono</label>
                     <p class="text-gray-900">{{ $persona->telefono ?? 'Sin especificar' }}</p>
                 </div>
-                <div>
-                    <label class="text-sm font-medium text-gray-500">WhatsApp</label>
-                    <p class="text-gray-900">{{ $persona->whatsapp ?? 'Sin especificar' }}</p>
-                </div>
                 <div class="md:col-span-2">
                     <label class="text-sm font-medium text-gray-500">Dirección</label>
                     <p class="text-gray-900">{{ $persona->direccion ?? 'Sin especificar' }}</p>

@@ -27,11 +27,14 @@ class Rol extends Model
     ];
 
     // Relaciones
-    public function colaboradores()
+
+    // id_rol vive en la tabla `users` (rol organizacional del usuario), no en `colaborador`.
+    public function usuariosConEsteRol()
     {
-        return $this->hasMany(Colaborador::class, 'id_rol', 'id_rol');
+        return $this->hasMany(User::class, 'id_rol', 'id_rol');
     }
 
+    // Usuario que creó/registró este rol (id_usuario es un campo distinto de id_rol)
     public function usuario()
     {
         return $this->belongsTo(User::class, 'id_usuario', 'id');

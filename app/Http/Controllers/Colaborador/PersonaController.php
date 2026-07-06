@@ -20,9 +20,9 @@ class PersonaController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:personas.ver', only: ['index', 'show']),
+            new Middleware('permission:personas.ver', only: ['index', 'show', 'buscarPorDni', 'export']),
             new Middleware('permission:personas.crear', only: ['create', 'store']),
-            new Middleware('permission:personas.editar', only: ['edit', 'update']),
+            new Middleware('permission:personas.editar', only: ['edit', 'update', 'actualizarCorreo', 'reenviarAcceso']),
             new Middleware('permission:personas.eliminar', only: ['destroy', 'toggleEstado']),
         ];
     }
@@ -148,7 +148,6 @@ class PersonaController extends Controller implements HasMiddleware
             'apellido_materno' => 'nullable|string|max:100',
             'correo' => 'nullable|email|max:100|unique:persona,correo',
             'telefono' => 'nullable|string|max:20',
-            'whatsapp' => 'nullable|string|max:20',
             'direccion' => 'nullable|string',
         ], [
             'tipo_persona.required' => 'Debe seleccionar el tipo de persona',
@@ -225,7 +224,6 @@ class PersonaController extends Controller implements HasMiddleware
             'apellido_materno' => 'nullable|string|max:100',
             'correo' => 'nullable|email|max:100|unique:persona,correo,' . $persona->id_persona . ',id_persona',
             'telefono' => 'nullable|string|max:20',
-            'whatsapp' => 'nullable|string|max:20',
             'direccion' => 'nullable|string',
         ]);
 
@@ -310,6 +308,56 @@ class PersonaController extends Controller implements HasMiddleware
     }
 
     /**
+     * Actualizar el correo de contacto de un cliente (AJAX, sin recargar la vista)
+     */
+    public function actualizarCorreo(Request $request, Persona $persona)
+    {
+        if ($persona->tipo_persona !== 'cliente') {
+            return response()->json(['success' => false, 'message' => 'Esta persona no es un cliente.'], 422);
+        }
+
+        $request->validate([
+            'correo' => 'required|email',
+        ]);
+
+        $persona->update(['correo' => $request->correo]);
+
+        return response()->json(['success' => true, 'correo' => $persona->correo]);
+    }
+
+    /**
+     * Reenviar el acceso de un cliente: reinicia su contraseña al DNI
+     * y le envía por correo su usuario y la nueva contraseña.
+     */
+    public function reenviarAcceso(Persona $persona)
+    {
+        if ($persona->tipo_persona !== 'cliente' || !$persona->user) {
+            return response()->json(['success' => false, 'message' => 'Esta persona no tiene una cuenta de cliente.'], 422);
+        }
+
+        if (!$persona->correo) {
+            return response()->json(['success' => false, 'message' => 'Esta persona no tiene un correo de contacto registrado.'], 422);
+        }
+
+        $user = $persona->user;
+        $passwordNueva = $persona->num_documento;
+        $user->update(['password' => \Illuminate\Support\Facades\Hash::make($passwordNueva)]);
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($persona->correo)->send(new \App\Mail\CredencialesAcceso([
+                'nombre' => trim($persona->nombres . ' ' . $persona->apellido_paterno . ' ' . $persona->apellido_materno),
+                'username' => $user->username,
+                'password' => $passwordNueva,
+                'resolucion' => null,
+            ]));
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'No se pudo enviar el correo: ' . $e->getMessage()], 500);
+        }
+
+        return response()->json(['success' => true, 'correo' => $persona->correo]);
+    }
+
+    /**
      * Exportar personas a CSV
      */
     public function export(Request $request)
@@ -382,13 +430,12 @@ class PersonaController extends Controller implements HasMiddleware
                         $persona->nombres ?? '',
                         $persona->correo ?? '',
                         $persona->telefono ?? '',
-                        $persona->whatsapp ?? '',
-                        $persona->tipo_persona == 'colaborador' && $persona->colaborador 
-                            ? ($persona->colaborador->direccion->nombre_direcciones ?? '') 
+                        $persona->tipo_persona == 'colaborador' && $persona->colaborador
+                            ? ($persona->colaborador->direccion->nombre_direcciones ?? '')
                             : ($persona->direccion ?? ''),
-                        $persona->colaborador->dependencia->nombre_dependencia ?? '',
-                        $persona->colaborador->area->nombre_area ?? '',
-                        $persona->colaborador->cargo->nombre_cargo ?? '',
+                        $persona->colaborador?->dependencia->nombre_dependencia ?? '',
+                        $persona->colaborador?->area->nombre_area ?? '',
+                        $persona->colaborador?->cargo->nombre_cargo ?? '',
                     ], ';');
                 }
 

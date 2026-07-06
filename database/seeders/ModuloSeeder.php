@@ -164,6 +164,16 @@ class ModuloSeeder extends Seeder
                 'tipo_modulo' => 'colaborador',
                 'i_active' => true,
             ],
+            [
+                'nombre_modulo' => 'Asistente IA',
+                'slug' => 'asistente-ia',
+                'descripcion' => 'Chatbot de consulta con IA sobre resoluciones',
+                'ruta' => '/colaborador/chatbot',
+                'icono' => 'fas fa-robot',
+                'orden' => 15,
+                'tipo_modulo' => 'colaborador',
+                'i_active' => true,
+            ],
         ];
 
         foreach ($modulos as $modulo) {

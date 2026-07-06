@@ -35,7 +35,13 @@ class DependenciaController extends Controller implements HasMiddleware
 
         $dependencias = $query->orderBy('nombre_dependencia')->paginate(20)->withQueryString();
 
-        return view('colaborador.dependencias.index', compact('dependencias'));
+        $stats = [
+            'total' => Dependencia::count(),
+            'activas' => Dependencia::where('i_active', true)->count(),
+            'inactivas' => Dependencia::where('i_active', false)->count(),
+        ];
+
+        return view('colaborador.dependencias.index', compact('dependencias', 'stats'));
     }
 
     public function create()
@@ -68,8 +74,9 @@ class DependenciaController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'cod_dependencia' => 'required|string|max:20|unique:dependencia,cod_dependencia,' . $dependencia->id_dependencias . ',id_dependencias',
             'nombre_dependencia' => 'required|string|max:100|unique:dependencia,nombre_dependencia,' . $dependencia->id_dependencias . ',id_dependencias',
-            'i_active' => 'required|boolean',
         ]);
+
+        $validated['i_active'] = $request->has('i_active') ? 1 : 0;
 
         $dependencia->update($validated);
 

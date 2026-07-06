@@ -15,7 +15,7 @@
                 </svg>
             </a>
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">➕ Crear Rol Organizacional</h1>
+                <h1 class="text-3xl font-bold text-gray-900">Crear Rol Organizacional</h1>
                 <p class="text-gray-600 mt-1">Registrar un nuevo rol para la estructura organizacional</p>
             </div>
         </div>
@@ -67,11 +67,11 @@
             <div class="flex justify-end gap-4 pt-6 border-t border-gray-200 mt-8">
                 <a href="{{ route('colaborador.roles.index') }}" 
                    class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition">
-                    ❌ Cancelar
+                    Cancelar
                 </a>
                 <button type="submit" 
                         class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition">
-                    ✓ Crear Rol
+                    Crear Rol
                 </button>
             </div>
         </form>

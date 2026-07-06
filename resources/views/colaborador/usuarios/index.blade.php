@@ -8,7 +8,7 @@
     <!-- Header -->
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">👥 Gestión de Usuarios</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Gestión de Usuarios</h1>
             <p class="text-gray-600 mt-1">Administración de usuarios del sistema</p>
         </div>
         @can('usuarios.crear')
@@ -38,11 +38,9 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Rol</label>
                 <select name="role" class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Todos los roles</option>
-                    @foreach($roles as $role)
-                    <option value="{{ $role->name }}" {{ request('role') == $role->name ? 'selected' : '' }}>
-                        {{ ucfirst($role->name) }}
-                    </option>
-                    @endforeach
+                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                    <option value="colaborador" {{ request('role') == 'colaborador' ? 'selected' : '' }}>Colaborador</option>
+                    <option value="cliente" {{ request('role') == 'cliente' ? 'selected' : '' }}>Cliente</option>
                 </select>
             </div>
 
@@ -56,11 +54,14 @@
             </div>
 
             <div class="flex gap-2 items-end">
-                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
-                    🔍 Buscar
+                <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Buscar
                 </button>
                 <a href="{{ route('colaborador.usuarios.index') }}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition">
-                    🔄
+                    Limpiar
                 </a>
             </div>
         </form>
@@ -183,14 +184,12 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        @foreach($usuario->roles as $role)
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            {{ $role->name === 'admin' ? 'bg-purple-100 text-purple-800' : 
-                               ($role->name === 'colaborador' ? 'bg-blue-100 text-blue-800' : 
-                               ($role->name === 'director' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800')) }}">
-                            {{ ucfirst($role->name) }}
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                            {{ $usuario->tipo_acceso === 'admin' ? 'bg-purple-100 text-purple-800' :
+                               ($usuario->tipo_acceso === 'colaborador' ? 'bg-blue-100 text-blue-800' :
+                               'bg-gray-100 text-gray-800') }}">
+                            {{ ucfirst($usuario->tipo_acceso) }}
                         </span>
-                        @endforeach
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         @if($usuario->ultima_sesion)
@@ -218,27 +217,34 @@
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div class="flex justify-end gap-2">
                             @can('usuarios.ver')
-                            <a href="{{ route('colaborador.usuarios.show', $usuario) }}" 
+                            <a href="{{ route('colaborador.usuarios.show', $usuario) }}"
                                class="text-blue-600 hover:text-blue-900" title="Ver">
-                                👁️
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
                             </a>
                             @endcan
                             @can('usuarios.editar')
-                            <a href="{{ route('colaborador.usuarios.edit', $usuario) }}" 
+                            <a href="{{ route('colaborador.usuarios.edit', $usuario) }}"
                                class="text-yellow-600 hover:text-yellow-900" title="Editar">
-                                ✏️
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
                             </a>
                             @endcan
                             @can('usuarios.eliminar')
                             @if($usuario->id !== auth()->id())
-                            <form method="POST" 
-                                  action="{{ route('colaborador.usuarios.destroy', $usuario) }}" 
+                            <form method="POST"
+                                  action="{{ route('colaborador.usuarios.destroy', $usuario) }}"
                                   onsubmit="return confirm('¿Está seguro de eliminar este usuario?')"
                                   class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-900" title="Eliminar">
-                                    🗑️
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
                                 </button>
                             </form>
                             @endif

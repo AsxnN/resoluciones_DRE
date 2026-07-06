@@ -38,7 +38,13 @@ class EspecialidadController extends Controller implements HasMiddleware
 
         $especialidades = $query->orderBy('nombre_especialidad')->paginate(20)->withQueryString();
 
-        return view('colaborador.especialidades.index', compact('especialidades'));
+        $stats = [
+            'total' => Especialidad::count(),
+            'activas' => Especialidad::where('i_active', true)->count(),
+            'inactivas' => Especialidad::where('i_active', false)->count(),
+        ];
+
+        return view('colaborador.especialidades.index', compact('especialidades', 'stats'));
     }
 
     public function create()
@@ -71,8 +77,9 @@ class EspecialidadController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'nombre_especialidad' => 'required|string|max:100|unique:especialidad,nombre_especialidad,' . $especialidad->id_especialidad . ',id_especialidad',
             'descripcion' => 'nullable|string|max:255',
-            'i_active' => 'required|boolean',
         ]);
+
+        $validated['i_active'] = $request->has('i_active') ? 1 : 0;
 
         $especialidad->update($validated);
 

@@ -16,7 +16,7 @@
                     </svg>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">👤 Detalle del Usuario</h1>
+                    <h1 class="text-3xl font-bold text-gray-900">Detalle del Usuario</h1>
                     <p class="text-gray-600 mt-1">Información completa de: <strong>{{ $usuario->name }}</strong></p>
                 </div>
             </div>
@@ -60,7 +60,7 @@
             <!-- Datos de Acceso -->
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">🔐 Datos de Acceso</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">Datos de Acceso</h3>
                     @if($usuario->i_active)
                         <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
                             ✓ Activo
@@ -99,7 +99,7 @@
             <!-- Rol Organizacional -->
             @if($usuario->rolOrganizacional)
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">👔 Rol Organizacional</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Rol Organizacional</h3>
                 
                 <div class="flex items-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <svg class="w-8 h-8 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,7 +118,7 @@
             <!-- Persona Asociada -->
             @if($usuario->persona)
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">👥 Persona Asociada</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Persona Asociada</h3>
                 
                 <div class="flex items-center mb-4">
                     @if($usuario->persona->foto_persona ?? false)
@@ -163,7 +163,7 @@
 
             <!-- Actividad -->
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">📊 Actividad</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Actividad</h3>
                 
                 <div class="space-y-3">
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -192,37 +192,10 @@
 
         <!-- Columna Lateral -->
         <div class="space-y-6">
-            <!-- Roles -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">🔑 Roles Asignados</h3>
-                
-                @if($usuario->roles->count() > 0)
-                    <div class="space-y-2">
-                        @foreach($usuario->roles as $role)
-                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                            <div>
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full
-                                    {{ $role->name === 'admin' ? 'bg-purple-100 text-purple-800' : 
-                                       ($role->name === 'colaborador' ? 'bg-blue-100 text-blue-800' : 
-                                       'bg-gray-100 text-gray-800') }}">
-                                    {{ ucfirst($role->name) }}
-                                </span>
-                                <p class="text-xs text-gray-500 mt-1">
-                                    {{ $role->permissions->count() }} permisos
-                                </p>
-                            </div>
-                        </div>
-                        @endforeach
-                    </div>
-                @else
-                    <p class="text-sm text-gray-500">Sin roles asignados</p>
-                @endif
-            </div>
-
             <!-- Permisos Directos -->
             @if($usuario->permissions->count() > 0)
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">🔐 Permisos Directos</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Permisos Directos</h3>
                 
                 <div class="space-y-1 max-h-64 overflow-y-auto">
                     @foreach($usuario->permissions as $permission)
@@ -239,7 +212,7 @@
 
             <!-- Estadísticas -->
             <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
-                <h3 class="text-lg font-semibold mb-4">📈 Estadísticas</h3>
+                <h3 class="text-lg font-semibold mb-4">Estadísticas</h3>
                 
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
@@ -262,7 +235,7 @@
             <!-- Acciones -->
             @can('usuarios.editar')
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">⚡ Acciones Rápidas</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
                 
                 <div class="space-y-2">
                     <form method="POST" action="{{ route('colaborador.usuarios.toggle-estado', $usuario) }}">
@@ -270,7 +243,7 @@
                         @method('PATCH')
                         <button type="submit" 
                                 class="w-full px-4 py-2 text-sm {{ $usuario->i_active ? 'bg-red-100 hover:bg-red-200 text-red-700' : 'bg-green-100 hover:bg-green-200 text-green-700' }} font-medium rounded-lg transition">
-                            {{ $usuario->i_active ? '🔴 Desactivar Usuario' : '✅ Activar Usuario' }}
+                            {{ $usuario->i_active ? 'Desactivar Usuario' : 'Activar Usuario' }}
                         </button>
                     </form>
 
@@ -280,7 +253,7 @@
                         @csrf
                         <button type="submit" 
                                 class="w-full px-4 py-2 text-sm bg-yellow-100 hover:bg-yellow-200 text-yellow-700 font-medium rounded-lg transition">
-                            🔑 Restablecer Contraseña
+                            Restablecer Contraseña
                         </button>
                     </form>
                 </div>

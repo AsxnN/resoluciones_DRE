@@ -36,8 +36,12 @@ return [
     ],
     
     'reniec' => [
-        'url' => env('RENIEC_API_URL', 'https://apiperu.dev/api/dni'),
+        'url' => env('RENIEC_API_URL', 'https://api.perudevs.com/api/v1/dni/complete'),
         'token' => env('RENIEC_API_TOKEN'),
+    ],
+
+    'firma_peru' => [
+        'webhook_secret' => env('FIRMA_PERU_WEBHOOK_SECRET'),
     ],
 
 ];

@@ -218,25 +218,7 @@
                     </a>
                     @endif
 
-                    @if($resolucion->archivo_firmado && Storage::disk('public')->exists($resolucion->archivo_firmado))
-                    <a href="{{ route('colaborador.resoluciones.descargarFirmado', $resolucion) }}" 
-                       class="flex items-center gap-3 p-3 bg-white hover:bg-green-50 rounded-lg transition-colors border-2 border-green-300 group">
-                        <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-green-900 group-hover:text-green-700">Archivo Firmado</p>
-                            <p class="text-xs text-green-600">Descargar PDF Firmado</p>
-                        </div>
-                        <svg class="w-5 h-5 text-green-600 group-hover:text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                        </svg>
-                    </a>
-                    @endif
-
-                    @if(!$resolucion->archivo_resolucion && !$resolucion->archivo_firmado)
+                    @if(!$resolucion->archivo_resolucion && $resolucion->entregas->isEmpty())
                     <div class="col-span-2 text-center py-6 text-gray-400">
                         <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
@@ -246,6 +228,42 @@
                     @endif
                 </div>
             </div>
+
+            <!-- Entregas firmadas (puede haber más de una: la misma resolución se puede entregar varias veces) -->
+            @if($resolucion->entregas->isNotEmpty())
+            <div class="bg-green-50 rounded-lg p-4 border border-green-200 mb-6">
+                <h3 class="text-sm font-bold text-green-900 mb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    ARCHIVOS FIRMADOS ({{ $resolucion->entregas->count() }} entrega{{ $resolucion->entregas->count() > 1 ? 's' : '' }})
+                </h3>
+
+                <div class="space-y-2">
+                    @foreach($resolucion->entregas as $entrega)
+                    <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-green-200">
+                        <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-green-900">
+                                Entregado a {{ $entrega->personaEntrega->nombres ?? 'N/A' }} {{ $entrega->personaEntrega->apellido_paterno ?? '' }}
+                            </p>
+                            <p class="text-xs text-green-600">{{ $entrega->fecha_entrega->format('d/m/Y H:i') }} · Firmado por {{ $entrega->usuarioFirma->name ?? 'N/A' }}</p>
+                        </div>
+                        @if(Storage::disk('public')->exists($entrega->archivo_firmado))
+                        <a href="{{ Storage::url($entrega->archivo_firmado) }}" target="_blank"
+                           class="flex-shrink-0 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-colors">
+                            Descargar PDF
+                        </a>
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
 
             <!-- Personas Relacionadas -->
             @php
@@ -330,12 +348,12 @@
                         <div class="bg-white border-2 border-blue-200 rounded-b-lg divide-y-2 divide-gray-200">
                             @foreach($personasExternas as $persona)
                             @php
-                                $tieneUsuario = $persona->id_user !== null;
-                                $usuarioSistema = null;
-                                
-                                if ($tieneUsuario) {
-                                    $usuarioSistema = \App\Models\User::find($persona->id_user);
-                                }
+                                // No usar $persona->id_user: ese campo solo lo llenaba el flujo viejo
+                                // de "Enviar Credenciales" (eliminado). La cuenta real se vincula vía
+                                // Persona->user, sin importar qué flujo la haya creado.
+                                $personaGeneral = \App\Models\Persona::where('num_documento', $persona->num_documento)->first();
+                                $usuarioSistema = $personaGeneral?->user;
+                                $tieneUsuario = $usuarioSistema !== null;
                             @endphp
                             <div class="p-4">
                                 <!-- Cabecera de persona en HORIZONTAL -->
@@ -383,7 +401,7 @@
                                                         <span class="text-green-800 font-bold text-sm">Usuario Registrado</span>
                                                     </div>
                                                     <p class="text-xs text-green-700 font-mono bg-green-100 px-2 py-1 rounded">
-                                                        📧 {{ $usuarioSistema->email }}
+                                                        👤 {{ $usuarioSistema->username }}
                                                     </p>
                                                 </div>
                                                 @else
@@ -399,141 +417,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- Formulario y Botón de Asignación -->
-                                <div class="grid grid-cols-1 gap-4">
-                                    <!-- FORMULARIO DE ENVÍO DE CREDENCIALES -->
-                                    <div class="bg-blue-50 rounded-lg border-2 border-blue-300 p-4">
-                                        <h5 class="text-blue-900 font-bold text-sm mb-3 flex items-center gap-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                                            </svg>
-                                            Enviar Credenciales
-                                        </h5>
-                                        <form action="{{ route('colaborador.resoluciones.enviar-credenciales', $persona->id_persona_resolucion_datos) }}" 
-                                              method="POST">
-                                            @csrf
-                                            <div class="mb-3">
-                                                <label class="text-xs text-gray-700 font-semibold block mb-1.5">
-                                                    Correo de destino:
-                                                </label>
-                                                <input type="email" 
-                                                       name="correo" 
-                                                       required 
-                                                       placeholder="ejemplo@correo.com"
-                                                       value="{{ $usuarioSistema->cliente->persona->correo ?? '' }}"
-                                                       class="w-full px-3 py-2 text-sm border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
-                                            </div>
-                                            
-                                            @if($tieneUsuario)
-                                            <div class="mb-3 bg-orange-50 border border-orange-300 rounded-lg p-2">
-                                                <p class="text-xs text-orange-800 font-semibold flex items-center gap-1.5">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                                    </svg>
-                                                    Se generará nueva contraseña
-                                                </p>
-                                                <p class="text-xs text-orange-700 mt-1">
-                                                    El usuario ya existe. Se actualizará su contraseña.
-                                                </p>
-                                            </div>
-                                            @else
-                                            <div class="mb-3 bg-blue-100 border border-blue-300 rounded-lg p-2">
-                                                <p class="text-xs text-blue-800 font-semibold flex items-center gap-1.5">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
-                                                    </svg>
-                                                    Se creará cuenta nueva
-                                                </p>
-                                                <p class="text-xs text-blue-700 mt-1">
-                                                    Se generará un correo del sistema automáticamente.
-                                                </p>
-                                            </div>
-                                            @endif
-                                            
-                                            <button type="submit" 
-                                                    class="w-full px-4 py-2.5 {{ $tieneUsuario ? 'bg-orange-600 hover:bg-orange-700' : 'bg-blue-600 hover:bg-blue-700' }} text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                                                </svg>
-                                                {{ $tieneUsuario ? 'Reenviar Credenciales' : 'Enviar Credenciales' }}
-                                            </button>
-                                        </form>
-                                    </div>
-
-                                    <!-- BOTÓN DE ASIGNAR RESOLUCIÓN AL CLIENTE -->
-                                    @if($tieneUsuario && $resolucion->archivo_firmado)
-                                    <div class="bg-purple-50 rounded-lg border-2 border-purple-300 p-4">
-                                        <h5 class="text-purple-900 font-bold text-sm mb-3 flex items-center gap-2">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                                            </svg>
-                                            Asignar Resolución
-                                        </h5>
-                                        
-                                        @if($persona->asignado_a_cliente ?? false)
-                                        <div class="bg-green-100 border border-green-300 rounded-lg p-3 mb-3">
-                                            <p class="text-sm text-green-800 font-semibold flex items-center gap-2">
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                                </svg>
-                                                ✅ Resolución ya asignada
-                                            </p>
-                                            @if($persona->fecha_asignacion)
-                                            <p class="text-xs text-green-700 mt-1 ml-7">
-                                                Asignado el {{ \Carbon\Carbon::parse($persona->fecha_asignacion)->format('d/m/Y H:i') }}
-                                            </p>
-                                            @endif
-                                            <p class="text-xs text-green-600 mt-2 ml-7">
-                                                El cliente puede ver esta resolución en "Mis Resoluciones"
-                                            </p>
-                                        </div>
-                                        @else
-                                        <div class="bg-purple-100 border border-purple-300 rounded-lg p-3 mb-3">
-                                            <p class="text-xs text-purple-800">
-                                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                </svg>
-                                                Al asignar esta resolución, el cliente podrá verla en su módulo "Mis Resoluciones".
-                                            </p>
-                                        </div>
-                                        @endif
-                                        
-                                        <form action="{{ route('colaborador.resoluciones.asignar-cliente', [$resolucion, $persona->id_persona_resolucion_datos]) }}" 
-                                              method="POST"
-                                              onsubmit="return confirm('¿Confirmar asignación de esta resolución al cliente?\n\n{{ $persona->nombres }} {{ $persona->apellido_paterno }}\n\nPodrá verla en su módulo Mis Resoluciones.')">
-                                            @csrf
-                                            
-                                            <button type="submit" 
-                                                    @if($persona->asignado_a_cliente ?? false) disabled @endif
-                                                    class="w-full px-4 py-2.5 {{ ($persona->asignado_a_cliente ?? false) ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700' }} text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                                                </svg>
-                                                {{ ($persona->asignado_a_cliente ?? false) ? '✓ Ya Asignada' : 'Asignar al Cliente' }}
-                                            </button>
-                                        </form>
-                                    </div>
-                                    @elseif(!$tieneUsuario)
-                                    <div class="bg-gray-100 border-2 border-gray-300 rounded-lg p-4">
-                                        <p class="text-sm text-gray-600 text-center flex items-center justify-center gap-2">
-                                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                                            </svg>
-                                            <span class="font-medium">Envía credenciales primero para poder asignar la resolución</span>
-                                        </p>
-                                    </div>
-                                    @elseif(!$resolucion->archivo_firmado)
-                                    <div class="bg-gray-100 border-2 border-gray-300 rounded-lg p-4">
-                                        <p class="text-sm text-gray-600 text-center flex items-center justify-center gap-2">
-                                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                                            </svg>
-                                            <span class="font-medium">La resolución debe estar firmada antes de asignarla</span>
-                                        </p>
-                                    </div>
-                                    @endif
+                                    <p class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                        Para crear su cuenta y entregarle esta resolución, usa el botón
+                                        <a href="{{ route('colaborador.resoluciones.revisar-firma') }}?resoluciones_ids={{ urlencode(json_encode([$resolucion->id_resolucion])) }}" class="font-bold text-purple-600 hover:text-purple-800 underline">Firmar / Entregar</a>
+                                        del listado de Resoluciones.
+                                    </p>
                                 </div>
                             </div>
                             @endforeach

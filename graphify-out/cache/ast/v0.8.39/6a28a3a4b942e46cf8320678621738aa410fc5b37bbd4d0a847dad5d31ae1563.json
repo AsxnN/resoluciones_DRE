@@ -1,0 +1,1 @@
+{"nodes": [{"id": "home_ludam_proyectos_laravel_resoluciones_dre_app_console_commands_procesardocumentosocrcommand_php", "label": "ProcesarDocumentosOCRCommand.php", "file_type": "code", "source_file": "app/Console/Commands/ProcesarDocumentosOCRCommand.php", "source_location": "L1"}], "edges": [], "raw_calls": []}

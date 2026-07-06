@@ -152,7 +152,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WhatsApp</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Total Resoluciones</th>
                     </tr>
                 </thead>
@@ -171,7 +171,7 @@
                             <span class="text-sm text-gray-600">{{ $persona->correo ?? 'Sin correo' }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm text-gray-600">{{ $persona->whatsapp ?? 'Sin WhatsApp' }}</span>
+                            <span class="text-sm text-gray-600">{{ $persona->telefono ?? 'Sin teléfono' }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span class="px-3 py-1 text-sm font-semibold bg-purple-100 text-purple-800 rounded-full">
@@ -202,10 +202,10 @@ const ctx = document.getElementById('chartPersonas');
 new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: {!! json_encode($datosGrafica->pluck('nombre')) !!},
+        labels: {!! \Illuminate\Support\Js::from($datosGrafica->pluck('nombre')) !!},
         datasets: [{
             label: 'Resoluciones',
-            data: {!! json_encode($datosGrafica->pluck('total')) !!},
+            data: {!! \Illuminate\Support\Js::from($datosGrafica->pluck('total')) !!},
             backgroundColor: 'rgba(147, 51, 234, 0.8)',
             borderColor: 'rgba(147, 51, 234, 1)',
             borderWidth: 1

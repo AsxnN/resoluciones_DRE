@@ -212,7 +212,7 @@
             <div class="mt-5 text-center">
                 <p class="text-sm text-gray-600">
                     ¿Ya tienes cuenta?
-                    <a href="{{ route('cliente.login') }}" class="text-green-600 hover:text-green-800 font-semibold ml-1">
+                    <a href="{{ route('login') }}" class="text-green-600 hover:text-green-800 font-semibold ml-1">
                         Inicia sesión aquí
                     </a>
                 </p>
@@ -221,8 +221,8 @@
 
         <!-- Footer -->
         <div class="mt-6 text-center">
-            <a href="{{ route('colaborador.login') }}" class="text-green-100 hover:text-white text-sm">
-                ← Volver a Login Principal
+            <a href="{{ route('login') }}" class="text-green-100 hover:text-white text-sm">
+                ← Volver al Login
             </a>
         </div>
     </div>

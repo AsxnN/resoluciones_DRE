@@ -16,7 +16,7 @@ class MisResolucionesController extends Controller
     /**
      * Mostrar resoluciones según el tipo de acceso del usuario
      * - Colaboradores/Admin: ven resoluciones donde están relacionados (es_interna=true)
-     * - Clientes externos: solo ven resoluciones asignadas (asignado_a_cliente=true) y firmadas
+     * - Clientes externos: solo ven resoluciones que se les hayan entregado (tabla entrega_resolucion) y firmadas
      */
     public function index(Request $request)
     {
@@ -34,11 +34,9 @@ class MisResolucionesController extends Controller
 
         // Filtrar según tipo de usuario
         if ($tipoAcceso === 'cliente') {
-            // EXTERNOS: Solo resoluciones asignadas y firmadas
-            $query->whereHas('personasRelacionadas', function($q) use ($userId) {
-                $q->where('persona_resolucion_datos.id_user', $userId)
-                  ->where('persona_resolucion_datos.es_interna', false)
-                  ->where('persona_resolucion_datos.asignado_a_cliente', true);
+            // EXTERNOS: solo resoluciones que se le hayan entregado realmente
+            $query->whereHas('entregas.personaEntrega.user', function($q) use ($userId) {
+                $q->where('id', $userId);
             })->whereNotNull('archivo_firmado');
         } else {
             // INTERNOS (colaborador/admin): Todas las relacionadas con es_interna=true
@@ -101,11 +99,9 @@ class MisResolucionesController extends Controller
 
         // Verificar acceso según tipo de usuario
         if ($tipoAcceso === 'cliente') {
-            // Externos: solo si está asignado y la resolución está firmada
-            $tieneAcceso = $resolucion->personasRelacionadas()
-                ->where('persona_resolucion_datos.id_user', $userId)
-                ->where('persona_resolucion_datos.es_interna', false)
-                ->where('persona_resolucion_datos.asignado_a_cliente', true)
+            // Externos: solo si se le entregó realmente y la resolución está firmada
+            $tieneAcceso = $resolucion->entregas()
+                ->whereHas('personaEntrega.user', fn($q) => $q->where('id', $userId))
                 ->exists() && $resolucion->archivo_firmado;
         } else {
             // Internos: si está relacionado con es_interna=true
@@ -145,10 +141,8 @@ class MisResolucionesController extends Controller
 
         // Verificar acceso (reutilizamos la misma lógica de show)
         if ($tipoAcceso === 'cliente') {
-            $tieneAcceso = $resolucion->personasRelacionadas()
-                ->where('persona_resolucion_datos.id_user', $userId)
-                ->where('persona_resolucion_datos.es_interna', false)
-                ->where('persona_resolucion_datos.asignado_a_cliente', true)
+            $tieneAcceso = $resolucion->entregas()
+                ->whereHas('personaEntrega.user', fn($q) => $q->where('id', $userId))
                 ->exists() && $resolucion->archivo_firmado;
         } else {
             $tieneAcceso = $resolucion->personasRelacionadas()

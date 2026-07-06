@@ -18,7 +18,7 @@ class TipoPersonalController extends Controller implements HasMiddleware
             new Middleware('permission:tipos-personal.ver', only: ['index', 'show']),
             new Middleware('permission:tipos-personal.crear', only: ['create', 'store']),
             new Middleware('permission:tipos-personal.editar', only: ['edit', 'update']),
-            new Middleware('permission:tipos-personal.eliminar', only: ['destroy']),
+            new Middleware('permission:tipos-personal.eliminar', only: ['destroy', 'toggleEstado']),
         ];
     }
     public function index(Request $request)
@@ -35,7 +35,13 @@ class TipoPersonalController extends Controller implements HasMiddleware
 
         $tiposPersonal = $query->orderBy('nombre_tipo_personal')->paginate(20)->withQueryString();
 
-        return view('colaborador.tipos-personal.index', compact('tiposPersonal'));
+        $stats = [
+            'total' => TipoPersonal::count(),
+            'activos' => TipoPersonal::where('i_active', true)->count(),
+            'inactivos' => TipoPersonal::where('i_active', false)->count(),
+        ];
+
+        return view('colaborador.tipos-personal.index', compact('tiposPersonal', 'stats'));
     }
 
     public function create()
@@ -59,6 +65,8 @@ class TipoPersonalController extends Controller implements HasMiddleware
 
     public function show(TipoPersonal $tipoPersonal)
     {
+        $tipoPersonal->load('colaboradores');
+
         return view('colaborador.tipos-personal.show', compact('tipoPersonal'));
     }
 
@@ -93,5 +101,16 @@ class TipoPersonalController extends Controller implements HasMiddleware
 
         return redirect()->route('colaborador.tipos-personal.index')
             ->with('success', '✅ Tipo de Personal eliminado exitosamente');
+    }
+
+    public function toggleEstado(TipoPersonal $tipoPersonal)
+    {
+        $tipoPersonal->i_active = !$tipoPersonal->i_active;
+        $tipoPersonal->save();
+
+        $estado = $tipoPersonal->i_active ? 'activado' : 'desactivado';
+
+        return redirect()->back()
+            ->with('success', "✅ Tipo de Personal {$estado} correctamente");
     }
 }

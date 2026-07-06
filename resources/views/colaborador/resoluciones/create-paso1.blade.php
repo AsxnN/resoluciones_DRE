@@ -372,50 +372,49 @@
                     <div id="contenido-reniec" class="hidden space-y-4">
                         <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
                             <p class="text-sm text-yellow-800">
-                                💡 Ingrese el DNI y los datos se completarán automáticamente desde RENIEC
+                                💡 Ingrese el DNI. Si la persona ya está registrada se usarán sus datos del sistema; si no, se consultará RENIEC automáticamente.
                             </p>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="md:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">
-                                    DNI <span class="text-red-500">*</span>
-                                </label>
-                                <div class="flex gap-2">
-                                    <input type="text" 
-                                           id="dni_reniec"
-                                           maxlength="8"
-                                           class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                           placeholder="Ingrese DNI de 8 dígitos">
-                                    <button type="button" 
-                                            id="btn-consultar-reniec"
-                                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">
-                                        Consultar
-                                    </button>
-                                </div>
-                                <div id="loading-reniec" class="hidden mt-2 text-sm text-blue-600">
-                                    ⏳ Consultando RENIEC...
-                                </div>
+
+                        <!-- DNI + botón consultar -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                DNI <span class="text-red-500">*</span>
+                            </label>
+                            <div class="flex gap-2">
+                                <input type="text"
+                                       id="dni_reniec"
+                                       maxlength="8"
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Ingrese DNI de 8 dígitos">
+                                <button type="button"
+                                        id="btn-consultar-reniec"
+                                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                                    Consultar
+                                </button>
                             </div>
+                            <!-- Badge de fuente -->
+                            <div id="badge-fuente-reniec" class="hidden mt-2"></div>
+                            <!-- Mensaje de error -->
+                            <div id="error-reniec" class="hidden mt-2 text-sm text-red-600 font-medium"></div>
+                        </div>
+
+                        <!-- Datos de la persona (ocultos hasta consultar) -->
+                        <div id="datos-persona-reniec" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Nombres</label>
-                                <input type="text" 
-                                       id="nombres_reniec"
-                                       readonly
-                                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg">
+                                <input type="text" id="nombres_reniec" readonly
+                                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Apellido Paterno</label>
-                                <input type="text" 
-                                       id="apellido_paterno_reniec"
-                                       readonly
-                                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg">
+                                <input type="text" id="apellido_paterno_reniec" readonly
+                                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Apellido Materno</label>
-                                <input type="text" 
-                                       id="apellido_materno_reniec"
-                                       readonly
-                                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg">
+                                <input type="text" id="apellido_materno_reniec" readonly
+                                       class="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Relación <span class="text-red-500">*</span></label>
@@ -427,18 +426,20 @@
                                     <option value="otro">Otro</option>
                                 </select>
                             </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Descripción de la Relación</label>
+                                <input type="text"
+                                       id="descripcion_relacion_reniec"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="Breve descripción (opcional)">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción de la Relación</label>
-                            <input type="text" 
-                                   id="descripcion_relacion_reniec" 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                   placeholder="Breve descripción (opcional)">
-                        </div>
+
+                        <!-- Botón agregar (oculto hasta consultar) -->
                         <div class="flex justify-end">
-                            <button type="button" 
+                            <button type="button"
                                     id="btn-agregar-reniec"
-                                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors">
+                                    class="hidden px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors">
                                 ✓ Agregar Persona Externa
                             </button>
                         </div>
@@ -607,8 +608,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const response = await fetch(url);
             const data = await response.json();
 
-            if (response.ok) {
-                mostrarResultadoInterno(data);
+            if (response.ok && data.success) {
+                mostrarResultadoInterno(data.usuario);
             } else {
                 alert(data.message || 'No se encontró el usuario');
                 document.getElementById('resultado-busqueda-interna').classList.add('hidden');
@@ -622,16 +623,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const contenedor = document.getElementById('resultado-busqueda-interna');
         usuarioInternoSeleccionado = usuario;
         
+        const iniciales = usuario.iniciales || (usuario.nombre_completo ? usuario.nombre_completo.substring(0, 2).toUpperCase() : '??');
+        
         const html = `
             <div class="bg-white border-2 border-green-300 rounded-lg p-4 shadow-sm">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <div class="h-14 w-14 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
-                            ${usuario.iniciales || usuario.nombre_completo.substring(0, 2).toUpperCase()}
+                            ${iniciales}
                         </div>
                         <div>
-                            <p class="font-bold text-gray-900 text-lg">${usuario.nombre_completo}</p>
-                            <p class="text-sm text-gray-600">DNI: ${usuario.num_documento}</p>
+                            <p class="font-bold text-gray-900 text-lg">${usuario.nombre_completo || 'Sin nombre'}</p>
+                            <p class="text-sm text-gray-600">DNI: ${usuario.dni || '---'}</p>
                             <p class="text-sm text-green-600 font-medium">✓ Trabajador de la DRE</p>
                         </div>
                     </div>
@@ -655,16 +658,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Verificar duplicado
-        if (personasInternas.some(p => p.num_documento === usuarioInternoSeleccionado.num_documento)) {
+        if (personasInternas.some(p => p.num_documento === usuarioInternoSeleccionado.dni)) {
             alert('Esta persona ya está en la lista de internas');
             return;
         }
 
         const persona = {
-            id_user: usuarioInternoSeleccionado.id_user,
-            num_documento: usuarioInternoSeleccionado.num_documento,
+            id_user: usuarioInternoSeleccionado.id,
+            num_documento: usuarioInternoSeleccionado.dni,
             nombre_completo: usuarioInternoSeleccionado.nombre_completo,
-            correo: usuarioInternoSeleccionado.correo,
+            correo: usuarioInternoSeleccionado.email,
             tipo_relacion: document.getElementById('tipo_relacion_interna').value,
             descripcion_relacion: document.getElementById('descripcion_relacion_interna').value.trim(),
             es_interna: true
@@ -716,8 +719,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const docFinal = numDocumento || `TEMP-${Date.now()}`;
-
         // Verificar duplicado solo si hay documento
         if (numDocumento && personasExternas.some(p => p.num_documento === numDocumento)) {
             alert('Esta persona ya está en la lista de externas');
@@ -726,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const persona = {
             tipo_documento: tipoDocumento,
-            num_documento: docFinal,
+            num_documento: numDocumento || null,
             nombres: nombres,
             apellido_paterno: apellidoPaterno,
             apellido_materno: apellidoMaterno,
@@ -746,18 +747,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Consultar RENIEC
+    // Estado de la consulta RENIEC
+    let reniecDatoVerificado = false;
+    let reniecIdPersona = null;
+
+    function resetearFormularioReniec() {
+        reniecDatoVerificado = false;
+        reniecIdPersona = null;
+        document.getElementById('nombres_reniec').value = '';
+        document.getElementById('apellido_paterno_reniec').value = '';
+        document.getElementById('apellido_materno_reniec').value = '';
+        document.getElementById('datos-persona-reniec').classList.add('hidden');
+        document.getElementById('btn-agregar-reniec').classList.add('hidden');
+        document.getElementById('badge-fuente-reniec').classList.add('hidden');
+        document.getElementById('badge-fuente-reniec').innerHTML = '';
+        document.getElementById('error-reniec').classList.add('hidden');
+        document.getElementById('error-reniec').textContent = '';
+    }
+
+    // Limpiar resultados si el usuario cambia el DNI
+    document.getElementById('dni_reniec').addEventListener('input', resetearFormularioReniec);
+
     document.getElementById('btn-consultar-reniec').addEventListener('click', async function() {
         const dni = document.getElementById('dni_reniec').value.trim();
-        const loadingReniec = document.getElementById('loading-reniec');
-        
+        const btn = this;
+
         if (dni.length !== 8 || isNaN(dni)) {
             alert('Por favor, ingrese un DNI válido de 8 dígitos');
             return;
         }
 
-        loadingReniec.classList.remove('hidden');
-        this.disabled = true;
-        
+        resetearFormularioReniec();
+        btn.disabled = true;
+        btn.textContent = '⏳ Consultando...';
+
         try {
             const response = await fetch('{{ route("colaborador.reniec.consultar") }}', {
                 method: 'POST',
@@ -765,77 +788,88 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ dni: dni })
+                body: JSON.stringify({ dni })
             });
 
             const data = await response.json();
 
             if (data.success) {
-                document.getElementById('nombres_reniec').value = data.nombres || '';
-                document.getElementById('apellido_paterno_reniec').value = data.apellido_paterno || '';
-                document.getElementById('apellido_materno_reniec').value = data.apellido_materno || '';
-                
-                loadingReniec.innerHTML = '✅ Datos obtenidos correctamente';
-                loadingReniec.classList.add('text-green-600');
-                loadingReniec.classList.remove('text-blue-600');
+                // Mostrar datos
+                document.getElementById('nombres_reniec').value          = data.nombres || '';
+                document.getElementById('apellido_paterno_reniec').value  = data.apellido_paterno || '';
+                document.getElementById('apellido_materno_reniec').value  = data.apellido_materno || '';
+                document.getElementById('datos-persona-reniec').classList.remove('hidden');
+                document.getElementById('btn-agregar-reniec').classList.remove('hidden');
+
+                reniecDatoVerificado = true;
+                reniecIdPersona = data.id_persona || null;
+
+                // Badge de origen
+                const badge = document.getElementById('badge-fuente-reniec');
+                badge.classList.remove('hidden');
+                if (data.fuente === 'sistema') {
+                    badge.innerHTML = '<span class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">✅ Persona ya registrada en el sistema</span>';
+                } else {
+                    badge.innerHTML = '<span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">✅ Datos verificados con RENIEC</span>';
+                }
             } else {
-                alert(data.message || 'No se encontraron datos en RENIEC');
-                document.getElementById('nombres_reniec').value = '';
-                document.getElementById('apellido_paterno_reniec').value = '';
-                document.getElementById('apellido_materno_reniec').value = '';
+                const errorDiv = document.getElementById('error-reniec');
+                errorDiv.classList.remove('hidden');
+                errorDiv.textContent = '⚠️ ' + (data.message || 'No se pudo verificar el DNI.');
             }
         } catch (error) {
-            alert('Error al consultar RENIEC. Por favor, intente nuevamente.');
+            const errorDiv = document.getElementById('error-reniec');
+            errorDiv.classList.remove('hidden');
+            errorDiv.textContent = '⚠️ Error de conexión. Por favor, intente nuevamente.';
         } finally {
-            setTimeout(() => {
-                loadingReniec.classList.add('hidden');
-                loadingReniec.innerHTML = '⏳ Consultando RENIEC...';
-                loadingReniec.classList.remove('text-green-600');
-                loadingReniec.classList.add('text-blue-600');
-            }, 2000);
-            this.disabled = false;
+            btn.disabled = false;
+            btn.textContent = 'Consultar';
         }
     });
 
-    // Agregar RENIEC
+    // Agregar persona externa verificada (desde BD o RENIEC)
     document.getElementById('btn-agregar-reniec').addEventListener('click', function() {
-        const dni = document.getElementById('dni_reniec').value.trim();
-        const nombres = document.getElementById('nombres_reniec').value.trim();
+        if (!reniecDatoVerificado) {
+            alert('Debe consultar y verificar el DNI primero.');
+            return;
+        }
+
+        const dni             = document.getElementById('dni_reniec').value.trim();
+        const nombres         = document.getElementById('nombres_reniec').value.trim();
         const apellidoPaterno = document.getElementById('apellido_paterno_reniec').value.trim();
         const apellidoMaterno = document.getElementById('apellido_materno_reniec').value.trim();
-        const tipoRelacion = document.getElementById('tipo_relacion_reniec').value;
+        const tipoRelacion    = document.getElementById('tipo_relacion_reniec').value;
         const descripcionRelacion = document.getElementById('descripcion_relacion_reniec').value.trim();
 
-        if (!dni || !nombres || !apellidoPaterno) {
-            alert('Por favor, consulte el DNI primero y asegúrese de que los datos estén completos');
+        if (!nombres || !apellidoPaterno) {
+            alert('Los datos de la persona no están completos.');
             return;
         }
 
-        // Verificar duplicado
         if (personasExternas.some(p => p.num_documento === dni)) {
-            alert('Esta persona ya está en la lista de externas');
+            alert('Esta persona ya está en la lista de externas.');
             return;
         }
 
-        const persona = {
-            tipo_documento: 'DNI',
-            num_documento: dni,
-            nombres: nombres,
-            apellido_paterno: apellidoPaterno,
-            apellido_materno: apellidoMaterno,
-            tipo_relacion: tipoRelacion,
+        personasExternas.push({
+            tipo_documento:       'DNI',
+            num_documento:        dni,
+            nombres:              nombres,
+            apellido_paterno:     apellidoPaterno,
+            apellido_materno:     apellidoMaterno,
+            tipo_relacion:        tipoRelacion,
             descripcion_relacion: descripcionRelacion,
-            obtenido_reniec: true,
-            es_interna: false
-        };
+            obtenido_reniec:      true,
+            es_interna:           false,
+            id_persona:           reniecIdPersona,
+        });
 
-        personasExternas.push(persona);
         actualizarTablaExternas();
         actualizarInputsHidden();
         limpiarFormularios();
+        resetearFormularioReniec();
+        document.getElementById('dni_reniec').value = '';
         formularioPersona.classList.add('hidden');
-        
-        alert('✅ Persona externa agregada correctamente desde RENIEC');
     });
 
     // ==================== ACTUALIZAR TABLAS ====================
@@ -861,7 +895,7 @@ document.addEventListener('DOMContentLoaded', function() {
             html += `
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 text-sm text-gray-900">${index + 1}</td>
-                    <td class="px-4 py-3 text-sm text-gray-900">${persona.num_documento}</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">${persona.num_documento || '<span class="text-yellow-600 font-medium">⚠️ Pendiente</span>'}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="font-medium">${persona.nombre_completo}</div>
                         ${persona.descripcion_relacion ? `<div class="text-xs text-gray-500">${persona.descripcion_relacion}</div>` : ''}
@@ -909,7 +943,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="px-4 py-3 text-sm text-gray-900">${index + 1}</td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="font-medium">${persona.tipo_documento}</div>
-                        <div class="text-gray-500">${persona.num_documento}</div>
+                        <div class="text-gray-500">${persona.num_documento || '<span class="text-yellow-600 font-medium">⚠️ Pendiente</span>'}</div>
                     </td>
                     <td class="px-4 py-3 text-sm text-gray-900">
                         <div class="font-medium">${nombreCompleto}</div>

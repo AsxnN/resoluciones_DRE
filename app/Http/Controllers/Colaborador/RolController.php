@@ -24,18 +24,27 @@ class RolController extends Controller implements HasMiddleware
 
     public function index(Request $request)
     {
-        $query = Rol::withCount('colaboradores');
+        $query = Rol::withCount('usuariosConEsteRol');
 
         if ($request->filled('search')) {
             $query->where('nombre_rol', 'like', '%' . $request->search . '%');
         }
 
-        $roles = $query->where('i_active', true)
-            ->orderBy('nombre_rol')
+        if ($request->filled('i_active')) {
+            $query->where('i_active', $request->boolean('i_active'));
+        }
+
+        $roles = $query->orderBy('nombre_rol')
             ->paginate(20)
             ->withQueryString();
 
-        return view('colaborador.roles.index', compact('roles'));
+        $stats = [
+            'total' => Rol::count(),
+            'activos' => Rol::where('i_active', true)->count(),
+            'inactivos' => Rol::where('i_active', false)->count(),
+        ];
+
+        return view('colaborador.roles.index', compact('roles', 'stats'));
     }
 
     public function create()
@@ -63,7 +72,7 @@ class RolController extends Controller implements HasMiddleware
 
     public function show(Rol $role)
     {
-        $role->load('colaboradores');
+        $role->load('usuariosConEsteRol');
         
         return view('colaborador.roles.show', compact('role'));
     }
@@ -84,7 +93,7 @@ class RolController extends Controller implements HasMiddleware
         $role->update([
             'nombre_rol' => $validated['nombre_rol'],
             'descripcion' => $validated['descripcion'] ?? null,
-            'i_active' => $validated['i_active'] ?? true,
+            'i_active' => $request->has('i_active') ? 1 : 0,
         ]);
 
         return redirect()->route('colaborador.roles.index')
@@ -93,10 +102,10 @@ class RolController extends Controller implements HasMiddleware
 
     public function destroy(Rol $role)
     {
-        // Verificar si tiene colaboradores asignados
-        if ($role->colaboradores()->count() > 0) {
+        // Verificar si tiene usuarios con este rol asignado
+        if ($role->usuariosConEsteRol()->count() > 0) {
             return redirect()->back()
-                ->with('error', '❌ No se puede eliminar un rol con colaboradores asignados');
+                ->with('error', '❌ No se puede eliminar un rol con usuarios asignados');
         }
 
         $role->update(['i_active' => false]);

@@ -28,6 +28,8 @@ class Resolucion extends Model
         'archivo_firmado',
         'fecha_firma',
         'id_usuario_firma',
+        'id_persona_entrega',
+        'correo_entrega',
         'enviada_resolucion',
         'fecha_envio',
         'i_active',
@@ -66,6 +68,17 @@ class Resolucion extends Model
     public function usuarioFirmante()
     {
         return $this->belongsTo(User::class, 'id_usuario_firma');
+    }
+
+    public function personaEntrega()
+    {
+        return $this->belongsTo(Persona::class, 'id_persona_entrega', 'id_persona');
+    }
+
+    public function entregas()
+    {
+        return $this->hasMany(EntregaResolucion::class, 'id_resolucion', 'id_resolucion')
+            ->orderBy('fecha_entrega', 'desc');
     }
 
     // Personas relacionadas (involucrados, notificados, firmantes)
@@ -168,32 +181,16 @@ class Resolucion extends Model
         return $query->where('id_estado', $idEstado);
     }
 
-    public function scopeBorrador($query)
-    {
-        return $query->whereHas('estado', function($q) {
-            $q->where('nombre_estado', 'Borrador');
-        });
-    }
-
+    // "estado" (id_estado) solo representa confidencialidad (Público/Confidencial/etc.),
+    // no el flujo de firma. El estado de firma real se determina por archivo_firmado.
     public function scopeFirmadas($query)
     {
-        return $query->whereHas('estado', function($q) {
-            $q->where('nombre_estado', 'Firmada');
-        });
-    }
-
-    public function scopePublicadas($query)
-    {
-        return $query->whereHas('estado', function($q) {
-            $q->where('nombre_estado', 'Publicada');
-        });
+        return $query->whereNotNull('archivo_firmado');
     }
 
     public function scopePendientesFirma($query)
     {
-        return $query->whereHas('estado', function($q) {
-            $q->where('nombre_estado', 'Pendiente de Firma');
-        });
+        return $query->whereNull('archivo_firmado');
     }
 
     public function scopePorTipo($query, $idTipo)
@@ -251,21 +248,6 @@ class Resolucion extends Model
     public function getEstaFirmadaAttribute(): bool
     {
         return !empty($this->archivo_firmado) && !empty($this->fecha_firma);
-    }
-
-    public function getEsBorradorAttribute(): bool
-    {
-        return $this->estado?->nombre_estado === 'Borrador';
-    }
-
-    public function getPuedeEditarseAttribute(): bool
-    {
-        return in_array($this->estado?->nombre_estado, ['Borrador', 'Observada']);
-    }
-
-    public function getPuedeFirmarseAttribute(): bool
-    {
-        return $this->estado?->nombre_estado === 'Pendiente de Firma';
     }
 
     public function getTieneFirmasPendientesAttribute(): bool

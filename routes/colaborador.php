@@ -1,7 +1,6 @@
 <?php
 // filepath: routes/colaborador.php
 
-use App\Http\Controllers\Auth\ColaboradorLoginController;
 use App\Http\Controllers\Colaborador\AreaController;
 use App\Http\Controllers\Colaborador\CargoController;
 use App\Http\Controllers\Colaborador\ChatbotController;
@@ -10,7 +9,6 @@ use App\Http\Controllers\Colaborador\DashboardController;
 use App\Http\Controllers\Colaborador\DependenciaController;
 use App\Http\Controllers\Colaborador\DireccionController;
 use App\Http\Controllers\Colaborador\EspecialidadController;
-use App\Http\Controllers\Colaborador\FirmaController;
 use App\Http\Controllers\Colaborador\MisResolucionesController;
 use App\Http\Controllers\Colaborador\PersonaController;
 use App\Http\Controllers\Colaborador\ResolucionController;
@@ -22,15 +20,9 @@ use App\Http\Controllers\Colaborador\UnidadController;
 use App\Http\Controllers\Colaborador\RolController;
 use App\Http\Controllers\Colaborador\TipoResolucionController;
 use App\Http\Controllers\Colaborador\ReporteController;
-use App\Http\Controllers\Colaborador\RegistroFirmaEntregaController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('colaborador')->name('colaborador.')->group(function () {
-    
-    // AUTENTICACIÓN
-    Route::get('login', [ColaboradorLoginController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [ColaboradorLoginController::class, 'login']);
-    Route::post('logout', [ColaboradorLoginController::class, 'logout'])->name('logout');
 
     // RUTAS PROTEGIDAS
     Route::middleware(['auth', 'tipo_acceso:colaborador'])->group(function () {
@@ -63,10 +55,14 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
             Route::resource('personas', PersonaController::class);
             Route::patch('personas/{persona}/toggle-estado', [PersonaController::class, 'toggleEstado'])->name('personas.toggle-estado');
             Route::get('personas/buscar/dni', [PersonaController::class, 'buscarPorDni'])->name('personas.buscar-dni');
+            Route::post('personas/{persona}/actualizar-correo', [PersonaController::class, 'actualizarCorreo'])->name('personas.actualizar-correo');
+            Route::post('personas/{persona}/reenviar-acceso', [PersonaController::class, 'reenviarAcceso'])->name('personas.reenviar-acceso');
             Route::get('personas-export', [PersonaController::class, 'export'])->name('personas.export');
-            
+
             // RESOLUCIONES
 
+            Route::post('resoluciones/verificar-receptor', [ResolucionController::class, 'verificarReceptor'])->name('resoluciones.verificar-receptor');
+            Route::post('resoluciones/personas-relacionadas/{personaResolucionDatos}/actualizar-dni', [ResolucionController::class, 'actualizarDniPersonaRelacionada'])->name('resoluciones.actualizar-dni-relacionada');
             Route::get('resoluciones/crear/paso1', [ResolucionController::class, 'create'])->name('resoluciones.create');
             Route::post('resoluciones/crear/paso1', [ResolucionController::class, 'storePaso1'])->name('resoluciones.store-paso1');
             Route::get('resoluciones/crear/paso2', [ResolucionController::class, 'createPaso2'])->name('resoluciones.create-paso2');
@@ -76,41 +72,17 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
             Route::post('resoluciones/firmar-masivo', [ResolucionController::class, 'firmarMasivo'])->name('resoluciones.firmarMasivo');
             Route::get('resoluciones/revisar-firma', [ResolucionController::class, 'revisarFirma'])->name('resoluciones.revisar-firma');
             Route::get('resoluciones/buscar-usuario', [ResolucionController::class, 'buscarUsuario'])->name('resoluciones.buscar-usuario');
-            Route::post('resoluciones/{resolucion}/asignar-cliente/{personaResolucionDatos}', [ResolucionController::class, 'asignarCliente'])
-            ->name('resoluciones.asignar-cliente');
 
             Route::resource('resoluciones', ResolucionController::class)->parameters(['resoluciones' => 'resolucion']);
-            
+
             Route::get('resoluciones/{resolucion}/descargar', [ResolucionController::class, 'descargar'])->name('resoluciones.descargar');
             Route::get('resoluciones/{resolucion}/descargar-firmado', [ResolucionController::class, 'descargarFirmado'])->name('resoluciones.descargar-firmado');
             Route::patch('resoluciones/{resolucion}/cambiar-estado', [ResolucionController::class, 'cambiarEstado'])->name('resoluciones.cambiar-estado');
             Route::post('resoluciones/generar-numero', [ResolucionController::class, 'generarNumero'])->name('resoluciones.generar-numero');
-            Route::post('resoluciones/personas/{personaResolucionDatos}/enviar-credenciales', 
-                [ResolucionController::class, 'enviarCredenciales']
-            )->name('resoluciones.enviar-credenciales');
-
-            // REGISTRO DE FIRMAS PARA ENTREGA (después de la sección de firmas)
-            Route::prefix('registro-firma-entrega')->name('registro-firma-entrega.')->group(function () {
-                Route::get('/', [RegistroFirmaEntregaController::class, 'index'])->name('index');
-                Route::get('/resolucion/{resolucion}/crear', [RegistroFirmaEntregaController::class, 'create'])->name('create');
-                Route::post('/resolucion/{resolucion}', [RegistroFirmaEntregaController::class, 'store'])->name('store');
-                Route::get('/{registro}', [RegistroFirmaEntregaController::class, 'show'])->name('show');
-                Route::post('/{registro}/firmar', [RegistroFirmaEntregaController::class, 'firmar'])->name('firmar');
-                Route::post('/{registro}/registrar-entrega', [RegistroFirmaEntregaController::class, 'registrarEntrega'])->name('registrar-entrega');
-                Route::get('/resolucion/{resolucion}/registros', [RegistroFirmaEntregaController::class, 'porResolucion'])->name('por-resolucion');
-            });
 
             Route::prefix('reportes')->name('reportes.')->group(function () {
             Route::get('personas-resoluciones', [ReporteController::class, 'personasConMasResoluciones'])->name('personas-resoluciones');
             Route::get('personas-resoluciones/exportar', [ReporteController::class, 'exportarPersonasResoluciones'])->name('personas-resoluciones.exportar');
-            });
-
-            // FIRMAS
-            Route::prefix('firma')->name('firma.')->group(function () {
-                Route::get('/', [FirmaController::class, 'index'])->name('index');
-                Route::get('/firmar', [FirmaController::class, 'create'])->name('firmar');
-                Route::post('/', [FirmaController::class, 'store'])->name('store');
-                Route::delete('/{firma}', [FirmaController::class, 'destroy'])->name('destroy');
             });
 
             // RESOLUCIONES FIRMADAS
@@ -144,25 +116,30 @@ Route::prefix('colaborador')->name('colaborador.')->group(function () {
             });
 
             // CATÁLOGOS
-            Route::resource('areas', AreaController::class);
+            // show() excluido: estos catálogos no tienen vista de detalle, solo listado + edición.
+            Route::resource('areas', AreaController::class)->except(['show']);
             Route::patch('areas/{area}/toggle-estado', [AreaController::class, 'toggleEstado'])->name('areas.toggle-estado');
 
             Route::resource('cargos', CargoController::class)->parameters(['cargos' => 'cargo']);
             Route::patch('cargos/{cargo}/toggle-estado', [CargoController::class, 'toggleEstado'])->name('cargos.toggle-estado');
 
-            Route::resource('dependencias', DependenciaController::class)->parameters(['dependencias' => 'dependencia']);
+            Route::resource('dependencias', DependenciaController::class)->parameters(['dependencias' => 'dependencia'])->except(['show']);
             Route::patch('dependencias/{dependencia}/toggle-estado', [DependenciaController::class, 'toggleEstado'])->name('dependencias.toggle-estado');
 
             Route::resource('direcciones', DireccionController::class)->parameters(['direcciones' => 'direccion']);
             Route::patch('direcciones/{direccion}/toggle-estado', [DireccionController::class, 'toggleEstado'])->name('direcciones.toggle-estado');
 
-            Route::resource('especialidades', EspecialidadController::class)->parameters(['especialidades' => 'especialidad']);
+            Route::resource('especialidades', EspecialidadController::class)->parameters(['especialidades' => 'especialidad'])->except(['show']);
             Route::patch('especialidades/{especialidad}/toggle-estado', [EspecialidadController::class, 'toggleEstado'])->name('especialidades.toggle-estado');
 
             Route::resource('tipos-personal', TipoPersonalController::class)->parameters(['tipos-personal' => 'tipoPersonal']);
             Route::patch('tipos-personal/{tipoPersonal}/toggle-estado', [TipoPersonalController::class, 'toggleEstado'])->name('tipos-personal.toggle-estado');
 
-            Route::resource('colaboradores', ColaboradorController::class)->parameters(['colaboradores' => 'colaborador']);
+            // create/store se quitaron: generaban un Colaborador sin cuenta de usuario.
+            // Usar "Usuarios > Nuevo Usuario" para crear colaboradores con acceso al sistema.
+            Route::resource('colaboradores', ColaboradorController::class)
+                ->parameters(['colaboradores' => 'colaborador'])
+                ->except(['create', 'store']);
             Route::patch('colaboradores/{colaborador}/toggle-estado', [ColaboradorController::class, 'toggleEstado'])->name('colaboradores.toggle-estado');
 
             Route::resource('unidades', UnidadController::class)->parameters(['unidades' => 'unidad']);

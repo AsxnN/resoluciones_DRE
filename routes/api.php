@@ -22,7 +22,14 @@ Route::middleware(['auth:sanctum'])->prefix('chatbot')->group(function () {
 
 // APIs públicas (webhooks, notificaciones)
 Route::post('webhooks/firma-peru', function (Request $request) {
-    // Procesar callback de Firma Perú
+    $secret = config('services.firma_peru.webhook_secret');
+    if ($secret) {
+        $signature = $request->header('X-Firma-Peru-Signature', '');
+        $expected  = 'sha256=' . hash_hmac('sha256', $request->getContent(), $secret);
+        if (!hash_equals($expected, $signature)) {
+            abort(401, 'Firma inválida');
+        }
+    }
     \Log::info('Webhook Firma Perú:', $request->all());
     return response()->json(['status' => 'received']);
 });

@@ -17,12 +17,10 @@ class MisResolucionesController extends Controller
     {
         $user = Auth::user();
         
-        // Obtener resoluciones asignadas al usuario actual
+        // Resoluciones que se le hayan entregado realmente a este cliente
         $query = Resolucion::with(['estado', 'tipoResolucion'])
-            ->whereHas('personasRelacionadas', function($q) use ($user) {
-                $q->where('id_user', $user->id)
-                ->where('es_interna', false)
-                ->where('asignado_a_cliente', true); // Solo las que están asignadas
+            ->whereHas('entregas.personaEntrega.user', function($q) use ($user) {
+                $q->where('id', $user->id);
             })
             ->whereNotNull('archivo_firmado'); // Solo resoluciones firmadas
 
@@ -96,38 +94,28 @@ class MisResolucionesController extends Controller
     {
         $user = Auth::user();
 
-        // Verificar que el cliente esté asignado a esta resolución
-        $personaRelacionada = $resolucion->personasRelacionadas()
-            ->where('id_user', $user->id)
-            ->where('es_interna', false)
-            ->where('asignado_a_cliente', true)
+        // Verificar que esta resolución se le haya entregado realmente a este cliente
+        $entrega = $resolucion->entregas()
+            ->whereHas('personaEntrega.user', fn($q) => $q->where('id', $user->id))
+            ->latest('fecha_entrega')
             ->first();
 
-        if (!$personaRelacionada) {
+        if (!$entrega) {
             abort(403, 'No tiene acceso a esta resolución');
         }
 
-        $resolucion->load([
-            'estado',
-            'tipoResolucion',
-            'usuarioCreador',
-            'personasRelacionadas' => function($query) use ($user) {
-                $query->where('id_user', $user->id);
-            }
-        ]);
+        $resolucion->load(['estado', 'tipoResolucion', 'usuarioCreador']);
 
-        return view('cliente.resoluciones.show', compact('resolucion', 'personaRelacionada'));
+        return view('cliente.resoluciones.show', compact('resolucion', 'entrega'));
     }
 
     public function descargar(Resolucion $resolucion)
     {
         $user = Auth::user();
 
-        // Verificar que el cliente esté asignado a esta resolución
-        $tieneAcceso = $resolucion->personasRelacionadas()
-            ->where('id_user', $user->id)
-            ->where('es_interna', false)
-            ->where('asignado_a_cliente', true)
+        // Verificar que esta resolución se le haya entregado realmente a este cliente
+        $tieneAcceso = $resolucion->entregas()
+            ->whereHas('personaEntrega.user', fn($q) => $q->where('id', $user->id))
             ->exists();
 
         if (!$tieneAcceso) {

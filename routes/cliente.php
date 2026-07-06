@@ -1,7 +1,6 @@
 <?php
 // filepath: routes/cliente.php
 
-use App\Http\Controllers\Auth\ClienteLoginController;
 use App\Http\Controllers\Cliente\DashboardController;
 use App\Http\Controllers\Cliente\MisResolucionesController;
 use App\Http\Controllers\Cliente\QuejaController;
@@ -14,13 +13,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('cliente')->name('cliente.')->group(function () {
-    
-    // ========================================
-    // AUTENTICACIÓN CLIENTE
-    // ========================================
-    Route::get('login', [ClienteLoginController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [ClienteLoginController::class, 'login']);
-    Route::post('logout', [ClienteLoginController::class, 'logout'])->name('logout');
 
     // Auto-registro de cliente (público, sin auth)
     Route::get('register', [\App\Http\Controllers\Auth\ClienteRegisterController::class, 'showForm'])->name('register');

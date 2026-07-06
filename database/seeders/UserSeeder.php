@@ -12,6 +12,11 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->isProduction()) {
+            $this->command->error('UserSeeder está deshabilitado en producción.');
+            return;
+        }
+
         // ========================================
         // 1. CREAR PERSONA ADMINISTRADOR
         // ========================================
@@ -26,6 +31,7 @@ class UserSeeder extends Seeder
                 'correo' => 'admin@resoluciones.gob.pe',
                 'telefono' => '999888777',
                 'datos_completos' => true,
+                'obtenido_reniec' => true,
                 'i_active' => true,
             ]);
         });
@@ -55,6 +61,7 @@ class UserSeeder extends Seeder
                 'correo' => 'colaborador@resoluciones.gob.pe',
                 'telefono' => '999777666',
                 'datos_completos' => true,
+                'obtenido_reniec' => true,
                 'i_active' => true,
             ]);
         });
@@ -86,6 +93,7 @@ class UserSeeder extends Seeder
             'correo' => 'cliente@gmail.com',
             'telefono' => '999555444',
             'datos_completos' => true,
+            'obtenido_reniec' => true,
             'i_active' => true,
         ]);
 

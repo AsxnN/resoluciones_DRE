@@ -168,127 +168,143 @@
         <input type="hidden" name="resoluciones_ids" id="resoluciones_ids">
     </form>
 
-    <!-- Tabla de resoluciones -->
+    <!-- Lista de resoluciones -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
-                    <tr>
-                        <!-- Checkbox para seleccionar todas -->
-                        @can('resoluciones.firmar')
-                        <th class="px-6 py-3 text-left">
-                            <input type="checkbox" 
-                                   id="selectAll"
-                                   onclick="toggleSelectAll(this)"
-                                   class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5">
-                        </th>
-                        @endcan
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Resolución</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Resolución</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Creación</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asunto</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @forelse($resoluciones as $resolucion)
-                    <tr class="hover:bg-gray-50 transition">
-                        <!-- Checkbox de selección -->
-                        @can('resoluciones.firmar')
-                        <td class="px-6 py-4">
-                            <input type="checkbox" 
-                                   class="checkbox-resolucion rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
-                                   value="{{ $resolucion->id_resolucion }}"
-                                   onchange="actualizarContador()">
-                        </td>
-                        @endcan
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm font-medium text-blue-600">{{ $resolucion->num_resolucion }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm text-gray-900">{{ $resolucion->tipoResolucion->nombre_tipo_resolucion }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-sm text-gray-600">{{ $resolucion->fecha_resolucion->format('d/m/Y') }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-medium text-gray-900">{{ $resolucion->fecha_creacion->format('d/m/Y') }}</span>
-                                <span class="text-xs text-gray-500">{{ $resolucion->fecha_creacion->format('H:i') }}</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full
-                                {{ $resolucion->estado->nombre_estado === 'Aprobado' ? 'bg-green-100 text-green-800' : '' }}
-                                {{ $resolucion->estado->nombre_estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                {{ $resolucion->estado->nombre_estado === 'Rechazado' ? 'bg-red-100 text-red-800' : '' }}
-                                {{ $resolucion->estado->nombre_estado === 'Borrador' ? 'bg-gray-100 text-gray-800' : '' }}">
-                                {{ $resolucion->estado->nombre_estado }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="text-sm text-gray-600 line-clamp-2">{{ Str::limit($resolucion->asunto_resolucion, 50) }}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div class="flex items-center justify-end gap-2">
-                                <!-- Ver -->
-                                <a href="{{ route('colaborador.resoluciones.show', $resolucion) }}" 
-                                   class="text-blue-600 hover:text-blue-900" 
-                                   title="Ver detalles">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                    </svg>
-                                </a>
-                                
-                                <!-- Firmar para Entrega (solo si tiene personas externas) -->
-                                @can('resoluciones.firmar')
-                                    @php
-                                        $tienePersonasExternas = $resolucion->personasRelacionadas()
-                                            ->where('es_interna', false)
-                                            ->exists();
-                                    @endphp
-                                    @if($tienePersonasExternas && $resolucion->archivo_resolucion)
-                                    <a href="{{ route('colaborador.registro-firma-entrega.create', $resolucion) }}" 
-                                       class="text-purple-600 hover:text-purple-900" 
-                                       title="Firmar para entrega">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                                        </svg>
-                                    </a>
-                                    @endif
-                                @endcan
-                                
-                                <!-- Editar -->
-                                @can('resoluciones.editar')
-                                <a href="{{ route('colaborador.resoluciones.edit', $resolucion) }}" 
-                                   class="text-yellow-600 hover:text-yellow-900" 
-                                   title="Editar">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                    </svg>
-                                </a>
-                                @endcan
-                            </div>
-                        </td>
-                    </tr>
+        <!-- Cabecera -->
+        <div class="flex items-center bg-blue-900 text-white text-sm font-semibold uppercase tracking-wide">
+            @can('resoluciones.firmar')
+            <div class="px-4 py-3">
+                <input type="checkbox"
+                       id="selectAll"
+                       onclick="toggleSelectAll(this)"
+                       class="rounded border-gray-400 text-blue-600 focus:ring-blue-500 h-4 w-4">
+            </div>
+            @endcan
+            <div class="flex-1 px-2 py-3">Documentos</div>
+            <div class="w-48 px-4 py-3 text-center border-l border-blue-800">Archivos</div>
+            <div class="w-32 px-4 py-3 text-right border-l border-blue-800">Acciones</div>
+        </div>
+
+        <div class="divide-y divide-gray-200">
+            @forelse($resoluciones as $resolucion)
+            @php
+                // Los documentos firmados se ven en "Resoluciones Firmadas", no aquí.
+                $archivosResolucion = [];
+                if ($resolucion->archivo_resolucion) {
+                    $archivosResolucion[] = ['ruta' => $resolucion->archivo_resolucion, 'etiqueta' => 'Documento'];
+                }
+                foreach ($archivosResolucion as &$archivoItem) {
+                    $bytes = Storage::disk('public')->exists($archivoItem['ruta'])
+                        ? Storage::disk('public')->size($archivoItem['ruta'])
+                        : 0;
+                    $archivoItem['tamano'] = $bytes
+                        ? ($bytes >= 1048576 ? number_format($bytes / 1048576, 2) . ' MB' : number_format($bytes / 1024, 0) . ' KB')
+                        : null;
+                }
+                unset($archivoItem);
+            @endphp
+            <div class="flex items-start hover:bg-gray-50 transition">
+                @can('resoluciones.firmar')
+                <div class="px-4 py-5">
+                    <input type="checkbox"
+                           class="checkbox-resolucion rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-4 w-4 mt-1"
+                           value="{{ $resolucion->id_resolucion }}"
+                           onchange="actualizarContador()">
+                </div>
+                @endcan
+
+                <!-- Información del documento -->
+                <a href="{{ route('colaborador.resoluciones.show', $resolucion) }}" class="flex-1 px-2 py-4 min-w-0">
+                    <div class="grid grid-cols-[90px_1fr] gap-x-3 gap-y-1.5 text-sm">
+                        <span class="font-bold text-gray-500">Doc:</span>
+                        <span class="font-semibold text-gray-900 truncate">
+                            {{ $resolucion->tipoResolucion->nombre_tipo_resolucion }} N° {{ $resolucion->num_resolucion }}
+                        </span>
+
+                        <span class="font-bold text-gray-500">Fecha:</span>
+                        <span class="text-gray-700">{{ $resolucion->fecha_resolucion->format('d-m-Y') }}</span>
+
+                        <span class="font-bold text-gray-500">Descripción:</span>
+                        <span class="text-gray-600 line-clamp-2">{{ $resolucion->asunto_resolucion }}</span>
+                    </div>
+
+                    <span class="inline-block mt-2 px-3 py-1 text-xs font-semibold rounded-full
+                        {{ $resolucion->estado->nombre_estado === 'Confidencial' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800' }}">
+                        {{ $resolucion->estado->nombre_estado }}
+                    </span>
+                    @if($resolucion->archivo_firmado)
+                    <span class="inline-block mt-2 ml-1 px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                        ✓ Firmada
+                    </span>
+                    @endif
+                </a>
+
+                <!-- Archivos -->
+                <div class="w-48 px-4 py-4 flex items-center justify-center gap-4 border-l border-gray-100">
+                    @forelse($archivosResolucion as $archivoItem)
+                    <a href="{{ Storage::url($archivoItem['ruta']) }}" target="_blank" class="flex flex-col items-center text-center hover:opacity-75">
+                        <span class="px-2 py-0.5 mb-1 bg-blue-900 text-white text-[10px] font-bold rounded-full">
+                            {{ $archivoItem['etiqueta'] }}
+                        </span>
+                        <svg class="w-9 h-9 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M7 2a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V8l-6-6H7z" opacity="0.15"/>
+                            <path d="M14 2H7a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H14a1 1 0 01-1-1V3.5zM7 4h5v4a3 3 0 003 3h4v9a.5.5 0 01-.5.5h-11a.5.5 0 01-.5-.5V4z"/>
+                            <text x="12" y="17" font-size="7" font-weight="bold" text-anchor="middle" fill="white">PDF</text>
+                        </svg>
+                        @if($archivoItem['tamano'])
+                        <span class="text-[11px] text-gray-500 mt-1">{{ $archivoItem['tamano'] }}</span>
+                        @endif
+                    </a>
                     @empty
-                    <tr>
-                        <td colspan="8" class="px-6 py-12 text-center">
-                            <div class="flex flex-col items-center justify-center text-gray-500">
-                                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                <p class="text-lg font-medium">No hay resoluciones disponibles</p>
-                                <p class="text-sm mt-1">Las resoluciones creadas aparecerán aquí</p>
-                            </div>
-                        </td>
-                    </tr>
+                    <span class="text-xs text-gray-400">Sin archivo</span>
                     @endforelse
-                </tbody>
-            </table>
+                </div>
+
+                <!-- Acciones -->
+                <div class="w-32 px-4 py-5 flex items-center justify-end gap-2">
+                    <a href="{{ route('colaborador.resoluciones.show', $resolucion) }}"
+                       class="text-blue-600 hover:text-blue-900"
+                       title="Ver detalles">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                    </a>
+
+                    @can('resoluciones.firmar')
+                        @if($resolucion->archivo_resolucion)
+                        <a href="{{ route('colaborador.resoluciones.revisar-firma') }}?resoluciones_ids={{ urlencode(json_encode([$resolucion->id_resolucion])) }}"
+                           class="text-purple-600 hover:text-purple-900"
+                           title="{{ $resolucion->archivo_firmado ? 'Entregar de nuevo' : 'Firmar' }}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                        </a>
+                        @endif
+                    @endcan
+
+                    @can('resoluciones.editar')
+                    <a href="{{ route('colaborador.resoluciones.edit', $resolucion) }}"
+                       class="text-yellow-600 hover:text-yellow-900"
+                       title="Editar">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </a>
+                    @endcan
+                </div>
+            </div>
+            @empty
+            <div class="px-6 py-12 text-center">
+                <div class="flex flex-col items-center justify-center text-gray-500">
+                    <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p class="text-lg font-medium">No hay resoluciones disponibles</p>
+                    <p class="text-sm mt-1">Las resoluciones creadas aparecerán aquí</p>
+                </div>
+            </div>
+            @endforelse
         </div>
 
         <!-- Paginación -->

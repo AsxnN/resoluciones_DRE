@@ -15,7 +15,7 @@
                 </svg>
             </a>
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">➕ Crear Nuevo Usuario</h1>
+                <h1 class="text-3xl font-bold text-gray-900">Crear Nuevo Usuario</h1>
                 <p class="text-gray-600 mt-1">Complete todos los datos: Usuario, Persona y Colaborador</p>
             </div>
         </div>
@@ -31,7 +31,7 @@
                 <div class="pb-6 border-b border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <span class="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center mr-3">1</span>
-                        🔐 Datos de Acceso al Sistema
+                        Datos de Acceso al Sistema
                     </h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -109,9 +109,9 @@
                                     required
                                     class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('tipo_acceso') border-red-500 @enderror">
                                 <option value="">Seleccione...</option>
-                                <option value="admin" {{ old('tipo_acceso') == 'admin' ? 'selected' : '' }}>👑 Administrador</option>
-                                <option value="colaborador" {{ old('tipo_acceso') == 'colaborador' ? 'selected' : '' }}>👔 Colaborador</option>
-                                <option value="cliente" {{ old('tipo_acceso') == 'cliente' ? 'selected' : '' }}>👥 Cliente</option>
+                                <option value="admin" {{ old('tipo_acceso') == 'admin' ? 'selected' : '' }}>Administrador</option>
+                                <option value="colaborador" {{ old('tipo_acceso') == 'colaborador' ? 'selected' : '' }}>Colaborador</option>
+                                <option value="cliente" {{ old('tipo_acceso') == 'cliente' ? 'selected' : '' }}>Cliente</option>
                             </select>
                             @error('tipo_acceso')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -124,7 +124,7 @@
                 <div class="pb-6 border-b border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <span class="bg-green-100 text-green-600 rounded-full w-8 h-8 flex items-center justify-center mr-3">2</span>
-                        👤 Datos Personales
+                        Datos Personales
                     </h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -179,7 +179,7 @@
                             @error('num_documento')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
-                            <p class="mt-1 text-xs text-blue-600" id="ayudaDNI">💡 Si es DNI, presiona "Buscar" para autocompletar datos desde RENIEC</p>
+                            <p class="mt-1 text-xs text-blue-600" id="ayudaDNI">Si es DNI, presiona "Buscar" para autocompletar datos desde RENIEC</p>
                         </div>
 
                         <!-- Nombres -->
@@ -255,22 +255,6 @@
                             @enderror
                         </div>
 
-                        <!-- WhatsApp -->
-                        <div class="md:col-span-2">
-                            <label for="whatsapp" class="block text-sm font-medium text-gray-700 mb-2">
-                                WhatsApp
-                            </label>
-                            <input type="text" 
-                                   name="whatsapp" 
-                                   id="whatsapp" 
-                                   value="{{ old('whatsapp') }}"
-                                   maxlength="20"
-                                   class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('whatsapp') border-red-500 @enderror"
-                                   placeholder="+51 999 888 777">
-                            @error('whatsapp')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
 
                         <!-- Dirección -->
                         <div class="md:col-span-3">
@@ -293,7 +277,7 @@
                 <div id="seccion-colaborador" class="pb-6 border-b border-gray-200">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <span class="bg-purple-100 text-purple-600 rounded-full w-8 h-8 flex items-center justify-center mr-3">3</span>
-                        💼 Datos del Colaborador (Opcional)
+                        Datos del Colaborador (Opcional)
                     </h3>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -439,7 +423,7 @@
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
                         <span class="bg-orange-100 text-orange-600 rounded-full w-8 h-8 flex items-center justify-center mr-3">4</span>
-                        ⚙️ Configuración
+                        Configuración
                     </h3>
                     
                     <div class="space-y-4">
@@ -492,11 +476,11 @@
             <div class="flex justify-end gap-4 pt-6 border-t border-gray-200 mt-8">
                 <a href="{{ route('colaborador.usuarios.index') }}" 
                    class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition">
-                    ❌ Cancelar
+                    Cancelar
                 </a>
                 <button type="submit" 
                         class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow transition">
-                    ✓ Crear Usuario Completo
+                    Crear Usuario Completo
                 </button>
             </div>
         </form>
@@ -646,7 +630,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     input.classList.add('bg-green-50', 'border-green-500');
                 });
 
-                mostrarAlerta('✓ Datos obtenidos de RENIEC. Campos bloqueados.', 'success');
+                mostrarAlerta('Datos obtenidos de RENIEC. Campos bloqueados.', 'success');
                 
                 // Hacer focus en el teléfono
                 setTimeout(() => {

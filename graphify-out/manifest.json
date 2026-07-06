@@ -1,0 +1,1812 @@
+{
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Actions/Fortify/CreateNewUser.php": {
+    "mtime": 1778322796.9702835,
+    "ast_hash": "e52df8c0bdb1b36e7b6f8c8388f68fed",
+    "semantic_hash": "e52df8c0bdb1b36e7b6f8c8388f68fed"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Actions/Fortify/PasswordValidationRules.php": {
+    "mtime": 1778322796.9707882,
+    "ast_hash": "c4dcdad78784ae99f69edb7d56be853f",
+    "semantic_hash": "c4dcdad78784ae99f69edb7d56be853f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Actions/Fortify/ResetUserPassword.php": {
+    "mtime": 1778322796.9707882,
+    "ast_hash": "82bdbec4ed14ea7d5b32e14835a7b272",
+    "semantic_hash": "82bdbec4ed14ea7d5b32e14835a7b272"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Actions/Fortify/UpdateUserPassword.php": {
+    "mtime": 1778322796.9707882,
+    "ast_hash": "4e4bdd1965495c3966e99ba02cf013f5",
+    "semantic_hash": "4e4bdd1965495c3966e99ba02cf013f5"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Actions/Fortify/UpdateUserProfileInformation.php": {
+    "mtime": 1778322796.9707882,
+    "ast_hash": "69050e7c0868ad4ad5fbb9a744d82213",
+    "semantic_hash": "69050e7c0868ad4ad5fbb9a744d82213"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Actions/Jetstream/DeleteUser.php": {
+    "mtime": 1778322796.9707882,
+    "ast_hash": "10411b13e7182ca8fb1fd3e03408a9a6",
+    "semantic_hash": "10411b13e7182ca8fb1fd3e03408a9a6"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Console/Commands/AsignarPermisosCommand.php": {
+    "mtime": 1778322796.9715452,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Console/Commands/ProcesarDocumentosOCRCommand.php": {
+    "mtime": 1778322796.9715452,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Enums/EstadoResoluci\u00f3n.php": {
+    "mtime": 1778322796.9718034,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Enums/PermisoAsignado.php": {
+    "mtime": 1778322796.9718034,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Enums/TipoAcceso.php": {
+    "mtime": 1778322796.9720707,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Exceptions/Handler.php": {
+    "mtime": 1778322796.9720707,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Exceptions/UnauthorizedAccessException.php": {
+    "mtime": 1778322796.9720707,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Helpers/AuditoriaHelper.php": {
+    "mtime": 1778322796.9723399,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Helpers/NotificacionHelper.php": {
+    "mtime": 1778322796.9723399,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Helpers/PermisoHelper.php": {
+    "mtime": 1778322796.9726002,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Admin/AuditoriaController.php": {
+    "mtime": 1778322796.9728837,
+    "ast_hash": "649ebbe505734779f2724490fbcd529d",
+    "semantic_hash": "649ebbe505734779f2724490fbcd529d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Admin/DashboardController.php": {
+    "mtime": 1778322796.973219,
+    "ast_hash": "ab4df32841939f60d42007dc941d88b9",
+    "semantic_hash": "ab4df32841939f60d42007dc941d88b9"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Admin/GestionPrivilegiosController.php": {
+    "mtime": 1778322796.973219,
+    "ast_hash": "b2c9e3450ba1312c4ba15b02c944120f",
+    "semantic_hash": "b2c9e3450ba1312c4ba15b02c944120f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Auth/AdminLoginController.php": {
+    "mtime": 1778322796.973219,
+    "ast_hash": "a58e70535575b95ef0cddbde94fc34e6",
+    "semantic_hash": "a58e70535575b95ef0cddbde94fc34e6"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Auth/ClienteLoginController.php": {
+    "mtime": 1778322796.973907,
+    "ast_hash": "c106573ead446b7a6940530b8fc0bed0",
+    "semantic_hash": "c106573ead446b7a6940530b8fc0bed0"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Auth/ClienteRegisterController.php": {
+    "mtime": 1778322796.973907,
+    "ast_hash": "a8ea82b61327713d376962fe3aca7e05",
+    "semantic_hash": "a8ea82b61327713d376962fe3aca7e05"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Auth/ColaboradorLoginController.php": {
+    "mtime": 1778322796.973907,
+    "ast_hash": "324325d1fd3164e2802f5b5528166671",
+    "semantic_hash": "324325d1fd3164e2802f5b5528166671"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Auth/LogoutController.php": {
+    "mtime": 1778322796.973907,
+    "ast_hash": "93b1117ab7267acd844255edd700a745",
+    "semantic_hash": "93b1117ab7267acd844255edd700a745"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Cliente/DashboardController.php": {
+    "mtime": 1778322796.9741378,
+    "ast_hash": "8e00ef736e8557ea937aaa6cabaab5c7",
+    "semantic_hash": "8e00ef736e8557ea937aaa6cabaab5c7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Cliente/MisResolucionesController.php": {
+    "mtime": 1778322796.9741378,
+    "ast_hash": "418e42ea6d1802fe496b9e4743d48810",
+    "semantic_hash": "418e42ea6d1802fe496b9e4743d48810"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Cliente/QuejaController.php": {
+    "mtime": 1778322796.9741378,
+    "ast_hash": "e76009c189bf537318542e1de88d07cb",
+    "semantic_hash": "e76009c189bf537318542e1de88d07cb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/AreaController.php": {
+    "mtime": 1778322796.9741378,
+    "ast_hash": "e2010c3dc869c3735efcc074cc5c03be",
+    "semantic_hash": "e2010c3dc869c3735efcc074cc5c03be"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/CargoController.php": {
+    "mtime": 1778322796.9754655,
+    "ast_hash": "a2a664af7424f19057689b4fcf1aac10",
+    "semantic_hash": "a2a664af7424f19057689b4fcf1aac10"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/ChatbotController.php": {
+    "mtime": 1778322796.9754655,
+    "ast_hash": "8768b1b179b833458d72c97da9e84464",
+    "semantic_hash": "8768b1b179b833458d72c97da9e84464"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/ColaboradorController.php": {
+    "mtime": 1778322796.9754655,
+    "ast_hash": "cab4afb25906a49066f6f5920d77e340",
+    "semantic_hash": "cab4afb25906a49066f6f5920d77e340"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/DashboardController.php": {
+    "mtime": 1778322796.9754655,
+    "ast_hash": "fe5c947fd995e2130af0934f64e5909c",
+    "semantic_hash": "fe5c947fd995e2130af0934f64e5909c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/DependenciaController.php": {
+    "mtime": 1778322796.9754655,
+    "ast_hash": "1d9be86a120087265390928fc6937002",
+    "semantic_hash": "1d9be86a120087265390928fc6937002"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/DireccionController.php": {
+    "mtime": 1778322796.9754655,
+    "ast_hash": "8653a3c2c553cae63fa0f53c3c5b2e3b",
+    "semantic_hash": "8653a3c2c553cae63fa0f53c3c5b2e3b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/EspecialidadController.php": {
+    "mtime": 1778322796.9754655,
+    "ast_hash": "41a253f67c09f664e6a43fb27cd86f46",
+    "semantic_hash": "41a253f67c09f664e6a43fb27cd86f46"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/MisResolucionesController.php": {
+    "mtime": 1778322796.9761376,
+    "ast_hash": "29b49df49823ac22fd071d32e0107824",
+    "semantic_hash": "29b49df49823ac22fd071d32e0107824"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/PersonaController.php": {
+    "mtime": 1778322796.9761376,
+    "ast_hash": "c6c9aa5ac1cc819a3092cdec824be1f2",
+    "semantic_hash": "c6c9aa5ac1cc819a3092cdec824be1f2"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/ProfileController.php": {
+    "mtime": 1778322796.9761376,
+    "ast_hash": "7ed1f655feceeca7404a0822ad7b7436",
+    "semantic_hash": "7ed1f655feceeca7404a0822ad7b7436"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/RegistroFirmaEntregaController.php": {
+    "mtime": 1778322796.9771378,
+    "ast_hash": "7d3ce9bb79fb4eb60940ab21342ccf59",
+    "semantic_hash": "7d3ce9bb79fb4eb60940ab21342ccf59"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/ReporteController.php": {
+    "mtime": 1778322796.9771378,
+    "ast_hash": "5bcd2598b530575d76928a867e6ab416",
+    "semantic_hash": "5bcd2598b530575d76928a867e6ab416"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/ResolucionController.php": {
+    "mtime": 1778322796.9771378,
+    "ast_hash": "4a34673942f930f156089a8df6838a5e",
+    "semantic_hash": "4a34673942f930f156089a8df6838a5e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/ResolucionFirmadaController.php": {
+    "mtime": 1778322796.9771378,
+    "ast_hash": "480e426e0a043813c3a3e0f2dc1d601c",
+    "semantic_hash": "480e426e0a043813c3a3e0f2dc1d601c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/RolController.php": {
+    "mtime": 1778322796.9781377,
+    "ast_hash": "646ec677b9837d1d974d6c64ce821977",
+    "semantic_hash": "646ec677b9837d1d974d6c64ce821977"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/TipoPersonalController.php": {
+    "mtime": 1778322796.9781377,
+    "ast_hash": "6b1078e20a7e7b2c906636bbfed3e4ec",
+    "semantic_hash": "6b1078e20a7e7b2c906636bbfed3e4ec"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/TipoResolucionController.php": {
+    "mtime": 1778322796.9781377,
+    "ast_hash": "de19f8ed7abe13a224bb6b9a7e1c0d07",
+    "semantic_hash": "de19f8ed7abe13a224bb6b9a7e1c0d07"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/UnidadController.php": {
+    "mtime": 1778322796.9781377,
+    "ast_hash": "be19f7fd557a2f0d0b67a34b204cc00e",
+    "semantic_hash": "be19f7fd557a2f0d0b67a34b204cc00e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Colaborador/UsuarioController.php": {
+    "mtime": 1778322796.9791377,
+    "ast_hash": "9d05b171d456dc971c6e6bb89ce5f653",
+    "semantic_hash": "9d05b171d456dc971c6e6bb89ce5f653"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/Controller.php": {
+    "mtime": 1778322796.9791377,
+    "ast_hash": "25a307335c0719bc9a91b3f7babd186d",
+    "semantic_hash": "25a307335c0719bc9a91b3f7babd186d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/FirmaController.php": {
+    "mtime": 1778322796.9791377,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Controllers/ReniecController.php": {
+    "mtime": 1778322796.9791377,
+    "ast_hash": "5c06fce09f2e0a7d3abcdd8944a30ddf",
+    "semantic_hash": "5c06fce09f2e0a7d3abcdd8944a30ddf"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Middleware/AuditarAccion.php": {
+    "mtime": 1778322796.9791377,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Middleware/Authenticate.php": {
+    "mtime": 1778322796.9805222,
+    "ast_hash": "1cafccd5f5509991874bca36c0d8bfec",
+    "semantic_hash": "1cafccd5f5509991874bca36c0d8bfec"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Middleware/CheckClienteToken.php": {
+    "mtime": 1778322796.9805222,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Middleware/CheckPermiso.php": {
+    "mtime": 1778322796.9805222,
+    "ast_hash": "616f2804c69c1e2b953e1abdc63e9174",
+    "semantic_hash": "616f2804c69c1e2b953e1abdc63e9174"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Middleware/CheckTipoAcceso.php": {
+    "mtime": 1778322796.9805222,
+    "ast_hash": "2a0e7240f704f5addc6a3a537e9b9fe4",
+    "semantic_hash": "2a0e7240f704f5addc6a3a537e9b9fe4"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Middleware/EnsureUserHasPermission.php": {
+    "mtime": 1778322796.9805222,
+    "ast_hash": "2e7681f5665272026ec853e7b2bbd33d",
+    "semantic_hash": "2e7681f5665272026ec853e7b2bbd33d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Middleware/HandleInertiaRequests.php": {
+    "mtime": 1778322796.9805222,
+    "ast_hash": "f8558003f7bf30c9581e63930cd62cc9",
+    "semantic_hash": "f8558003f7bf30c9581e63930cd62cc9"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Middleware/RedirectIfAuthenticated.php": {
+    "mtime": 1778322796.9805222,
+    "ast_hash": "3ff6519cba21fe382b613168e13ee69e",
+    "semantic_hash": "3ff6519cba21fe382b613168e13ee69e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Middleware/VerificarPerfilCompleto.php": {
+    "mtime": 1778322796.9811378,
+    "ast_hash": "5c52f8be29414601413b17f3c13c4484",
+    "semantic_hash": "5c52f8be29414601413b17f3c13c4484"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Requests/Admin/AsignarPermisoRequest.php": {
+    "mtime": 1778322796.9820788,
+    "ast_hash": "40ade9b82004a4aff02d91e65d95e9b6",
+    "semantic_hash": "40ade9b82004a4aff02d91e65d95e9b6"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Requests/Admin/StoreModuloRequest.php": {
+    "mtime": 1778322796.9823008,
+    "ast_hash": "1690decbd9a41b81dc9df5940a8eeb1b",
+    "semantic_hash": "1690decbd9a41b81dc9df5940a8eeb1b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Requests/Admin/StorePermisoRequest.php": {
+    "mtime": 1778322796.9823008,
+    "ast_hash": "e97abe5ae372714199a22c74c96982df",
+    "semantic_hash": "e97abe5ae372714199a22c74c96982df"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Requests/Auth/AdminLoginRequest.php": {
+    "mtime": 1778322796.9823008,
+    "ast_hash": "9c11fdf9d2bb8c027dfc6a415cd658cd",
+    "semantic_hash": "9c11fdf9d2bb8c027dfc6a415cd658cd"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Requests/Auth/ClienteLoginRequest.php": {
+    "mtime": 1778322796.9827714,
+    "ast_hash": "dcb46160effb43ee37933ad6ba312346",
+    "semantic_hash": "dcb46160effb43ee37933ad6ba312346"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Requests/Auth/ColaboradorLoginRequest.php": {
+    "mtime": 1778322796.9827714,
+    "ast_hash": "ee19830d5eaf6e03103860358810d2b6",
+    "semantic_hash": "ee19830d5eaf6e03103860358810d2b6"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Requests/Colaborador/FirmarResolucionRequest.php": {
+    "mtime": 1778322796.9827714,
+    "ast_hash": "4dfa62cc0e7e80f617454391d6626655",
+    "semantic_hash": "4dfa62cc0e7e80f617454391d6626655"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Requests/Colaborador/StoreResolucionRequest.php": {
+    "mtime": 1778322796.9831176,
+    "ast_hash": "684e9798d530991aa9616fae90c69574",
+    "semantic_hash": "684e9798d530991aa9616fae90c69574"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Requests/Colaborador/UpdateResolucionRequest.php": {
+    "mtime": 1778322796.9831176,
+    "ast_hash": "c8bd7d0007cfc18c3cdc44d7f0c1fdc1",
+    "semantic_hash": "c8bd7d0007cfc18c3cdc44d7f0c1fdc1"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Resources/ModuloResource.php": {
+    "mtime": 1778322796.9831176,
+    "ast_hash": "536fb1e028a06d774acb4bff498be410",
+    "semantic_hash": "536fb1e028a06d774acb4bff498be410"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Resources/NotificacionResource.php": {
+    "mtime": 1778322796.9835439,
+    "ast_hash": "133647847c0be324889058851c90e4e9",
+    "semantic_hash": "133647847c0be324889058851c90e4e9"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Resources/PermisoResource.php": {
+    "mtime": 1778322796.9835439,
+    "ast_hash": "2ef9c01267943cd436e0fc5dca620815",
+    "semantic_hash": "2ef9c01267943cd436e0fc5dca620815"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Resources/ResolucionResource.php": {
+    "mtime": 1778322796.9835439,
+    "ast_hash": "6e0d5d90b49c41fad1e18199f005ac17",
+    "semantic_hash": "6e0d5d90b49c41fad1e18199f005ac17"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Http/Resources/UsuarioResource.php": {
+    "mtime": 1778322796.9835439,
+    "ast_hash": "db15ac24a876e633dba27add0f7a534b",
+    "semantic_hash": "db15ac24a876e633dba27add0f7a534b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Listeners/ActualizarUltimaSesion.php": {
+    "mtime": 1778322796.9835439,
+    "ast_hash": "5a982b5761d5b1fb0565969ae1dc6872",
+    "semantic_hash": "5a982b5761d5b1fb0565969ae1dc6872"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Listeners/EnviarNotificacionResolucion.php": {
+    "mtime": 1778322796.9842134,
+    "ast_hash": "cbe751ecf80e5edd4881610b2791d062",
+    "semantic_hash": "cbe751ecf80e5edd4881610b2791d062"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Listeners/RegistrarAuditoria.php": {
+    "mtime": 1778322796.9842134,
+    "ast_hash": "195ffb0aebb26f9c622c3c514d4ad679",
+    "semantic_hash": "195ffb0aebb26f9c622c3c514d4ad679"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Mail/CredencialesAcceso.php": {
+    "mtime": 1778322796.9842134,
+    "ast_hash": "99ba1de528dfeeb4e2c4d480f05b1935",
+    "semantic_hash": "99ba1de528dfeeb4e2c4d480f05b1935"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Mail/ResolucionNotificacion.php": {
+    "mtime": 1778322796.9846148,
+    "ast_hash": "d008604af1853f34ce3a077b98ce7d0a",
+    "semantic_hash": "d008604af1853f34ce3a077b98ce7d0a"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Area.php": {
+    "mtime": 1778322796.9846148,
+    "ast_hash": "3498424498afa6a5cb361483ac7bb143",
+    "semantic_hash": "3498424498afa6a5cb361483ac7bb143"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Auditoria.php": {
+    "mtime": 1778322796.9849849,
+    "ast_hash": "bd49509e72b8e41e5c0fe612f6fa4aae",
+    "semantic_hash": "bd49509e72b8e41e5c0fe612f6fa4aae"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Cargo.php": {
+    "mtime": 1778322796.9849849,
+    "ast_hash": "4d6adaf2f630d8f78e3e694bdea6c169",
+    "semantic_hash": "4d6adaf2f630d8f78e3e694bdea6c169"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Cliente.php": {
+    "mtime": 1778322796.9849849,
+    "ast_hash": "bb7baa3a347a8df3338e42fae6d37c02",
+    "semantic_hash": "bb7baa3a347a8df3338e42fae6d37c02"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/ColaFirma.php": {
+    "mtime": 1778322796.9849849,
+    "ast_hash": "a88271715ec8430435eae5c51aed47b6",
+    "semantic_hash": "a88271715ec8430435eae5c51aed47b6"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Colaborador.php": {
+    "mtime": 1778322796.9849849,
+    "ast_hash": "3b3eab67a7198e764031056042f579eb",
+    "semantic_hash": "3b3eab67a7198e764031056042f579eb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/ConfiguracionIA.php": {
+    "mtime": 1778322796.9851377,
+    "ast_hash": "87c86aee7b88b89d54ed1243deb9551a",
+    "semantic_hash": "87c86aee7b88b89d54ed1243deb9551a"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/ConsultaAsistente.php": {
+    "mtime": 1778322796.9851377,
+    "ast_hash": "4b8af5862d5ba33506e3ffb7629f61ef",
+    "semantic_hash": "4b8af5862d5ba33506e3ffb7629f61ef"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Dependencia.php": {
+    "mtime": 1778322796.9851377,
+    "ast_hash": "d1434a0eb7f874638352a8a7381cfc05",
+    "semantic_hash": "d1434a0eb7f874638352a8a7381cfc05"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Direccion.php": {
+    "mtime": 1778322796.9851377,
+    "ast_hash": "18d3eb4ff292c4095c560256da97d5eb",
+    "semantic_hash": "18d3eb4ff292c4095c560256da97d5eb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/DocumentoChunk.php": {
+    "mtime": 1778322796.9851377,
+    "ast_hash": "28cda3f1a87211b22d96b467b940ffbf",
+    "semantic_hash": "28cda3f1a87211b22d96b467b940ffbf"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/DocumentoTextoOCR.php": {
+    "mtime": 1778322796.9851377,
+    "ast_hash": "9902521e48ccddc884947a2080ea3c2a",
+    "semantic_hash": "9902521e48ccddc884947a2080ea3c2a"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/EnvioCredencial.php": {
+    "mtime": 1778322796.9861376,
+    "ast_hash": "0943b49e06b7a227fc1208c0120d57dc",
+    "semantic_hash": "0943b49e06b7a227fc1208c0120d57dc"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Especialidad.php": {
+    "mtime": 1778322796.9861376,
+    "ast_hash": "691a96cad752d9a363c91888c9e3eeb4",
+    "semantic_hash": "691a96cad752d9a363c91888c9e3eeb4"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Estado.php": {
+    "mtime": 1778322796.9861376,
+    "ast_hash": "1dbb4c4ed8062e09c7196aab7e811046",
+    "semantic_hash": "1dbb4c4ed8062e09c7196aab7e811046"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/EstadoFirma.php": {
+    "mtime": 1778322796.9861376,
+    "ast_hash": "f5a3d9d43b3c7d7ebc9be68d91f83ac1",
+    "semantic_hash": "f5a3d9d43b3c7d7ebc9be68d91f83ac1"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/HistorialFirma.php": {
+    "mtime": 1778322796.9861376,
+    "ast_hash": "3582680352f3219e9dce4768396d4c86",
+    "semantic_hash": "3582680352f3219e9dce4768396d4c86"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Modulo.php": {
+    "mtime": 1778322796.9861376,
+    "ast_hash": "03849ff1d08fccf8543a1569b68adb89",
+    "semantic_hash": "03849ff1d08fccf8543a1569b68adb89"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Notificacion.php": {
+    "mtime": 1778322796.9861376,
+    "ast_hash": "ec72819ef1a2e4bf22b00407b9a6eeec",
+    "semantic_hash": "ec72819ef1a2e4bf22b00407b9a6eeec"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Permiso.php": {
+    "mtime": 1778322796.9861376,
+    "ast_hash": "305a48167efc51accde758b2c31da222",
+    "semantic_hash": "305a48167efc51accde758b2c31da222"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Persona.php": {
+    "mtime": 1778322796.9871378,
+    "ast_hash": "4702b44266af202311c2b4a4f35f44cd",
+    "semantic_hash": "4702b44266af202311c2b4a4f35f44cd"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/PersonaResolucion.php": {
+    "mtime": 1778322796.9871378,
+    "ast_hash": "b92ab8a89edf08d5d2a177b4f6cadb0b",
+    "semantic_hash": "b92ab8a89edf08d5d2a177b4f6cadb0b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/PersonaResolucionDatos.php": {
+    "mtime": 1778322796.9871378,
+    "ast_hash": "ec7c142c9128ac78ab830dbf50b787f2",
+    "semantic_hash": "ec7c142c9128ac78ab830dbf50b787f2"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Queja.php": {
+    "mtime": 1778322796.9871378,
+    "ast_hash": "62390f83c593107702e42a22b8e095d0",
+    "semantic_hash": "62390f83c593107702e42a22b8e095d0"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/RegistroFirmaEntrega.php": {
+    "mtime": 1778322796.9871378,
+    "ast_hash": "97259961b6664b3f3687590fc8b78671",
+    "semantic_hash": "97259961b6664b3f3687590fc8b78671"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Resolucion.php": {
+    "mtime": 1778322796.9871378,
+    "ast_hash": "6b0fd0350196b0abca770556a365fd37",
+    "semantic_hash": "6b0fd0350196b0abca770556a365fd37"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Rol.php": {
+    "mtime": 1778322796.9871378,
+    "ast_hash": "532460e8d81b49d0fcba89a42e18b2b1",
+    "semantic_hash": "532460e8d81b49d0fcba89a42e18b2b1"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/SesionCliente.php": {
+    "mtime": 1778322796.9871378,
+    "ast_hash": "0ec84a506ed207da452d1b2c6283ebb5",
+    "semantic_hash": "0ec84a506ed207da452d1b2c6283ebb5"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/TipoPersonal.php": {
+    "mtime": 1778322796.9881377,
+    "ast_hash": "2d8cea19d1fe0c4560bf50f0a09af1a7",
+    "semantic_hash": "2d8cea19d1fe0c4560bf50f0a09af1a7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/TipoResolucion.php": {
+    "mtime": 1778322796.9881377,
+    "ast_hash": "028e637246448a87e5961143677c52ab",
+    "semantic_hash": "028e637246448a87e5961143677c52ab"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/Unidad.php": {
+    "mtime": 1778322796.9881377,
+    "ast_hash": "95680bf6429eb88e0fb3eb8a6612a77d",
+    "semantic_hash": "95680bf6429eb88e0fb3eb8a6612a77d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/User.php": {
+    "mtime": 1778322796.9881377,
+    "ast_hash": "a738c60f4bd729555c9a6a5303f23afd",
+    "semantic_hash": "a738c60f4bd729555c9a6a5303f23afd"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Models/UsuarioPermisoMetadata.php": {
+    "mtime": 1778322796.9881377,
+    "ast_hash": "bd608d70a78817c7be0c96ca6ae84235",
+    "semantic_hash": "bd608d70a78817c7be0c96ca6ae84235"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Observers/PermisoObserver.php": {
+    "mtime": 1778322796.9881377,
+    "ast_hash": "3cf8bcc9224866b875d18c9ae762072a",
+    "semantic_hash": "3cf8bcc9224866b875d18c9ae762072a"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Observers/PersonaObserver.php": {
+    "mtime": 1778322796.9894865,
+    "ast_hash": "1816c3d08c42c89291a5834eae9f4daa",
+    "semantic_hash": "1816c3d08c42c89291a5834eae9f4daa"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Observers/ResolucionObserver.php": {
+    "mtime": 1778322796.9894865,
+    "ast_hash": "6d8ca91d4a85ddadcbde1823b677aced",
+    "semantic_hash": "6d8ca91d4a85ddadcbde1823b677aced"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Observers/UserObserver.php": {
+    "mtime": 1778322796.9894865,
+    "ast_hash": "fd886124436b70ea90be93275698c0ed",
+    "semantic_hash": "fd886124436b70ea90be93275698c0ed"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Policies/ModuloPolicy.php": {
+    "mtime": 1778322796.9894865,
+    "ast_hash": "dd2e862dbd6f0309689e231020446ae3",
+    "semantic_hash": "dd2e862dbd6f0309689e231020446ae3"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Policies/PermisoPolicy.php": {
+    "mtime": 1778322796.9901874,
+    "ast_hash": "69fc83569f90bb1244cf1c6aa06d94ac",
+    "semantic_hash": "69fc83569f90bb1244cf1c6aa06d94ac"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Policies/ResolucionPolicy.php": {
+    "mtime": 1778322796.9901874,
+    "ast_hash": "e8373cf3243ba056ab373a852e67a81c",
+    "semantic_hash": "e8373cf3243ba056ab373a852e67a81c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Policies/UsuarioPolicy.php": {
+    "mtime": 1778322796.9901874,
+    "ast_hash": "55155d73f769de0a8e9a2435b48373bb",
+    "semantic_hash": "55155d73f769de0a8e9a2435b48373bb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Providers/AppServiceProvider.php": {
+    "mtime": 1778322796.9901874,
+    "ast_hash": "ffa8d2210dea2354b9823ade2000bbaf",
+    "semantic_hash": "ffa8d2210dea2354b9823ade2000bbaf"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Providers/AuthServiceProvider.php": {
+    "mtime": 1778322796.9908667,
+    "ast_hash": "ad5972e6198f70a433c783f9ae5d51a8",
+    "semantic_hash": "ad5972e6198f70a433c783f9ae5d51a8"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Providers/EventServiceProvider.php": {
+    "mtime": 1778322796.9908667,
+    "ast_hash": "0bad4196cd675055d7c231f29548031b",
+    "semantic_hash": "0bad4196cd675055d7c231f29548031b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Providers/FortifyServiceProvider.php": {
+    "mtime": 1778322796.9908667,
+    "ast_hash": "90677a8252028f537ab774a97e685a49",
+    "semantic_hash": "90677a8252028f537ab774a97e685a49"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Providers/JetstreamServiceProvider.php": {
+    "mtime": 1778322796.9908667,
+    "ast_hash": "e6b7da2a2a390922a5aeb2f5a1bf7575",
+    "semantic_hash": "e6b7da2a2a390922a5aeb2f5a1bf7575"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Providers/RouteServiceProvider.php": {
+    "mtime": 1778322796.9908667,
+    "ast_hash": "2b686239755efa5a81d475e87597ea21",
+    "semantic_hash": "2b686239755efa5a81d475e87597ea21"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Auditoria/AuditoriaService.php": {
+    "mtime": 1778322796.991497,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Auth/AdminAuthService.php": {
+    "mtime": 1778322796.991497,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Auth/ClienteAuthService.php": {
+    "mtime": 1778322796.991497,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Auth/ColaboradorAuthService.php": {
+    "mtime": 1778322796.9918475,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/IA/ChunkingService.php": {
+    "mtime": 1778322796.9918475,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/IA/EmbeddingService.php": {
+    "mtime": 1778322796.9918475,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/IA/OCRService.php": {
+    "mtime": 1778322796.9921181,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/IA/RAGService.php": {
+    "mtime": 1778322796.9921181,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/IA/llamaService.php": {
+    "mtime": 1778322796.9921181,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Permiso/AsignacionPermisoService.php": {
+    "mtime": 1778322796.9921181,
+    "ast_hash": "3fc8210cc20f1da0bb7ff2d0013820b4",
+    "semantic_hash": "3fc8210cc20f1da0bb7ff2d0013820b4"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Permiso/ModuloService.php": {
+    "mtime": 1778322796.9921377,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Permiso/PermisoService.php": {
+    "mtime": 1778322796.9921377,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/ReniecService.php": {
+    "mtime": 1778322796.9921377,
+    "ast_hash": "f53733c23ab9f9ec982bdf639ccbb014",
+    "semantic_hash": "f53733c23ab9f9ec982bdf639ccbb014"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Resolucion/FirmaDigitalService.php": {
+    "mtime": 1778322796.9921377,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Resolucion/NotificacionService.php": {
+    "mtime": 1778322796.9921377,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Services/Resolucion/ResolucionService.php": {
+    "mtime": 1778322796.9931538,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Traits/HasAuditoria.php": {
+    "mtime": 1778322796.9931538,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Traits/HasNotificaciones.php": {
+    "mtime": 1778322796.9931538,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/Traits/HasPermisos.php": {
+    "mtime": 1778322796.9936597,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/View/Components/AppLayout.php": {
+    "mtime": 1778322796.994012,
+    "ast_hash": "b9778de9551cc2b9f166fe7e6629b9a5",
+    "semantic_hash": "b9778de9551cc2b9f166fe7e6629b9a5"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/app/View/Components/GuestLayout.php": {
+    "mtime": 1778322796.9942923,
+    "ast_hash": "aefcd0a8c6a6a8b4d88313ff2998fbb5",
+    "semantic_hash": "aefcd0a8c6a6a8b4d88313ff2998fbb5"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/factories/UserFactory.php": {
+    "mtime": 1778322796.999209,
+    "ast_hash": "b4d53d4da09a58e85a9c7e61d92bd4a8",
+    "semantic_hash": "b4d53d4da09a58e85a9c7e61d92bd4a8"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/0001_01_01_000000_create_users_table.php": {
+    "mtime": 1781075870.0248463,
+    "ast_hash": "5a1360127321b2a2df5a9b48de995239",
+    "semantic_hash": "5a1360127321b2a2df5a9b48de995239"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/0001_01_01_000001_create_cache_table.php": {
+    "mtime": 1778322796.9996371,
+    "ast_hash": "6803c10a1aa695d40633ec8bea5576d5",
+    "semantic_hash": "6803c10a1aa695d40633ec8bea5576d5"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/0001_01_01_000002_create_jobs_table.php": {
+    "mtime": 1778322796.9996371,
+    "ast_hash": "ead9cce2650b36345454f85e8c0214a0",
+    "semantic_hash": "ead9cce2650b36345454f85e8c0214a0"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_214942_add_two_factor_columns_to_users_table.php": {
+    "mtime": 1778322796.9996371,
+    "ast_hash": "ce1ecf81af87ab19e6f83d204ed0f436",
+    "semantic_hash": "ce1ecf81af87ab19e6f83d204ed0f436"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_215038_create_personal_access_tokens_table.php": {
+    "mtime": 1778322796.9996371,
+    "ast_hash": "eb77af89d184f92ec893eff344c34999",
+    "semantic_hash": "eb77af89d184f92ec893eff344c34999"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_215404_create_permission_tables.php": {
+    "mtime": 1778322796.9996371,
+    "ast_hash": "fd1a576bd0e0447ddcd23a52f47cb439",
+    "semantic_hash": "fd1a576bd0e0447ddcd23a52f47cb439"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_220858_create_persona_table.php": {
+    "mtime": 1778322796.9996371,
+    "ast_hash": "374ccade50c8d951162aa0eb287a734b",
+    "semantic_hash": "374ccade50c8d951162aa0eb287a734b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_220939_create_area_table.php": {
+    "mtime": 1778322796.9996371,
+    "ast_hash": "f09fd2d7e441fa61d89eb018853a0a54",
+    "semantic_hash": "f09fd2d7e441fa61d89eb018853a0a54"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221010_create_cargo_table.php": {
+    "mtime": 1778322797.0001376,
+    "ast_hash": "253c283ef40d2bf282d91e7101b690d1",
+    "semantic_hash": "253c283ef40d2bf282d91e7101b690d1"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221026_create_unidad_table.php": {
+    "mtime": 1778322797.0001376,
+    "ast_hash": "f51500c0ea62049c6f0bc7afcfd77856",
+    "semantic_hash": "f51500c0ea62049c6f0bc7afcfd77856"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221041_create_dependencia_table.php": {
+    "mtime": 1778322797.0001376,
+    "ast_hash": "a61a4e961e0bc59e79e20f5a0f0b4e5d",
+    "semantic_hash": "a61a4e961e0bc59e79e20f5a0f0b4e5d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221055_create_direccion_table.php": {
+    "mtime": 1778322797.0001376,
+    "ast_hash": "2df07ca0f4b6ab560af359baaaa92b89",
+    "semantic_hash": "2df07ca0f4b6ab560af359baaaa92b89"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221108_create_especialidad_table.php": {
+    "mtime": 1778322797.0001376,
+    "ast_hash": "b59fe26d7bfeea9764b59e49e1bdcac0",
+    "semantic_hash": "b59fe26d7bfeea9764b59e49e1bdcac0"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221123_create_tipo_personal_table.php": {
+    "mtime": 1778322797.0001376,
+    "ast_hash": "60e9d4e73b15f8753e76f7209d7c4c12",
+    "semantic_hash": "60e9d4e73b15f8753e76f7209d7c4c12"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221135_create_cliente_table.php": {
+    "mtime": 1778322797.0001376,
+    "ast_hash": "42455b5cb38a0328fb4e789552125fa7",
+    "semantic_hash": "42455b5cb38a0328fb4e789552125fa7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221146_create_roles_table.php": {
+    "mtime": 1778322797.0001376,
+    "ast_hash": "705749365b60cea38afb547c6f4ce516",
+    "semantic_hash": "705749365b60cea38afb547c6f4ce516"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221147_create_colaborador_table.php": {
+    "mtime": 1778322797.0001376,
+    "ast_hash": "a345586b141dd7c95eed07f6fe3ec2cc",
+    "semantic_hash": "a345586b141dd7c95eed07f6fe3ec2cc"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221148_add_foreign_keys_to_users_table.php": {
+    "mtime": 1781075870.0350702,
+    "ast_hash": "0d5c7b5daa7ed91be3fff5126b9ebc60",
+    "semantic_hash": "0d5c7b5daa7ed91be3fff5126b9ebc60"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221649_create_estado_table.php": {
+    "mtime": 1778322797.0011377,
+    "ast_hash": "97e3ae4d8188457523f5f479928e5e2d",
+    "semantic_hash": "97e3ae4d8188457523f5f479928e5e2d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221705_create_tipo_resolucion_table.php": {
+    "mtime": 1778322797.0011377,
+    "ast_hash": "334d51ed939b90c94ecea2b14a640446",
+    "semantic_hash": "334d51ed939b90c94ecea2b14a640446"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221734_create_resolucion_table.php": {
+    "mtime": 1778322797.0011377,
+    "ast_hash": "0ba3d81f69b3b010b07bb52e31778e91",
+    "semantic_hash": "0ba3d81f69b3b010b07bb52e31778e91"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221753_create_persona_resolucion_table.php": {
+    "mtime": 1778322797.0011377,
+    "ast_hash": "d803819b8f43e031b1f0f7f384c4e160",
+    "semantic_hash": "d803819b8f43e031b1f0f7f384c4e160"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221809_create_historial_firma_table.php": {
+    "mtime": 1778322797.0011377,
+    "ast_hash": "daabb3b125cb0e505e695b3a0f517a0c",
+    "semantic_hash": "daabb3b125cb0e505e695b3a0f517a0c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221838_create_documento_texto_ocr_table.php": {
+    "mtime": 1778322797.0011377,
+    "ast_hash": "414be9047b858a0ec423e0555fcc394d",
+    "semantic_hash": "414be9047b858a0ec423e0555fcc394d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_221946_create_consulta_asistente_table.php": {
+    "mtime": 1778322797.0011377,
+    "ast_hash": "e1eb368c0d6dbc1bd9c06fbf754aedfa",
+    "semantic_hash": "e1eb368c0d6dbc1bd9c06fbf754aedfa"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_10_22_222000_create_notificacion_table.php": {
+    "mtime": 1778322797.0021377,
+    "ast_hash": "88ea98852fb52b69e62e3ae0a1d8ea53",
+    "semantic_hash": "88ea98852fb52b69e62e3ae0a1d8ea53"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210648_add_custom_fields_to_permissions_table.php": {
+    "mtime": 1778322797.0021377,
+    "ast_hash": "3936383a4528c2c9f42f3219a7edf807",
+    "semantic_hash": "3936383a4528c2c9f42f3219a7edf807"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210703_create_modulos_table.php": {
+    "mtime": 1778322797.0021377,
+    "ast_hash": "b16573182e277ee1d4f1e33ebbdd1b82",
+    "semantic_hash": "b16573182e277ee1d4f1e33ebbdd1b82"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210717_add_foreign_key_modulos_to_permissions_table.php": {
+    "mtime": 1778322797.0021377,
+    "ast_hash": "ee9ae8e9d1200ea915be852e3a917b5f",
+    "semantic_hash": "ee9ae8e9d1200ea915be852e3a917b5f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210732_add_tipo_acceso_to_users_table.php": {
+    "mtime": 1781075870.0250735,
+    "ast_hash": "4bf18bd5a5489ceac86e9dfd5db27520",
+    "semantic_hash": "4bf18bd5a5489ceac86e9dfd5db27520"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210755_create_usuario_permisos_metadata_table.php": {
+    "mtime": 1778322797.0021377,
+    "ast_hash": "dca9c5e4d872f4db93c4c857107be783",
+    "semantic_hash": "dca9c5e4d872f4db93c4c857107be783"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210809_create_estados_firma_table.php": {
+    "mtime": 1778322797.0021377,
+    "ast_hash": "6c0cb6b50498dd6baf696cc532aa7ff0",
+    "semantic_hash": "6c0cb6b50498dd6baf696cc532aa7ff0"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210822_create_cola_firma_table.php": {
+    "mtime": 1778322797.0021377,
+    "ast_hash": "7d2a4048188759eef542659c0874d01f",
+    "semantic_hash": "7d2a4048188759eef542659c0874d01f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210838_add_fields_to_historial_firma_table.php": {
+    "mtime": 1778322797.0031376,
+    "ast_hash": "2711a3f191d1c15f0f27f031fae3e3fa",
+    "semantic_hash": "2711a3f191d1c15f0f27f031fae3e3fa"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210852_create_documento_chunks_table.php": {
+    "mtime": 1778322797.0031376,
+    "ast_hash": "78e8458ae2f7572a6b01d9591a6d3064",
+    "semantic_hash": "78e8458ae2f7572a6b01d9591a6d3064"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210902_create_configuracion_ia_table.php": {
+    "mtime": 1778322797.0031376,
+    "ast_hash": "4bc77c819d09e04d50d759bee3197385",
+    "semantic_hash": "4bc77c819d09e04d50d759bee3197385"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210915_add_fields_to_consulta_asistente_table.php": {
+    "mtime": 1778322797.0031376,
+    "ast_hash": "934986582642e2f060f5963e86d000fb",
+    "semantic_hash": "934986582642e2f060f5963e86d000fb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210926_create_auditoria_table.php": {
+    "mtime": 1778322797.0031376,
+    "ast_hash": "a6e512a9853c014540241aa698fa3d55",
+    "semantic_hash": "a6e512a9853c014540241aa698fa3d55"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_210954_create_sesiones_cliente_table.php": {
+    "mtime": 1778322797.0031376,
+    "ast_hash": "7a915a0d71be918d265303ead61ab391",
+    "semantic_hash": "7a915a0d71be918d265303ead61ab391"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2025_11_12_234827_create_quejas_table.php": {
+    "mtime": 1778322797.0031376,
+    "ast_hash": "7ff24d1a8bc503d5945c1f4bd50bdf77",
+    "semantic_hash": "7ff24d1a8bc503d5945c1f4bd50bdf77"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2026_01_13_194657_create_persona_resolucion_datos_table.php": {
+    "mtime": 1778322797.0031376,
+    "ast_hash": "fe9b1cc00d713bd6ef26fe986fbae128",
+    "semantic_hash": "fe9b1cc00d713bd6ef26fe986fbae128"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2026_01_17_234939_create_envios_credenciales_table.php": {
+    "mtime": 1778322797.0041378,
+    "ast_hash": "9993bb20c5896e0e46ebcf7e3e509651",
+    "semantic_hash": "9993bb20c5896e0e46ebcf7e3e509651"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2026_01_18_003105_add_asignacion_fields_to_persona_resolucion_datos_table.php": {
+    "mtime": 1778322797.0041378,
+    "ast_hash": "2f7570fe78879ba78e9bc0d28199ef90",
+    "semantic_hash": "2f7570fe78879ba78e9bc0d28199ef90"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/migrations/2026_01_20_010447_create_registro_firma_entrega_table.php": {
+    "mtime": 1778322797.0041378,
+    "ast_hash": "c6b14de41322b81ad09a775d7de5f79e",
+    "semantic_hash": "c6b14de41322b81ad09a775d7de5f79e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/seeders/CatalogosSeeder.php": {
+    "mtime": 1778322797.0041378,
+    "ast_hash": "93ec9767ae0e3af02804c8a7c5807d83",
+    "semantic_hash": "93ec9767ae0e3af02804c8a7c5807d83"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/seeders/DatabaseSeeder.php": {
+    "mtime": 1781075870.0252929,
+    "ast_hash": "1c8795ec7d9ace0261aec4c4ab1372b6",
+    "semantic_hash": "1c8795ec7d9ace0261aec4c4ab1372b6"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/seeders/EstadoFirmaSeeder.php": {
+    "mtime": 1778322797.005243,
+    "ast_hash": "88949a0370482efe62a6523e197c85d0",
+    "semantic_hash": "88949a0370482efe62a6523e197c85d0"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/seeders/EstadoSeeder.php": {
+    "mtime": 1778322797.005243,
+    "ast_hash": "e6561c2400e26b2c23b24c139af4efb5",
+    "semantic_hash": "e6561c2400e26b2c23b24c139af4efb5"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/seeders/ModuloSeeder.php": {
+    "mtime": 1778322797.005243,
+    "ast_hash": "3afe199d7e7cb04538e1a0cda2120170",
+    "semantic_hash": "3afe199d7e7cb04538e1a0cda2120170"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/seeders/PermisoSeeder.php": {
+    "mtime": 1778322797.005243,
+    "ast_hash": "f580dfebae9c7bb1b3a2343f20771362",
+    "semantic_hash": "f580dfebae9c7bb1b3a2343f20771362"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/seeders/TipoResolucionSeeder.php": {
+    "mtime": 1778322797.005243,
+    "ast_hash": "6c8fccc17361920d4b999b8e4e4b877c",
+    "semantic_hash": "6c8fccc17361920d4b999b8e4e4b877c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/database/seeders/UserSeeder.php": {
+    "mtime": 1778322797.005243,
+    "ast_hash": "440504ab8f150bff138f2ef5f006f347",
+    "semantic_hash": "440504ab8f150bff138f2ef5f006f347"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/routes/admin.php": {
+    "mtime": 1778322797.0451376,
+    "ast_hash": "c301106f829322020f59615c611b31af",
+    "semantic_hash": "c301106f829322020f59615c611b31af"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/routes/api.php": {
+    "mtime": 1778322797.0451376,
+    "ast_hash": "349d1df6197b4309a57155db1127ced9",
+    "semantic_hash": "349d1df6197b4309a57155db1127ced9"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/routes/cliente.php": {
+    "mtime": 1778322797.0451376,
+    "ast_hash": "5076c06a46e1d03b9a0ea975881e6c96",
+    "semantic_hash": "5076c06a46e1d03b9a0ea975881e6c96"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/routes/colaborador.php": {
+    "mtime": 1778322797.0451376,
+    "ast_hash": "09338d992c62a4b2eb17e4a7e3135847",
+    "semantic_hash": "09338d992c62a4b2eb17e4a7e3135847"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/routes/console.php": {
+    "mtime": 1778322797.0451376,
+    "ast_hash": "3c6ce2e6d16444282b24a9aa63885563",
+    "semantic_hash": "3c6ce2e6d16444282b24a9aa63885563"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/routes/web.php": {
+    "mtime": 1778322797.0451376,
+    "ast_hash": "9dcc0493105ee10890c51ba48dabaa21",
+    "semantic_hash": "9dcc0493105ee10890c51ba48dabaa21"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/auditoria/index.blade.php": {
+    "mtime": 1778322797.0131376,
+    "ast_hash": "c6359a60f407549f86d5144b7464015b",
+    "semantic_hash": "c6359a60f407549f86d5144b7464015b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/auditoria/show.blade.php": {
+    "mtime": 1778322797.0131376,
+    "ast_hash": "38bef309c701815a9e44287b87df8822",
+    "semantic_hash": "38bef309c701815a9e44287b87df8822"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/dashboard.blade.php": {
+    "mtime": 1778322797.0141377,
+    "ast_hash": "0454562c52a6a8b697025d2f71e7eef5",
+    "semantic_hash": "0454562c52a6a8b697025d2f71e7eef5"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/modulos/index.blade.php": {
+    "mtime": 1778322797.0141377,
+    "ast_hash": "c907c1cde67389a29c65a2a40f241cf3",
+    "semantic_hash": "c907c1cde67389a29c65a2a40f241cf3"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/permisos/index.blade.php": {
+    "mtime": 1778322797.0141377,
+    "ast_hash": "cccdc0461aa4e3c15cf404ac9978a51f",
+    "semantic_hash": "cccdc0461aa4e3c15cf404ac9978a51f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/privilegios/gestionar.blade.php": {
+    "mtime": 1778322797.0151377,
+    "ast_hash": "4b02a1c1dc5ba18bde1a76141072fa83",
+    "semantic_hash": "4b02a1c1dc5ba18bde1a76141072fa83"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/privilegios/historial.blade.php": {
+    "mtime": 1778322797.0151377,
+    "ast_hash": "cbde279ab976fafccc857093afec09d0",
+    "semantic_hash": "cbde279ab976fafccc857093afec09d0"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/privilegios/index.blade.php": {
+    "mtime": 1778322797.0151377,
+    "ast_hash": "8d53fd80343ddbcd9e7319498b6468b3",
+    "semantic_hash": "8d53fd80343ddbcd9e7319498b6468b3"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/roles-permisos/create.blade.php": {
+    "mtime": 1778322797.0151377,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/roles-permisos/edit.blade.php": {
+    "mtime": 1778322797.0151377,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/roles-permisos/index.blade.php": {
+    "mtime": 1778322797.0163412,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/usuarios/asignar-permisos.blade.php": {
+    "mtime": 1778322797.0163412,
+    "ast_hash": "e6e400bcf5e453ed27b1e101187435e6",
+    "semantic_hash": "e6e400bcf5e453ed27b1e101187435e6"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/usuarios/create.blade.php": {
+    "mtime": 1778322797.0163412,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/usuarios/edit.blade.php": {
+    "mtime": 1778322797.0168095,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/usuarios/index.blade.php": {
+    "mtime": 1778322797.0168095,
+    "ast_hash": "14b1362948ad5d77cbae1a13d69df324",
+    "semantic_hash": "14b1362948ad5d77cbae1a13d69df324"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/admin/usuarios/show.blade.php": {
+    "mtime": 1778322797.0168095,
+    "ast_hash": "29dee1b3f7f404cb8c70b38419dac141",
+    "semantic_hash": "29dee1b3f7f404cb8c70b38419dac141"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/api/api-token-manager.blade.php": {
+    "mtime": 1778322797.0171378,
+    "ast_hash": "645b6ba0b4351400cf60c8024df7f7d8",
+    "semantic_hash": "645b6ba0b4351400cf60c8024df7f7d8"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/api/index.blade.php": {
+    "mtime": 1778322797.0171378,
+    "ast_hash": "79acc591e29efc5d9d8d699669d850a9",
+    "semantic_hash": "79acc591e29efc5d9d8d699669d850a9"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/auth/admin-login.blade.php": {
+    "mtime": 1778322797.0171378,
+    "ast_hash": "127301f438e2d0fc09cdbf92bc7daf17",
+    "semantic_hash": "127301f438e2d0fc09cdbf92bc7daf17"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/auth/cliente-login.blade.php": {
+    "mtime": 1778322797.0180964,
+    "ast_hash": "25a55ea05580450c20e9d1d05982bd8f",
+    "semantic_hash": "25a55ea05580450c20e9d1d05982bd8f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/auth/cliente-register.blade.php": {
+    "mtime": 1778322797.0181377,
+    "ast_hash": "758d7b67a53226c5caedb5fbd2f858fc",
+    "semantic_hash": "758d7b67a53226c5caedb5fbd2f858fc"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/auth/colaborador-login.blade.php": {
+    "mtime": 1778322797.0181377,
+    "ast_hash": "c051439d144ff8e13233b194c81c58b7",
+    "semantic_hash": "c051439d144ff8e13233b194c81c58b7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/auth/login.blade.php": {
+    "mtime": 1778322797.0181377,
+    "ast_hash": "60b7a5144ba0feb34b8723d35972d6a5",
+    "semantic_hash": "60b7a5144ba0feb34b8723d35972d6a5"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/auth/register.blade.php": {
+    "mtime": 1778322797.0181377,
+    "ast_hash": "2e10f732823ef1afc06c82621eca0b50",
+    "semantic_hash": "2e10f732823ef1afc06c82621eca0b50"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/auth/two-factor-challenge.blade.php": {
+    "mtime": 1778322797.0191376,
+    "ast_hash": "b17a8caff7d33b2edcbb1ea5ecb4c713",
+    "semantic_hash": "b17a8caff7d33b2edcbb1ea5ecb4c713"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/auth/verify-email.blade.php": {
+    "mtime": 1778322797.0191376,
+    "ast_hash": "71d1046e222af5a77d704de45ac47229",
+    "semantic_hash": "71d1046e222af5a77d704de45ac47229"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/cliente/busqueda/index.blade.php": {
+    "mtime": 1778322797.019898,
+    "ast_hash": "781bda1726ea8130c9069c1b1f9d696e",
+    "semantic_hash": "781bda1726ea8130c9069c1b1f9d696e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/cliente/dashboard.blade.php": {
+    "mtime": 1778322797.019898,
+    "ast_hash": "a2497cf45f253ab7246011af7d17f5a7",
+    "semantic_hash": "a2497cf45f253ab7246011af7d17f5a7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/cliente/quejas/create.blade.php": {
+    "mtime": 1778322797.0201378,
+    "ast_hash": "40c9712d77bd5e16d00941659896a5d4",
+    "semantic_hash": "40c9712d77bd5e16d00941659896a5d4"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/cliente/quejas/index.blade.php": {
+    "mtime": 1778322797.0201378,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/cliente/resoluciones/index.blade.php": {
+    "mtime": 1778322797.0207582,
+    "ast_hash": "44fd83c5db475382e436ec8a12f316eb",
+    "semantic_hash": "44fd83c5db475382e436ec8a12f316eb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/cliente/resoluciones/show.blade.php": {
+    "mtime": 1778322797.0210364,
+    "ast_hash": "df0a89bba3790ca863f63c306c4401ac",
+    "semantic_hash": "df0a89bba3790ca863f63c306c4401ac"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/areas/create.blade.php": {
+    "mtime": 1778322797.02127,
+    "ast_hash": "ce7c75a2ed71c656c04e3e41f370dafd",
+    "semantic_hash": "ce7c75a2ed71c656c04e3e41f370dafd"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/areas/edit.blade.php": {
+    "mtime": 1778322797.0214727,
+    "ast_hash": "4565bf462e2a7b0f4a477466f241e8ef",
+    "semantic_hash": "4565bf462e2a7b0f4a477466f241e8ef"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/areas/index.blade.php": {
+    "mtime": 1778322797.0214727,
+    "ast_hash": "55966e3e177c1e952434cf337e621b7e",
+    "semantic_hash": "55966e3e177c1e952434cf337e621b7e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/cargos/create.blade.php": {
+    "mtime": 1778322797.0214727,
+    "ast_hash": "faf2397b9a81c3bc41935c2559185841",
+    "semantic_hash": "faf2397b9a81c3bc41935c2559185841"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/cargos/edit.blade.php": {
+    "mtime": 1778322797.0224588,
+    "ast_hash": "78d2afce4c575dee683cf62984ecee4f",
+    "semantic_hash": "78d2afce4c575dee683cf62984ecee4f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/cargos/index.blade.php": {
+    "mtime": 1778322797.0224588,
+    "ast_hash": "bd1738e2b702d3d7e849a00e42baafca",
+    "semantic_hash": "bd1738e2b702d3d7e849a00e42baafca"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/cargos/show.blade.php": {
+    "mtime": 1778322797.0224588,
+    "ast_hash": "f1e0c495d9266b4ebe7a16c19067b982",
+    "semantic_hash": "f1e0c495d9266b4ebe7a16c19067b982"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/chatbot/create.blade.php": {
+    "mtime": 1778322797.0224588,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/chatbot/edit.blade.php": {
+    "mtime": 1778322797.0224588,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/chatbot/index.blade.php": {
+    "mtime": 1778322797.023135,
+    "ast_hash": "6f9739c73a3c8bbb1bfdac23f0b2f46f",
+    "semantic_hash": "6f9739c73a3c8bbb1bfdac23f0b2f46f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/chatbot/show.blade.php": {
+    "mtime": 1778322797.023135,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/colaboradores/create.blade.php": {
+    "mtime": 1778322797.0231376,
+    "ast_hash": "1d560d1f0cd30844ae19b91faaa80ec2",
+    "semantic_hash": "1d560d1f0cd30844ae19b91faaa80ec2"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/colaboradores/edit.blade.php": {
+    "mtime": 1778322797.0231376,
+    "ast_hash": "55d33da327c4e19959259ede76c98e0d",
+    "semantic_hash": "55d33da327c4e19959259ede76c98e0d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/colaboradores/index.blade.php": {
+    "mtime": 1778322797.0231376,
+    "ast_hash": "6bd97e2d8ffd4f75a7abe07aeb0531a6",
+    "semantic_hash": "6bd97e2d8ffd4f75a7abe07aeb0531a6"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/colaboradores/show.blade.php": {
+    "mtime": 1778322797.0231376,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/dashboard.blade.php": {
+    "mtime": 1778322797.0231376,
+    "ast_hash": "addf5e7af478eefe9862c5d0375204c9",
+    "semantic_hash": "addf5e7af478eefe9862c5d0375204c9"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/dependencias/create.blade.php": {
+    "mtime": 1778322797.0241377,
+    "ast_hash": "43c1e2e181df886beced1173a07b84fb",
+    "semantic_hash": "43c1e2e181df886beced1173a07b84fb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/dependencias/edit.blade.php": {
+    "mtime": 1778322797.0249126,
+    "ast_hash": "7f12eda84341d36a00b2f8f7c2ba6d02",
+    "semantic_hash": "7f12eda84341d36a00b2f8f7c2ba6d02"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/dependencias/index.blade.php": {
+    "mtime": 1778322797.0249126,
+    "ast_hash": "76fbd9a465a33560837a5d43e50c51ec",
+    "semantic_hash": "76fbd9a465a33560837a5d43e50c51ec"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/dependencias/show.blade.php": {
+    "mtime": 1778322797.0249126,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/direcciones/create.blade.php": {
+    "mtime": 1778322797.0249126,
+    "ast_hash": "fbbb8c0631caf491d8ac9048a2a9a275",
+    "semantic_hash": "fbbb8c0631caf491d8ac9048a2a9a275"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/direcciones/edit.blade.php": {
+    "mtime": 1778322797.025485,
+    "ast_hash": "ae5cc3b137b42481f9e643c7d2d1678f",
+    "semantic_hash": "ae5cc3b137b42481f9e643c7d2d1678f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/direcciones/index.blade.php": {
+    "mtime": 1778322797.025485,
+    "ast_hash": "a02785da663fc549fcb1a5e1cc75fff9",
+    "semantic_hash": "a02785da663fc549fcb1a5e1cc75fff9"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/direcciones/show.blade.php": {
+    "mtime": 1778322797.025485,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/especialidades/create.blade.php": {
+    "mtime": 1778322797.025485,
+    "ast_hash": "34855cc6619b5cdb3b3846a27994192f",
+    "semantic_hash": "34855cc6619b5cdb3b3846a27994192f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/especialidades/edit.blade.php": {
+    "mtime": 1778322797.0260773,
+    "ast_hash": "98a963ce7fa21d7ecbb829f67e83e47b",
+    "semantic_hash": "98a963ce7fa21d7ecbb829f67e83e47b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/especialidades/index.blade.php": {
+    "mtime": 1778322797.0260773,
+    "ast_hash": "01c0c9d922f8b20b057c381bff632b9d",
+    "semantic_hash": "01c0c9d922f8b20b057c381bff632b9d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/especialidades/show.blade.php": {
+    "mtime": 1778322797.0260773,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/firmas/firmar.blade.php": {
+    "mtime": 1778322797.0260773,
+    "ast_hash": "7e4137ade1385a764800a2044d2b34eb",
+    "semantic_hash": "7e4137ade1385a764800a2044d2b34eb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/firmas/index.blade.php": {
+    "mtime": 1778322797.0261376,
+    "ast_hash": "20c2ef40a0c8be8dcff4f41194b9db67",
+    "semantic_hash": "20c2ef40a0c8be8dcff4f41194b9db67"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/mis-resoluciones/index.blade.php": {
+    "mtime": 1778322797.0261376,
+    "ast_hash": "5185818886c2333ac11d6ae28e48418e",
+    "semantic_hash": "5185818886c2333ac11d6ae28e48418e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/mis-resoluciones/show.blade.php": {
+    "mtime": 1778322797.0274432,
+    "ast_hash": "5338163be99205c2ad9ec50ef43e6cde",
+    "semantic_hash": "5338163be99205c2ad9ec50ef43e6cde"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/personas/create.blade.php": {
+    "mtime": 1778322797.0274432,
+    "ast_hash": "eab727bbd6114a47ea2a80ff1020732e",
+    "semantic_hash": "eab727bbd6114a47ea2a80ff1020732e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/personas/edit.blade.php": {
+    "mtime": 1778322797.028008,
+    "ast_hash": "88a2d8f4aa1055e536b8d595c15af079",
+    "semantic_hash": "88a2d8f4aa1055e536b8d595c15af079"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/personas/index.blade.php": {
+    "mtime": 1778322797.028008,
+    "ast_hash": "91ce895b98f1bb33f4679bd2fd2879de",
+    "semantic_hash": "91ce895b98f1bb33f4679bd2fd2879de"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/personas/show.blade.php": {
+    "mtime": 1778322797.028008,
+    "ast_hash": "938b49bf27fd4dffb830e34bb5d2b3f7",
+    "semantic_hash": "938b49bf27fd4dffb830e34bb5d2b3f7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/profile/edit.blade.php": {
+    "mtime": 1778322797.0281377,
+    "ast_hash": "3180ce52aa624679c012f922950058a4",
+    "semantic_hash": "3180ce52aa624679c012f922950058a4"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/profile/show.blade.php": {
+    "mtime": 1778322797.0289764,
+    "ast_hash": "b475f0737f68c9ba8e189a74b98891ac",
+    "semantic_hash": "b475f0737f68c9ba8e189a74b98891ac"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/registro-firma-entrega/create.blade.php": {
+    "mtime": 1778322797.0289764,
+    "ast_hash": "c654ce52ac77f967af7d3741ab1f4262",
+    "semantic_hash": "c654ce52ac77f967af7d3741ab1f4262"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/registro-firma-entrega/index.blade.php": {
+    "mtime": 1778322797.0291376,
+    "ast_hash": "5961a111e4f9ec74f692543d2931be49",
+    "semantic_hash": "5961a111e4f9ec74f692543d2931be49"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/registro-firma-entrega/show.blade.php": {
+    "mtime": 1778322797.0291376,
+    "ast_hash": "fa6199e21dcf10b880b9dfc1457ef99f",
+    "semantic_hash": "fa6199e21dcf10b880b9dfc1457ef99f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/reportes/personas-resoluciones.blade.php": {
+    "mtime": 1778322797.0291376,
+    "ast_hash": "c17b9f173833049f5082ed5d90a0a9de",
+    "semantic_hash": "c17b9f173833049f5082ed5d90a0a9de"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones-firmadas/enviar-correo.blade.php": {
+    "mtime": 1778322797.0301378,
+    "ast_hash": "bfa6a6e36c5f3bc77eceda0e46017d56",
+    "semantic_hash": "bfa6a6e36c5f3bc77eceda0e46017d56"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones-firmadas/historial.blade.php": {
+    "mtime": 1778322797.0301378,
+    "ast_hash": "468fdfb324e543cd5020a252756c7dbc",
+    "semantic_hash": "468fdfb324e543cd5020a252756c7dbc"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones-firmadas/index.blade.php": {
+    "mtime": 1778322797.0301378,
+    "ast_hash": "5b0d4b759803e2caa4656a971b500a3e",
+    "semantic_hash": "5b0d4b759803e2caa4656a971b500a3e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones/create-paso1.blade.php": {
+    "mtime": 1778322797.0301378,
+    "ast_hash": "fc5b546727a6cc5cc7ef4069144b5b8e",
+    "semantic_hash": "fc5b546727a6cc5cc7ef4069144b5b8e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones/create-paso2.blade.php": {
+    "mtime": 1778322797.0311377,
+    "ast_hash": "5b0cbc57ec3c9dcce3fb5f12652ee411",
+    "semantic_hash": "5b0cbc57ec3c9dcce3fb5f12652ee411"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones/create-paso3.blade.php": {
+    "mtime": 1778322797.0311377,
+    "ast_hash": "b7879c002bce13f41aa97abf73f47cf0",
+    "semantic_hash": "b7879c002bce13f41aa97abf73f47cf0"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones/create.blade.php": {
+    "mtime": 1778322797.0311377,
+    "ast_hash": "5d4eada334c902f22f03e71a1698e8af",
+    "semantic_hash": "5d4eada334c902f22f03e71a1698e8af"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones/edit.blade.php": {
+    "mtime": 1778322797.0321376,
+    "ast_hash": "31d123ce21ac5c4ac36028a48abf0403",
+    "semantic_hash": "31d123ce21ac5c4ac36028a48abf0403"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones/firmar.blade.php": {
+    "mtime": 1778322797.0321376,
+    "ast_hash": "9f35bdacd46c1d5872293ea4313d0f81",
+    "semantic_hash": "9f35bdacd46c1d5872293ea4313d0f81"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones/index.blade.php": {
+    "mtime": 1778322797.0321376,
+    "ast_hash": "57ce50e2562500f3b46fe26b8ae6763e",
+    "semantic_hash": "57ce50e2562500f3b46fe26b8ae6763e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones/revisar-firma.blade.php": {
+    "mtime": 1778322797.0321376,
+    "ast_hash": "098bd767041336bc662698f68ef3be94",
+    "semantic_hash": "098bd767041336bc662698f68ef3be94"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/resoluciones/show.blade.php": {
+    "mtime": 1778322797.0331378,
+    "ast_hash": "6f2b177cc5cbb9d734fe998e8fadb8a0",
+    "semantic_hash": "6f2b177cc5cbb9d734fe998e8fadb8a0"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/roles/create.blade.php": {
+    "mtime": 1778322797.0331378,
+    "ast_hash": "af0656a300e2a7c5f6ad2cba5e982944",
+    "semantic_hash": "af0656a300e2a7c5f6ad2cba5e982944"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/roles/edit.blade.php": {
+    "mtime": 1778322797.0339932,
+    "ast_hash": "aff1edc6dc2324d6672392d21c6e0a3c",
+    "semantic_hash": "aff1edc6dc2324d6672392d21c6e0a3c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/roles/index.blade.php": {
+    "mtime": 1778322797.0339932,
+    "ast_hash": "a59ffeeb6c25e5c8887f1ad6fd8544e8",
+    "semantic_hash": "a59ffeeb6c25e5c8887f1ad6fd8544e8"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/roles/show.blade.php": {
+    "mtime": 1778322797.0339932,
+    "ast_hash": "eae6498c2e6d90bf925ede3e9ee6b8ce",
+    "semantic_hash": "eae6498c2e6d90bf925ede3e9ee6b8ce"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/tipos-personal/create.blade.php": {
+    "mtime": 1778322797.0341377,
+    "ast_hash": "ed68869ad495d795dd8794b2eea430f2",
+    "semantic_hash": "ed68869ad495d795dd8794b2eea430f2"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/tipos-personal/edit.blade.php": {
+    "mtime": 1778322797.0348523,
+    "ast_hash": "36d183e6a8aac3bd437a3120829d5277",
+    "semantic_hash": "36d183e6a8aac3bd437a3120829d5277"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/tipos-personal/index.blade.php": {
+    "mtime": 1778322797.0348523,
+    "ast_hash": "01571c36fabcc1f3ad210c4f9b28de6e",
+    "semantic_hash": "01571c36fabcc1f3ad210c4f9b28de6e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/tipos-resolucion/create.blade.php": {
+    "mtime": 1778322797.0348523,
+    "ast_hash": "88491a3eee23cc39ce99d1329e684d05",
+    "semantic_hash": "88491a3eee23cc39ce99d1329e684d05"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/tipos-resolucion/edit.blade.php": {
+    "mtime": 1778322797.0353034,
+    "ast_hash": "59784732ceb7967cff89219b401bcaf9",
+    "semantic_hash": "59784732ceb7967cff89219b401bcaf9"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/tipos-resolucion/index.blade.php": {
+    "mtime": 1778322797.0353034,
+    "ast_hash": "d90e85d74d8b76c68057605bcbf0848b",
+    "semantic_hash": "d90e85d74d8b76c68057605bcbf0848b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/unidades/create.blade.php": {
+    "mtime": 1778322797.0353034,
+    "ast_hash": "7ac47a0e64f4dad42ddcf6bfa636129c",
+    "semantic_hash": "7ac47a0e64f4dad42ddcf6bfa636129c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/unidades/edit.blade.php": {
+    "mtime": 1778322797.0358033,
+    "ast_hash": "44b52682f34ffb6f5256529e42198b03",
+    "semantic_hash": "44b52682f34ffb6f5256529e42198b03"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/unidades/index.blade.php": {
+    "mtime": 1778322797.0358033,
+    "ast_hash": "8c52f8fc27a03d82d93b28ce8127ca15",
+    "semantic_hash": "8c52f8fc27a03d82d93b28ce8127ca15"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/usuarios/create.blade.php": {
+    "mtime": 1778322797.0358033,
+    "ast_hash": "ea4243d999ba190542075f340da8a527",
+    "semantic_hash": "ea4243d999ba190542075f340da8a527"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/usuarios/edit.blade.php": {
+    "mtime": 1778322797.0364761,
+    "ast_hash": "a146c24fb83692cad3b1604dc23e3442",
+    "semantic_hash": "a146c24fb83692cad3b1604dc23e3442"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/usuarios/index.blade.php": {
+    "mtime": 1778322797.0364761,
+    "ast_hash": "ee3ad83475a7fb85f7746b8b7e789e4f",
+    "semantic_hash": "ee3ad83475a7fb85f7746b8b7e789e4f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/colaborador/usuarios/show.blade.php": {
+    "mtime": 1778322797.0364761,
+    "ast_hash": "966b8a88a5e1c4c8cb7e9b2feb2f65c6",
+    "semantic_hash": "966b8a88a5e1c4c8cb7e9b2feb2f65c6"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/action-message.blade.php": {
+    "mtime": 1778322797.0364761,
+    "ast_hash": "21d3f1e578628c65a30c4b67b31214c7",
+    "semantic_hash": "21d3f1e578628c65a30c4b67b31214c7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/action-section.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "dbb65b1b2da8bad8e338acefdc1f1bb5",
+    "semantic_hash": "dbb65b1b2da8bad8e338acefdc1f1bb5"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/application-logo.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "f340493c7e1112f847054012e8c8796f",
+    "semantic_hash": "f340493c7e1112f847054012e8c8796f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/application-mark.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "4bb2d03fae84deacd5f47276a4bf5739",
+    "semantic_hash": "4bb2d03fae84deacd5f47276a4bf5739"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/authentication-card-logo.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "c9246da1b8331816fbbb24da9d11a76e",
+    "semantic_hash": "c9246da1b8331816fbbb24da9d11a76e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/authentication-card.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "babf8db7953f524513bb4d4f3d2af302",
+    "semantic_hash": "babf8db7953f524513bb4d4f3d2af302"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/banner.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "da4bff3a843bd2f77a9d99d3d5f004b9",
+    "semantic_hash": "da4bff3a843bd2f77a9d99d3d5f004b9"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/button.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "7fea3cdb072aa21917924cd698ca126e",
+    "semantic_hash": "7fea3cdb072aa21917924cd698ca126e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/chatbot.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "5819b00ef2d2b3302f225e537148671b",
+    "semantic_hash": "5819b00ef2d2b3302f225e537148671b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/checkbox.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "eabd817c09d6bbb28dd667b573f727b7",
+    "semantic_hash": "eabd817c09d6bbb28dd667b573f727b7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/confirmation-modal.blade.php": {
+    "mtime": 1778322797.037188,
+    "ast_hash": "aa71b84298b2d401028931c32fc56675",
+    "semantic_hash": "aa71b84298b2d401028931c32fc56675"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/danger-button.blade.php": {
+    "mtime": 1778322797.0381377,
+    "ast_hash": "9128ca2a02e26333d9d362bdf635ceab",
+    "semantic_hash": "9128ca2a02e26333d9d362bdf635ceab"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/dialog-modal.blade.php": {
+    "mtime": 1778322797.0381377,
+    "ast_hash": "5d377a5eb75f20433c6f17418043773d",
+    "semantic_hash": "5d377a5eb75f20433c6f17418043773d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/dropdown-link.blade.php": {
+    "mtime": 1778322797.0381377,
+    "ast_hash": "1442d4ec7334419096ceb677e753e0cf",
+    "semantic_hash": "1442d4ec7334419096ceb677e753e0cf"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/dropdown.blade.php": {
+    "mtime": 1778322797.0381377,
+    "ast_hash": "0b44e16ff4d80d0e91d4ed596b531d25",
+    "semantic_hash": "0b44e16ff4d80d0e91d4ed596b531d25"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/form-section.blade.php": {
+    "mtime": 1778322797.0381377,
+    "ast_hash": "946c91bebed7a6341c209f02aea0d75d",
+    "semantic_hash": "946c91bebed7a6341c209f02aea0d75d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/input-error.blade.php": {
+    "mtime": 1778322797.0381377,
+    "ast_hash": "97f0303fdf94b633f7a60f62c948613c",
+    "semantic_hash": "97f0303fdf94b633f7a60f62c948613c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/input.blade.php": {
+    "mtime": 1778322797.0381377,
+    "ast_hash": "b44a141cc4f5569f29c7fc07c0e4626c",
+    "semantic_hash": "b44a141cc4f5569f29c7fc07c0e4626c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/label.blade.php": {
+    "mtime": 1778322797.0381377,
+    "ast_hash": "9e713254eb286b92e50de032b4f1e2e4",
+    "semantic_hash": "9e713254eb286b92e50de032b4f1e2e4"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/modal.blade.php": {
+    "mtime": 1778322797.0381377,
+    "ast_hash": "21b61860a941081692bdd9e4f0fbe170",
+    "semantic_hash": "21b61860a941081692bdd9e4f0fbe170"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/nav-link.blade.php": {
+    "mtime": 1778322797.0391376,
+    "ast_hash": "2e3873c46196df715f42705950a1ade7",
+    "semantic_hash": "2e3873c46196df715f42705950a1ade7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/responsive-nav-link.blade.php": {
+    "mtime": 1778322797.0391376,
+    "ast_hash": "7c294b1357fef2bde22c49f5eb379f02",
+    "semantic_hash": "7c294b1357fef2bde22c49f5eb379f02"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/secondary-button.blade.php": {
+    "mtime": 1778322797.0391376,
+    "ast_hash": "0bba7f2251160081062a1085be9dd117",
+    "semantic_hash": "0bba7f2251160081062a1085be9dd117"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/section-border.blade.php": {
+    "mtime": 1778322797.0391376,
+    "ast_hash": "f1bcbcbc8c4bbdad4448e52655166646",
+    "semantic_hash": "f1bcbcbc8c4bbdad4448e52655166646"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/section-title.blade.php": {
+    "mtime": 1778322797.0391376,
+    "ast_hash": "f70a76ace5a456421ad77a48c1e67f65",
+    "semantic_hash": "f70a76ace5a456421ad77a48c1e67f65"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/sidebar-admin.blade.php": {
+    "mtime": 1778322797.0391376,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/sidebar-cliente.blade.php": {
+    "mtime": 1778322797.0391376,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/sidebar-colaborador.blade.php": {
+    "mtime": 1778322797.0391376,
+    "ast_hash": "9df5061b5bff23bdd74a1358008dbfcb",
+    "semantic_hash": "9df5061b5bff23bdd74a1358008dbfcb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/switchable-team.blade.php": {
+    "mtime": 1778322797.0391376,
+    "ast_hash": "51049a44fd5778250e6f5e37d65810ff",
+    "semantic_hash": "51049a44fd5778250e6f5e37d65810ff"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/validation-errors.blade.php": {
+    "mtime": 1778322797.0401378,
+    "ast_hash": "8fdbc3473d8e9b957b8cf6df3c342e0a",
+    "semantic_hash": "8fdbc3473d8e9b957b8cf6df3c342e0a"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/components/welcome.blade.php": {
+    "mtime": 1778322797.0401378,
+    "ast_hash": "cf827543ffa26a155c647f0d31365131",
+    "semantic_hash": "cf827543ffa26a155c647f0d31365131"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/dashboard.blade.php": {
+    "mtime": 1778322797.0401378,
+    "ast_hash": "9b13e90a31660ed06bae27d7c92c8379",
+    "semantic_hash": "9b13e90a31660ed06bae27d7c92c8379"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/emails/credenciales-acceso.blade.php": {
+    "mtime": 1778322797.0401378,
+    "ast_hash": "6b25b770c439a46f580095396a838a66",
+    "semantic_hash": "6b25b770c439a46f580095396a838a66"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/emails/resolucion-notificacion.blade.php": {
+    "mtime": 1778322797.0412455,
+    "ast_hash": "df3b69f88d8c4b9314324ce38ff68875",
+    "semantic_hash": "df3b69f88d8c4b9314324ce38ff68875"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/emails/team-invitation.blade.php": {
+    "mtime": 1778322797.0412455,
+    "ast_hash": "8ca68a2fb3357ec39e757c87bce3946e",
+    "semantic_hash": "8ca68a2fb3357ec39e757c87bce3946e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/layouts/admin.blade.php": {
+    "mtime": 1778322797.0412455,
+    "ast_hash": "d9af124d8e9c64f297b9cf0391d56489",
+    "semantic_hash": "d9af124d8e9c64f297b9cf0391d56489"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/layouts/app.blade.php": {
+    "mtime": 1778322797.0421236,
+    "ast_hash": "ae4d0f5d179067dfc0eb664221202ad4",
+    "semantic_hash": "ae4d0f5d179067dfc0eb664221202ad4"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/layouts/cliente.blade.php": {
+    "mtime": 1778322797.0421236,
+    "ast_hash": "85aff3765c86338b26b429ec153f0a64",
+    "semantic_hash": "85aff3765c86338b26b429ec153f0a64"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/layouts/colaborador.blade.php": {
+    "mtime": 1778322797.0421376,
+    "ast_hash": "02a0c566c9cef31a712be54e71813faf",
+    "semantic_hash": "02a0c566c9cef31a712be54e71813faf"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/layouts/guest.blade.php": {
+    "mtime": 1778322797.0421376,
+    "ast_hash": "9491ae4508d49dff1aa9ab195de8e324",
+    "semantic_hash": "9491ae4508d49dff1aa9ab195de8e324"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/layouts/navigation.blade.php": {
+    "mtime": 1778322797.0421376,
+    "ast_hash": "92df4fe8f0c8898f81ec75d1675f461a",
+    "semantic_hash": "92df4fe8f0c8898f81ec75d1675f461a"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/layouts/sidebar.blade.php": {
+    "mtime": 1778322797.0421376,
+    "ast_hash": "f195ae455624249d534cb1133f12a2ab",
+    "semantic_hash": "f195ae455624249d534cb1133f12a2ab"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/layouts/topbar.blade.php": {
+    "mtime": 1778322797.0421376,
+    "ast_hash": "4a0658913b6f079daa58bcfa85c85c0d",
+    "semantic_hash": "4a0658913b6f079daa58bcfa85c85c0d"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/livewire/navigation-menu.blade.php": {
+    "mtime": 1778322797.0431378,
+    "ast_hash": "e324d04d752e91455796ddf85fddbd2e",
+    "semantic_hash": "e324d04d752e91455796ddf85fddbd2e"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/navigation-menu.blade.php": {
+    "mtime": 1778322797.0431378,
+    "ast_hash": "0e8fa4bbf63cc19f8f8ffcf7e97d1c0c",
+    "semantic_hash": "0e8fa4bbf63cc19f8f8ffcf7e97d1c0c"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/policy.blade.php": {
+    "mtime": 1778322797.0431378,
+    "ast_hash": "23c29f4f4025c77b52993bdd86b18bbb",
+    "semantic_hash": "23c29f4f4025c77b52993bdd86b18bbb"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/profile/delete-user-form.blade.php": {
+    "mtime": 1778322797.0431378,
+    "ast_hash": "d89d220fed17cadcb2552eb5dcfa2901",
+    "semantic_hash": "d89d220fed17cadcb2552eb5dcfa2901"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/profile/logout-other-browser-sessions-form.blade.php": {
+    "mtime": 1778322797.044295,
+    "ast_hash": "9d541c2fda8619c32af49cb29f695f10",
+    "semantic_hash": "9d541c2fda8619c32af49cb29f695f10"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/profile/show.blade.php": {
+    "mtime": 1778322797.044295,
+    "ast_hash": "19848a5b2d6b4bb6b0be8e12e5e677c7",
+    "semantic_hash": "19848a5b2d6b4bb6b0be8e12e5e677c7"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/profile/two-factor-authentication-form.blade.php": {
+    "mtime": 1778322797.044295,
+    "ast_hash": "315084253d8f7f57c8172c24229f514b",
+    "semantic_hash": "315084253d8f7f57c8172c24229f514b"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/profile/update-password-form.blade.php": {
+    "mtime": 1778322797.044295,
+    "ast_hash": "884fc0e0d87f9a1c2556e48606b70f7f",
+    "semantic_hash": "884fc0e0d87f9a1c2556e48606b70f7f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/profile/update-profile-information-form.blade.php": {
+    "mtime": 1778322797.044295,
+    "ast_hash": "0baeca503ee422347f30e35a46b8cf1f",
+    "semantic_hash": "0baeca503ee422347f30e35a46b8cf1f"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/terms.blade.php": {
+    "mtime": 1778322797.044295,
+    "ast_hash": "8f031b509fcb406c239db52bcb183351",
+    "semantic_hash": "8f031b509fcb406c239db52bcb183351"
+  },
+  "/home/ludam/Proyectos/Laravel/resoluciones_DRE/resources/views/welcome.blade.php": {
+    "mtime": 1778322797.044295,
+    "ast_hash": "d2bb0dfe36fd7a75e37c69aa4adc193a",
+    "semantic_hash": "d2bb0dfe36fd7a75e37c69aa4adc193a"
+  }
+}

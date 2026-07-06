@@ -70,104 +70,31 @@
                     <span class="font-medium text-sm">Dashboard</span>
                 </a>
 
-                <!-- Separador -->
+                    <!-- Separador -->
                 <div class="px-3 pt-4 pb-2">
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Administración</p>
                 </div>
 
                 <!-- Gestión de Privilegios -->
-                <div x-data="{ open: {{ request()->routeIs('admin.privilegios.*') || request()->routeIs('admin.usuarios.*') || request()->routeIs('admin.modulos.*') || request()->routeIs('admin.permisos.*') ? 'true' : 'false' }} }">
-                    <!-- Título del grupo -->
-                    <button @click="open = !open" 
-                            class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition {{ request()->routeIs('admin.privilegios.*') ? 'bg-red-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                            </svg>
-                            <span class="font-medium text-sm">Privilegios</span>
-                        </div>
-                        <svg :class="{ 'rotate-180': open }" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
-
-                    <!-- Submenú -->
-                    <div x-show="open" 
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 -translate-y-1"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         class="mt-1 ml-8 space-y-1">
-                        
-                        <a href="{{ route('admin.privilegios.index') }}" 
-                           class="flex items-center px-3 py-2 rounded-lg text-sm transition {{ request()->routeIs('admin.privilegios.index') || request()->routeIs('admin.privilegios.gestionar') ? 'bg-red-100 text-red-700 font-semibold' : 'text-gray-600 hover:bg-gray-100' }}">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                            </svg>
-                            Usuarios
-                        </a>
-
-                        <a href="{{ route('admin.privilegios.index') }}" 
-                           class="flex items-center px-3 py-2 rounded-lg text-sm transition text-gray-600 hover:bg-gray-100">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                            </svg>
-                            Módulos
-                            <span class="ml-auto px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">Pronto</span>
-                        </a>
-
-                        <a href="{{ route('admin.privilegios.index') }}" 
-                           class="flex items-center px-3 py-2 rounded-lg text-sm transition text-gray-600 hover:bg-gray-100">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                            </svg>
-                            Permisos
-                            <span class="ml-auto px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">Pronto</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Separador -->
-                <div class="px-3 pt-4 pb-2">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Sistema</p>
-                </div>
-
-                <!-- Resoluciones -->
-                <a href="#" 
-                   class="flex items-center px-4 py-2.5 rounded-lg transition text-gray-700 hover:bg-gray-100">
+                <a href="{{ route('admin.privilegios.index') }}"
+                   class="flex items-center px-4 py-2.5 rounded-lg transition {{ request()->routeIs('admin.privilegios.*') ? 'bg-red-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                     </svg>
-                    <span class="font-medium text-sm">Resoluciones</span>
-                    <span class="ml-auto px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">Pronto</span>
+                    <span class="font-medium text-sm">Gestión de Privilegios</span>
                 </a>
 
-                <!-- Personas -->
-                <a href="#" 
-                   class="flex items-center px-4 py-2.5 rounded-lg transition text-gray-700 hover:bg-gray-100">
+                <!-- Clientes -->
+                <a href="{{ route('admin.clientes.index') }}"
+                   class="flex items-center px-4 py-2.5 rounded-lg transition {{ request()->routeIs('admin.clientes.*') ? 'bg-red-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                     </svg>
-                    <span class="font-medium text-sm">Personas</span>
-                    <span class="ml-auto px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">Pronto</span>
+                    <span class="font-medium text-sm">Clientes</span>
                 </a>
-
-                <!-- Firmas -->
-                <a href="#" 
-                   class="flex items-center px-4 py-2.5 rounded-lg transition text-gray-700 hover:bg-gray-100">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                    </svg>
-                    <span class="font-medium text-sm">Firmas</span>
-                    <span class="ml-auto px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">Pronto</span>
-                </a>
-
-                <!-- Separador -->
-                <div class="px-3 pt-4 pb-2">
-                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Reportes</p>
-                </div>
 
                 <!-- Auditoría -->
-                <a href="{{ route('admin.auditoria.index') }}" 
+                <a href="{{ route('admin.auditoria.index') }}"
                    class="flex items-center px-4 py-2.5 rounded-lg transition {{ request()->routeIs('admin.auditoria.*') ? 'bg-red-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -175,21 +102,11 @@
                     <span class="font-medium text-sm">Auditoría</span>
                 </a>
 
-                <!-- Estadísticas -->
-                <a href="#" 
-                   class="flex items-center px-4 py-2.5 rounded-lg transition text-gray-700 hover:bg-gray-100">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                    </svg>
-                    <span class="font-medium text-sm">Estadísticas</span>
-                    <span class="ml-auto px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">Pronto</span>
-                </a>
-
             </nav>
 
             <!-- Footer del Sidebar -->
             <div class="p-4 border-t border-gray-200 bg-white">
-                <form action="{{ route('admin.logout') }}" method="POST">
+                <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" 
                             class="w-full flex items-center justify-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition text-sm font-medium text-gray-700">

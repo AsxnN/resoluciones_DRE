@@ -71,11 +71,9 @@ class DireccionController extends Controller implements HasMiddleware
 
     public function show(Direccion $direccion)
     {
-        $direccion->load(['personas', 'areas']);
+        $direccion->load('colaboradores.persona');
 
         $stats = [
-            'personas' => $direccion->personas()->count(),
-            'areas' => $direccion->areas()->count(),
             'colaboradores' => $direccion->colaboradores()->count(),
         ];
 
@@ -91,8 +89,9 @@ class DireccionController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'nombre_direcciones' => 'required|string|max:100|unique:direccion,nombre_direcciones,' . $direccion->id_direcciones . ',id_direcciones',
-            'i_active' => 'required|boolean',
         ]);
+
+        $validated['i_active'] = $request->has('i_active') ? 1 : 0;
 
         $direccion->update($validated);
 

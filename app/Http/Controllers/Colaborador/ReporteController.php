@@ -17,7 +17,7 @@ class ReporteController extends Controller
     public function personasConMasResoluciones(Request $request)
     {
         // Obtener parámetros de filtro
-        $limite = $request->input('limite', 10);
+        $limite = max(1, min(500, (int) $request->input('limite', 10)));
         $fechaDesde = $request->input('fecha_desde');
         $fechaHasta = $request->input('fecha_hasta');
         $tipoRelacion = $request->input('tipo_relacion'); // involucrado, notificado, firmante
@@ -29,7 +29,7 @@ class ReporteController extends Controller
                 'persona.apellido_paterno',
                 'persona.apellido_materno',
                 'persona.correo',
-                'persona.whatsapp',
+                'persona.telefono',
                 DB::raw('COUNT(DISTINCT persona_resolucion.id_resolucion) as total_resoluciones')
             )
             ->join('persona_resolucion', 'persona.id_persona', '=', 'persona_resolucion.id_persona')
@@ -56,7 +56,7 @@ class ReporteController extends Controller
                 'persona.apellido_paterno',
                 'persona.apellido_materno',
                 'persona.correo',
-                'persona.whatsapp'
+                'persona.telefono'
             )
             ->orderBy('total_resoluciones', 'desc')
             ->limit($limite)
@@ -119,7 +119,7 @@ class ReporteController extends Controller
                 'persona.apellido_paterno',
                 'persona.apellido_materno',
                 'persona.correo',
-                'persona.whatsapp',
+                'persona.telefono',
                 DB::raw('COUNT(DISTINCT persona_resolucion.id_resolucion) as total_resoluciones')
             )
             ->join('persona_resolucion', 'persona.id_persona', '=', 'persona_resolucion.id_persona')
@@ -142,7 +142,7 @@ class ReporteController extends Controller
                 'persona.apellido_paterno',
                 'persona.apellido_materno',
                 'persona.correo',
-                'persona.whatsapp'
+                'persona.telefono'
             )
             ->orderBy('total_resoluciones', 'desc')
             ->get();
@@ -164,7 +164,7 @@ class ReporteController extends Controller
             fputcsv($file, [
                 'Nombre Completo',
                 'Correo',
-                'WhatsApp',
+                'Teléfono',
                 'Total Resoluciones'
             ]);
 
@@ -173,7 +173,7 @@ class ReporteController extends Controller
                 fputcsv($file, [
                     trim($persona->nombre_persona . ' ' . $persona->apellido_paterno . ' ' . $persona->apellido_materno),
                     $persona->correo ?? 'Sin correo',
-                    $persona->whatsapp ?? 'Sin WhatsApp',
+                    $persona->telefono ?? 'Sin teléfono',
                     $persona->total_resoluciones,
                 ]);
             }

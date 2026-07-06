@@ -15,7 +15,7 @@
                 </svg>
             </a>
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">✏️ Editar Persona</h1>
+                <h1 class="text-3xl font-bold text-gray-900">Editar Persona</h1>
                 <p class="text-gray-600 mt-1">Modificar datos de: <strong>{{ $persona->nombres }} {{ $persona->apellido_paterno }}</strong></p>
             </div>
         </div>
@@ -34,7 +34,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                 </div>
-                <h2 class="text-xl font-bold text-gray-900">📋 Datos Personales</h2>
+                <h2 class="text-xl font-bold text-gray-900">Datos Personales</h2>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -48,8 +48,8 @@
                             required
                             class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('tipo_persona') border-red-500 @enderror">
                         <option value="">Seleccionar</option>
-                        <option value="colaborador" {{ old('tipo_persona', $persona->tipo_persona) == 'colaborador' ? 'selected' : '' }}>👔 Trabajador</option>
-                        <option value="cliente" {{ old('tipo_persona', $persona->tipo_persona) == 'cliente' ? 'selected' : '' }}>👥 Cliente</option>
+                        <option value="colaborador" {{ old('tipo_persona', $persona->tipo_persona) == 'colaborador' ? 'selected' : '' }}>Trabajador</option>
+                        <option value="cliente" {{ old('tipo_persona', $persona->tipo_persona) == 'cliente' ? 'selected' : '' }}>Cliente</option>
                     </select>
                     @error('tipo_persona')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -174,22 +174,6 @@
                     @enderror
                 </div>
 
-                <!-- WhatsApp -->
-                <div>
-                    <label for="whatsapp" class="block text-sm font-medium text-gray-700 mb-2">
-                        WhatsApp
-                    </label>
-                    <input type="text" 
-                           id="whatsapp" 
-                           name="whatsapp" 
-                           value="{{ old('whatsapp', $persona->whatsapp) }}"
-                           maxlength="20"
-                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('whatsapp') border-red-500 @enderror">
-                    @error('whatsapp')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
                 <!-- Dirección -->
                 <div class="md:col-span-2">
                     <label for="direccion" class="block text-sm font-medium text-gray-700 mb-2">
@@ -214,7 +198,7 @@
             </a>
             <button type="submit" 
                     class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
-                💾 Actualizar Persona
+                Actualizar Persona
             </button>
         </div>
     </form>

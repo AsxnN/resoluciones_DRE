@@ -20,7 +20,7 @@ class ChatbotController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:asistente_ia.usar'),
+            new Middleware('permission:asistente-ia.usar'),
         ];
     }
 

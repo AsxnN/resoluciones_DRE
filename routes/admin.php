@@ -4,7 +4,7 @@
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\AuditoriaController;
 use App\Http\Controllers\Admin\GestionPrivilegiosController;
-use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\Admin\ClienteController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,13 +14,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    
-    // ========================================
-    // AUTENTICACIÓN ADMIN
-    // ========================================
-    Route::get('login', [AdminLoginController::class, 'showLoginForm'])->name('login');
-    Route::post('login', [AdminLoginController::class, 'login']);
-    Route::post('logout', [AdminLoginController::class, 'logout'])->name('logout');
 
     // ========================================
     // RUTAS PROTEGIDAS (ADMIN)
@@ -44,6 +37,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('{usuario}/asignar-modulo', [GestionPrivilegiosController::class, 'asignarModuloCompleto'])->name('asignar-modulo');
             Route::post('{usuario}/revocar-modulo', [GestionPrivilegiosController::class, 'revocarModuloCompleto'])->name('revocar-modulo');
         });
+
+        // ========================================
+        // CLIENTES
+        // ========================================
+        Route::get('clientes', [ClienteController::class, 'index'])->name('clientes.index');
 
         // ========================================
         // AUDITORÍA

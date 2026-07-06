@@ -6,7 +6,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Http\Controllers\Colaborador\RegistroFirmaEntregaController;
 
 class Colaborador extends Model
 {
@@ -22,7 +21,7 @@ class Colaborador extends Model
         'id_colab_dis',
         'id_persona',
         'id_cargos',
-        'id_unidades',
+        'id_unidad',
         'id_direcciones',
         'id_dependencia',
         'id_area',
@@ -71,7 +70,7 @@ class Colaborador extends Model
      */
     public function unidad(): BelongsTo
     {
-        return $this->belongsTo(Unidad::class, 'id_unidades', 'id_unidad');
+        return $this->belongsTo(Unidad::class, 'id_unidad', 'id_unidad');
     }
 
     /**

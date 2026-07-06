@@ -31,7 +31,7 @@
     </div>
 
     <!-- Stats Cards Principales -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <!-- Resoluciones Creadas -->
         <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
             <div class="flex items-center justify-between mb-4">
@@ -53,12 +53,12 @@
             </a>
         </div>
 
-        <!-- Firmas Pendientes -->
+        <!-- Resoluciones sin firmar -->
         <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <p class="text-sm text-gray-600">Firmas Pendientes</p>
-                    <p class="text-3xl font-bold text-yellow-600">{{ $stats['firmas_pendientes'] ?? 0 }}</p>
+                    <p class="text-sm text-gray-600">Resoluciones sin Firmar</p>
+                    <p class="text-3xl font-bold text-yellow-600">{{ $stats['resoluciones_sin_firmar'] ?? 0 }}</p>
                     <p class="text-xs text-gray-500 mt-1">Requieren atención</p>
                 </div>
                 <div class="p-3 bg-yellow-100 rounded-full">
@@ -67,8 +67,27 @@
                     </svg>
                 </div>
             </div>
-            <a href="{{ route('colaborador.firma.index') }}" class="text-xs text-yellow-600 hover:text-yellow-800 flex items-center">
-                Ver pendientes →
+            <a href="{{ route('colaborador.resoluciones.index') }}" class="text-xs text-yellow-600 hover:text-yellow-800 flex items-center">
+                Ver y firmar →
+            </a>
+        </div>
+
+        <!-- Relacionadas Conmigo -->
+        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-sm text-gray-600">Relacionadas Conmigo</p>
+                    <p class="text-3xl font-bold text-indigo-600">{{ $stats['resoluciones_relacionadas'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Donde estoy involucrado</p>
+                </div>
+                <div class="p-3 bg-indigo-100 rounded-full">
+                    <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <a href="{{ route('colaborador.mis-resoluciones.index') }}" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center">
+                Ver mis resoluciones →
             </a>
         </div>
 
@@ -109,6 +128,25 @@
                 Ver áreas →
             </a>
         </div>
+
+        <!-- Resoluciones Firmadas por mí -->
+        <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-sm text-gray-600">Firmadas por Mí</p>
+                    <p class="text-3xl font-bold text-green-600">{{ $stats['resoluciones_firmadas'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Histórico personal</p>
+                </div>
+                <div class="p-3 bg-green-100 rounded-full">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <a href="{{ route('colaborador.resoluciones-firmadas.index') }}" class="text-xs text-green-600 hover:text-green-800 flex items-center">
+                Ver historial →
+            </a>
+        </div>
     </div>
 
     <!-- Accesos Rápidos -->
@@ -116,6 +154,7 @@
         <h3 class="text-xl font-semibold text-gray-900 mb-4">⚡ Accesos Rápidos</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <!-- Nueva Resolución -->
+            @can('resoluciones.crear')
             <a href="{{ route('colaborador.resoluciones.create') }}" 
                class="block bg-white rounded-lg shadow hover:shadow-lg transition p-6">
                 <div class="flex items-center">
@@ -130,8 +169,10 @@
                     </div>
                 </div>
             </a>
+            @endcan
 
             <!-- Registrar Persona -->
+            @can('personas.crear')
             <a href="{{ route('colaborador.personas.create') }}" 
                class="block bg-white rounded-lg shadow hover:shadow-lg transition p-6">
                 <div class="flex items-center">
@@ -146,8 +187,10 @@
                     </div>
                 </div>
             </a>
+            @endcan
 
             <!-- Gestionar Áreas -->
+            @can('areas.ver')
             <a href="{{ route('colaborador.areas.index') }}" 
                class="block bg-white rounded-lg shadow hover:shadow-lg transition p-6">
                 <div class="flex items-center">
@@ -162,6 +205,7 @@
                     </div>
                 </div>
             </a>
+            @endcan
         </div>
     </div>
 
@@ -172,24 +216,23 @@
             <h3 class="text-lg font-semibold text-gray-900 mb-4">📄 Resoluciones Recientes</h3>
             <div class="space-y-4">
                 @forelse($resoluciones_recientes ?? [] as $resolucion)
-                <div class="flex items-start justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                    <div class="flex-1">
-                        <h4 class="text-sm font-semibold text-gray-900">{{ $resolucion->numero_resolucion }}</h4>
-                        <p class="text-xs text-gray-600 mt-1">{{ Str::limit($resolucion->asunto, 60) }}</p>
-                        <div class="flex items-center mt-2 text-xs text-gray-500">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                            <span>{{ $resolucion->fecha_emision->format('d/m/Y') }}</span>
+                <a href="{{ route('colaborador.resoluciones.show', $resolucion) }}" class="block">
+                    <div class="flex items-start justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                        <div class="flex-1">
+                            <h4 class="text-sm font-semibold text-gray-900">{{ $resolucion->num_resolucion }}</h4>
+                            <p class="text-xs text-gray-600 mt-1">{{ Str::limit($resolucion->asunto_resolucion, 60) }}</p>
+                            <div class="flex items-center mt-2 text-xs text-gray-500">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>{{ $resolucion->fecha_resolucion->format('d/m/Y') }}</span>
+                            </div>
                         </div>
+                        <span class="ml-4 px-2 py-1 rounded text-xs font-medium {{ $resolucion->archivo_firmado ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                            {{ $resolucion->archivo_firmado ? '✓ Firmada' : 'Sin firmar' }}
+                        </span>
                     </div>
-                    <span class="ml-4 px-2 py-1 rounded text-xs font-medium
-                        {{ $resolucion->estado === 'aprobado' ? 'bg-green-100 text-green-800' : 
-                           ($resolucion->estado === 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 
-                           'bg-gray-100 text-gray-800') }}">
-                        {{ ucfirst($resolucion->estado) }}
-                    </span>
-                </div>
+                </a>
                 @empty
                 <div class="text-center py-8 text-gray-500">
                     <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,22 +252,22 @@
                 <div class="flex items-start">
                     <div class="flex-shrink-0">
                         <div class="w-10 h-10 rounded-full 
-                            {{ $actividad->tipo === 'crear' ? 'bg-green-100 text-green-600' : 
-                               ($actividad->tipo === 'editar' ? 'bg-yellow-100 text-yellow-600' : 
+                            {{ $actividad->accion === 'crear' ? 'bg-green-100 text-green-600' : 
+                               ($actividad->accion === 'editar' ? 'bg-yellow-100 text-yellow-600' : 
                                'bg-blue-100 text-blue-600') }} 
                             flex items-center justify-center">
-                            @if($actividad->tipo === 'crear')
-                                ➕
-                            @elseif($actividad->tipo === 'editar')
-                                ✏️
+                            @if($actividad->accion === 'crear')
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            @elseif($actividad->accion === 'editar')
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             @else
-                                ✓
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                             @endif
                         </div>
                     </div>
                     <div class="ml-3 flex-1">
                         <p class="text-sm text-gray-900">{{ $actividad->descripcion }}</p>
-                        <p class="text-xs text-gray-500 mt-1">{{ $actividad->created_at->diffForHumans() }}</p>
+                        <p class="text-xs text-gray-500 mt-1">{{ $actividad->fecha_accion->diffForHumans() }}</p>
                     </div>
                 </div>
                 @empty

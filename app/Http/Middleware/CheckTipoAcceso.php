@@ -15,7 +15,7 @@ class CheckTipoAcceso
     public function handle(Request $request, Closure $next, string $tipoAcceso): Response
     {
         if (!auth()->check()) {
-            return redirect()->route($tipoAcceso . '.login');
+            return redirect()->route('login');
         }
 
         $user = auth()->user();
@@ -23,14 +23,14 @@ class CheckTipoAcceso
         // Verificar que el usuario esté activo
         if (!$user->i_active) {
             auth()->logout();
-            return redirect()->route($tipoAcceso . '.login')
+            return redirect()->route('login')
                 ->with('error', '❌ Su cuenta está inactiva. Contacte al administrador.');
         }
 
         // Verificar tipo de acceso
         if ($user->tipo_acceso !== $tipoAcceso) {
             auth()->logout();
-            return redirect()->route($tipoAcceso . '.login')
+            return redirect()->route('login')
                 ->with('error', '❌ No tiene permisos para acceder a esta sección.');
         }
 

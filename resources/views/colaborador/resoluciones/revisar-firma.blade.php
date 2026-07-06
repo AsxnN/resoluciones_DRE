@@ -15,7 +15,7 @@
             </a>
             <h1 class="text-3xl font-bold text-gray-900">Revisar Firma de Resoluciones</h1>
         </div>
-        <p class="text-gray-600">Revisa las resoluciones seleccionadas antes de firmar</p>
+        <p class="text-gray-600">Sigue los 3 pasos para firmar y entregar la resolución.</p>
     </div>
 
     <!-- Resumen -->
@@ -31,410 +31,597 @@
         </div>
     </div>
 
+    <!-- Indicador de pasos -->
+    <div class="flex items-center justify-center gap-2 mb-6 text-xs font-bold uppercase">
+        <span class="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-800 rounded-full">① Documento</span>
+        <span class="text-gray-300">→</span>
+        <span class="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-full">② Receptor</span>
+        <span class="text-gray-300">→</span>
+        <span class="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full">③ Notificación</span>
+    </div>
+
     <!-- Formulario de Firma -->
-    <form method="POST" action="{{ route('colaborador.resoluciones.firmarMasivo') }}" id="formFirmar">
+    <form method="POST" action="{{ route('colaborador.resoluciones.firmarMasivo') }}" id="formFirmar" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="resoluciones_ids" value="{{ json_encode($resoluciones->pluck('id_resolucion')->toArray()) }}">
+        <input type="hidden" name="tipo_receptor" id="tipo_receptor" value="">
 
-        <!-- Lista de Resoluciones -->
-        <div class="bg-white rounded-lg shadow-lg mb-6 overflow-hidden">
-            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Columna Izquierda: Lista de Resoluciones Seleccionadas -->
+            <div class="lg:col-span-1 space-y-4">
+                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
-                    Resoluciones a Firmar
+                    Resoluciones seleccionadas
                 </h3>
-            </div>
 
-            <div class="divide-y divide-gray-200">
                 @foreach($resoluciones as $resolucion)
-                <div class="p-6 hover:bg-gray-50 transition">
-                    <div class="flex items-start gap-4">
-                        <div class="flex-shrink-0">
-                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                            </div>
-                        </div>
-
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-start justify-between mb-2">
-                                <div>
-                                    <h4 class="text-lg font-bold text-gray-900">{{ $resolucion->num_resolucion }}</h4>
-                                    <p class="text-sm text-gray-600">{{ $resolucion->tipoResolucion->nombre_tipo_resolucion }}</p>
-                                </div>
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full
-                                    {{ $resolucion->estado->nombre_estado === 'Aprobado' ? 'bg-green-100 text-green-800' : '' }}
-                                    {{ $resolucion->estado->nombre_estado === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                    {{ $resolucion->estado->nombre_estado === 'Rechazado' ? 'bg-red-100 text-red-800' : '' }}">
-                                    {{ $resolucion->estado->nombre_estado }}
-                                </span>
-                            </div>
-
-                            <p class="text-sm text-gray-700 mb-3">{{ $resolucion->asunto_resolucion }}</p>
-
-                            <div class="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <span class="text-gray-600">Fecha:</span>
-                                    <span class="font-medium text-gray-900">{{ $resolucion->fecha_resolucion->format('d/m/Y') }}</span>
-                                </div>
-                                <div>
-                                    <span class="text-gray-600">Creado por:</span>
-                                    <span class="font-medium text-gray-900">{{ $resolucion->usuarioCreador->persona->nombre_persona ?? 'N/A' }}</span>
-                                </div>
-                            </div>
-
-                            @if($resolucion->personasInvolucradas && $resolucion->personasInvolucradas->isNotEmpty())
-                            <div class="mt-3 pt-3 border-t border-gray-200">
-                                <p class="text-xs font-semibold text-gray-700 mb-2">Personas a notificar:</p>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach($resolucion->personasInvolucradas as $persona)
-                                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
-                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
-                                        </svg>
-                                        {{ $persona->nombre_persona }}
-                                    </span>
-                                    @endforeach
-                                </div>
-                            </div>
-                            @else
-                            <div class="mt-3 pt-3 border-t border-gray-200">
-                                <p class="text-xs text-gray-500 italic">Sin personas involucradas</p>
-                            </div>
-                            @endif
-                        </div>
+                <div class="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+                    <p class="font-bold text-blue-900 text-sm">{{ $resolucion->num_resolucion }}</p>
+                    <p class="text-xs text-gray-600 mt-1 line-clamp-2">{{ $resolucion->asunto_resolucion }}</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-medium">
+                            {{ $resolucion->tipoResolucion->nombre_tipo_resolucion }}
+                        </span>
                     </div>
                 </div>
                 @endforeach
             </div>
-        </div>
 
-        <!-- Opciones de Notificación -->
-        <div class="bg-white rounded-lg shadow-lg mb-6 overflow-hidden">
-            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                    </svg>
-                    Opciones de Notificación
-                </h3>
-            </div>
-
-            <div class="p-6 space-y-4">
-                <p class="text-gray-700 mb-4">Selecciona cómo deseas notificar a las personas involucradas:</p>
-
-                <!-- WhatsApp -->
-                <div class="flex items-center p-4 bg-green-50 border-2 border-green-200 rounded-lg hover:border-green-400 transition-colors cursor-pointer" onclick="toggleCheckbox('enviar_whatsapp')">
-                    <input type="checkbox" 
-                           name="enviar_whatsapp" 
-                           id="enviar_whatsapp" 
-                           value="1"
-                           class="w-6 h-6 text-green-600 border-gray-300 rounded focus:ring-green-500">
-                    <label for="enviar_whatsapp" class="ml-4 flex items-center gap-3 cursor-pointer flex-1">
-                        <svg class="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                        </svg>
-                        <div>
-                            <span class="block font-bold text-gray-900 text-lg">Enviar por WhatsApp</span>
-                            <span class="block text-sm text-gray-600">Notificar a las personas con número de WhatsApp registrado</span>
-                        </div>
-                    </label>
-                </div>
-
-                <!-- Correo Electrónico -->
-                <div class="flex items-center p-4 bg-blue-50 border-2 border-blue-200 rounded-lg hover:border-blue-400 transition-colors cursor-pointer" onclick="toggleCheckbox('enviar_correo')">
-                    <input type="checkbox" 
-                           name="enviar_correo" 
-                           id="enviar_correo" 
-                           value="1"
-                           class="w-6 h-6 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="enviar_correo" class="ml-4 flex items-center gap-3 cursor-pointer flex-1">
-                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
-                        <div>
-                            <span class="block font-bold text-gray-900 text-lg">Enviar por Correo Electrónico</span>
-                            <span class="block text-sm text-gray-600">Notificar a las personas con correo electrónico registrado</span>
-                        </div>
-                    </label>
-                </div>
-
-                <!-- Buscar Usuarios Adicionales por DNI -->
-                <div class="bg-white rounded-lg shadow-lg mb-6 overflow-hidden">
-                    <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
-                        <h3 class="text-white font-bold text-lg flex items-center gap-2">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            <!-- Columna Derecha: Panel de Procesamiento -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Paso 1: Documento Firmado -->
+                <div class="bg-white rounded-xl shadow-lg border-2 border-purple-100 overflow-hidden">
+                    <div class="bg-purple-600 px-6 py-3">
+                        <h3 class="text-white font-bold flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                             </svg>
-                            ENVIAR POR CORREO A USUARIOS ADICIONALES
+                            ① Sube el documento ya firmado
                         </h3>
                     </div>
                     <div class="p-6">
-                        <p class="text-sm text-gray-600 mb-4">
-                            Busca usuarios por DNI para enviarles las resoluciones firmadas por correo electrónico
-                        </p>
-
-                        <!-- Formulario de búsqueda -->
-                        <div class="mb-6 bg-gray-50 border-2 border-gray-200 rounded-lg p-4">
-                            <div class="flex gap-3">
-                                <div class="flex-1">
-                                    <label for="dni_buscar" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Buscar por DNI
-                                    </label>
-                                    <input type="text" 
-                                           id="dni_buscar" 
-                                           placeholder="Ingrese DNI de 8 dígitos"
-                                           maxlength="8"
-                                           class="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                                <div class="flex items-end">
-                                    <button type="button" 
-                                            id="btn-buscar-usuario"
-                                            class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                        </svg>
-                                        Buscar
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Resultado de búsqueda -->
-                            <div id="resultado-busqueda" class="hidden mt-4 p-4 bg-white border border-gray-300 rounded-lg">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-gray-900" id="usuario-nombre"></p>
-                                            <p class="text-sm text-gray-600" id="usuario-dni"></p>
-                                            <p class="text-sm text-gray-500" id="usuario-email"></p>
-                                        </div>
-                                    </div>
-                                    <button type="button" 
-                                            id="btn-agregar-usuario"
-                                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                        </svg>
-                                        Agregar
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Mensaje de no encontrado -->
-                            <div id="mensaje-no-encontrado" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                                <div class="flex items-center gap-2 text-red-700">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <span class="font-medium">No se encontró usuario con ese DNI</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Lista de usuarios seleccionados -->
-                        <div>
-                            <h4 class="text-sm font-semibold text-gray-700 mb-3">
-                                Usuarios adicionales a notificar (<span id="contador-usuarios">0</span>)
-                            </h4>
-                            <div id="lista-usuarios-notificar" class="space-y-2">
-                                <!-- Se llenará dinámicamente con JavaScript -->
-                            </div>
-                            <div id="mensaje-sin-usuarios" class="text-center py-8 text-gray-500">
-                                <svg class="mx-auto h-12 w-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                        <div class="bg-purple-50 p-4 rounded-lg border-2 border-dashed border-purple-300 text-center">
+                            <input type="file" name="archivo_firmado" id="archivo_firmado" accept=".pdf" required class="hidden">
+                            <label for="archivo_firmado" class="cursor-pointer">
+                                <svg class="w-12 h-12 text-purple-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                                 </svg>
-                                <p class="text-sm">No hay usuarios adicionales seleccionados</p>
-                            </div>
+                                <p class="text-purple-700 font-bold">Haz click para seleccionar el archivo PDF</p>
+                                <p class="text-purple-500 text-xs mt-1">Debe ser el PDF que ya tiene la firma digital (FirmaPerú)</p>
+                                <p id="file-name" class="mt-2 text-sm font-semibold text-green-600 hidden"></p>
+                            </label>
                         </div>
-
-                        <!-- Inputs ocultos para enviar los IDs -->
-                        <div id="inputs-usuarios-notificar"></div>
                     </div>
                 </div>
 
-                <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg">
-                    <div class="flex items-start">
-                        <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                        </svg>
-                        <div>
-                            <p class="text-sm font-medium text-yellow-800">Las notificaciones son opcionales</p>
-                            <p class="text-xs text-yellow-700 mt-1">Puedes firmar sin enviar notificaciones si así lo deseas</p>
+                <!-- Paso 2: Identificación del Receptor -->
+                <div class="bg-white rounded-xl shadow-lg border-2 border-blue-100 overflow-hidden">
+                    <div class="bg-blue-600 px-6 py-3">
+                        <h3 class="text-white font-bold flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/>
+                            </svg>
+                            ② ¿A quién se le entrega?
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-xs text-gray-500 mb-4">Debe ser un cliente o persona natural externa a la DRE. Si es trabajador interno, el sistema lo bloqueará.</p>
+
+                        @if($personasExternas->isNotEmpty())
+                        <p class="text-sm font-bold text-gray-800 mb-1">👥 Personas registradas en esta resolución</p>
+                        <p class="text-xs text-gray-500 mb-3">Se agregaron al crear la resolución. Haz click en "Usar" para continuar con sus datos.</p>
+                        <div class="space-y-2 mb-5">
+                            @foreach($personasExternas as $pe)
+                            <div class="persona-relacionada flex items-center justify-between gap-3 p-3 bg-gray-50 border border-gray-200 rounded-lg" data-id="{{ $pe->id_persona_resolucion_datos }}">
+                                <div class="flex-1">
+                                    <p class="text-sm font-semibold text-gray-900">{{ $pe->nombres }} {{ $pe->apellido_paterno }} {{ $pe->apellido_materno }}</p>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-xs text-gray-500">{{ $pe->tipo_relacion }}</span>
+                                        @if($pe->num_documento)
+                                            @if($pe->obtenido_reniec)
+                                            <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded-full">🔍 Verificado con RENIEC</span>
+                                            @else
+                                            <span class="px-2 py-0.5 bg-gray-200 text-gray-700 text-[10px] font-bold rounded-full">✍️ Ingresado manualmente</span>
+                                            @endif
+                                        @endif
+                                    </div>
+                                    <p class="advertencia-dni hidden text-xs text-yellow-700 font-medium mt-1"></p>
+                                </div>
+
+                                @if($pe->num_documento)
+                                <button type="button" class="btn-seleccionar-persona px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg" data-dni="{{ $pe->num_documento }}">
+                                    DNI {{ $pe->num_documento }} · Usar
+                                </button>
+                                @else
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-[10px] font-bold rounded-full">⚠️ Sin DNI</span>
+                                    <input type="text" maxlength="8" placeholder="DNI" class="input-dni-faltante w-24 px-2 py-1 border border-yellow-300 rounded text-sm font-mono">
+                                    <button type="button" class="btn-guardar-dni-faltante px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs font-bold rounded-lg">Guardar</button>
+                                </div>
+                                @endif
+                            </div>
+                            @if(!$pe->num_documento)
+                            <p class="text-[11px] text-gray-400 -mt-1 ml-1">No se registró al crear la resolución. Pídele el DNI a la persona ahora.</p>
+                            @endif
+                            @endforeach
+                        </div>
+
+                        <details class="mb-2">
+                            <summary class="cursor-pointer text-xs font-bold text-gray-600 uppercase">¿La persona no está en la lista? Ingresa el DNI manualmente</summary>
+                            <div class="mt-3">
+                                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Número de DNI *</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="dni_receptor" maxlength="8"
+                                           class="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-lg font-mono tracking-widest">
+                                    <button type="button" id="btn-verificar-dni" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all flex items-center gap-2">
+                                        <span id="text-btn">Verificar</span>
+                                        <span id="loader-dni" class="hidden animate-spin">⌛</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </details>
+                        @else
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Número de DNI *</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="dni_receptor" maxlength="8"
+                                   class="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-lg font-mono tracking-widest">
+                            <button type="button" id="btn-verificar-dni" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all flex items-center gap-2">
+                                <span id="text-btn">Verificar</span>
+                                <span id="loader-dni" class="hidden animate-spin">⌛</span>
+                            </button>
+                        </div>
+                        @endif
+
+                        <!-- Campos que se envían al backend según el caso resuelto -->
+                        <input type="hidden" name="dni" id="dni_final">
+                        <input type="hidden" name="nombres" id="nombres_receptor">
+                        <input type="hidden" name="apellido_paterno" id="paterno_receptor">
+                        <input type="hidden" name="apellido_materno" id="materno_receptor">
+
+                        <!-- Resultado de la verificación -->
+                        <div id="resultado-verificacion" class="mt-4">
+                            <!-- Caso (a): bloqueado por ser colaborador -->
+                            <div id="caso-colaborador" class="hidden p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+                                <p class="text-red-800 font-bold flex items-center gap-2">🚫 <span id="msg-colaborador"></span></p>
+                            </div>
+
+                            <!-- Caso (b): cliente ya existente -->
+                            <div id="caso-cliente" class="hidden p-4 bg-green-50 border-2 border-green-300 rounded-lg space-y-2">
+                                <p class="text-green-900 font-bold">✅ Cliente ya registrado en el sistema</p>
+                                <p class="text-sm text-gray-700"><strong>Nombre:</strong> <span id="cliente-nombre"></span></p>
+                                <p class="text-sm text-gray-700"><strong>Usuario del sistema:</strong> <span id="cliente-email-sistema" class="font-mono"></span></p>
+
+                                <div class="flex items-center gap-2 text-sm text-gray-700">
+                                    <strong>Correo de contacto:</strong>
+                                    <span id="cliente-correo-texto"></span>
+                                    <input type="email" id="cliente-correo-input" class="hidden flex-1 px-2 py-1 border border-green-300 rounded">
+                                    <button type="button" id="btn-editar-correo" class="text-blue-600 hover:text-blue-800 text-xs font-bold">✏️ Cambiar correo</button>
+                                    <button type="button" id="btn-guardar-correo" class="hidden text-green-700 hover:text-green-900 text-xs font-bold">💾 Guardar</button>
+                                </div>
+
+                                <button type="button" id="btn-reenviar-acceso" class="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg">
+                                    ✉️ Enviar correo y usuario
+                                </button>
+                                <span id="msg-reenvio" class="text-xs text-gray-500"></span>
+                            </div>
+
+                            <!-- Caso (c): persona nueva -->
+                            <div id="caso-nuevo" class="hidden p-4 bg-blue-50 border-2 border-blue-300 rounded-lg space-y-3">
+                                <p class="text-blue-900 font-bold">🆕 Persona no registrada. Se creará una cuenta nueva.</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nombres *</label>
+                                        <input type="text" id="nuevo-nombres" class="w-full px-3 py-2 border border-blue-300 rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Apellido Paterno *</label>
+                                        <input type="text" id="nuevo-paterno" class="w-full px-3 py-2 border border-blue-300 rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Apellido Materno</label>
+                                        <input type="text" id="nuevo-materno" class="w-full px-3 py-2 border border-blue-300 rounded-lg">
+                                    </div>
+                                </div>
+
+                                <div id="bloque-verificar-reniec-opcional" class="hidden border-t border-blue-200 pt-3">
+                                    <button type="button" id="btn-verificar-reniec-opcional" class="px-4 py-2 bg-white border border-blue-300 text-blue-700 hover:bg-blue-100 text-xs font-bold rounded-lg">
+                                        🔍 Verificar con RENIEC (opcional)
+                                    </button>
+                                    <p class="text-[11px] text-gray-500 mt-1">Estos datos se ingresaron a mano al crear la resolución. Puedes confirmarlos con RENIEC antes de continuar, por precaución.</p>
+                                    <p id="resultado-reniec-opcional" class="text-xs font-medium mt-2"></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Paso 3: Notificación y Cuenta (solo aparece tras resolver el receptor) -->
+                <div id="paso3" class="hidden bg-white rounded-xl shadow-lg border-2 border-green-100 overflow-hidden">
+                    <div class="bg-green-600 px-6 py-3">
+                        <h3 class="text-white font-bold flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            ③ Notificación y entrega digital
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <input type="checkbox" name="enviar_correo" id="check_correo" value="1" checked class="w-5 h-5 text-blue-600 rounded">
+                            <div class="flex-1">
+                                <label for="check_correo" class="block text-sm font-bold text-blue-900">Enviar por Correo Electrónico</label>
+                                <input type="email" name="email_destino" id="email_destino" placeholder="ejemplo@correo.com" class="mt-2 w-full px-4 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <p id="email-hint" class="text-[10px] text-blue-600 mt-1 uppercase font-bold"></p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Botón Final de Acción -->
+                <div class="flex flex-col gap-3 pt-4">
+                    <button type="submit" id="btn-submit-firmar" disabled class="w-full py-5 bg-gradient-to-r from-purple-600 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-black text-xl rounded-2xl shadow-2xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        FIRMADO Y ENTREGAR AHORA
+                    </button>
+                    <p class="text-center text-xs text-gray-500 uppercase tracking-widest font-bold">
+                        Al procesar, se oficializará el documento y, si corresponde, se creará la cuenta del cliente.
+                    </p>
                 </div>
             </div>
-        </div>
-
-        <!-- Botones de Acción -->
-        <div class="flex items-center justify-between gap-4">
-            <a href="{{ route('colaborador.resoluciones.index') }}" 
-               class="inline-flex items-center px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-                Cancelar
-            </a>
-
-            <button type="submit" 
-                    class="inline-flex items-center px-8 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                </svg>
-                Firmar {{ $resoluciones->count() }} Resolución(es)
-            </button>
         </div>
     </form>
 </div>
 
 @push('scripts')
 <script>
-// Array para almacenar usuarios seleccionados
-let usuariosNotificar = [];
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejo de nombre de archivo
+    const fileInput = document.getElementById('archivo_firmado');
+    const fileNameDisplay = document.getElementById('file-name');
 
-function toggleCheckbox(id) {
-    const checkbox = document.getElementById(id);
-    checkbox.checked = !checkbox.checked;
-}
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            fileNameDisplay.textContent = '📄 Archivo seleccionado: ' + this.files[0].name;
+            fileNameDisplay.classList.remove('hidden');
+        }
+    });
 
-// Buscar usuario por DNI
-document.getElementById('btn-buscar-usuario').addEventListener('click', async function() {
-    const dni = document.getElementById('dni_buscar').value.trim();
-    
-    if (!dni) {
-        alert('⚠️ Ingrese un DNI para buscar');
-        return;
+    const btnVerificar = document.getElementById('btn-verificar-dni');
+    const loader = document.getElementById('loader-dni');
+    const textBtn = document.getElementById('text-btn');
+    const dniInput = document.getElementById('dni_receptor');
+    const dniFinal = document.getElementById('dni_final');
+    const tipoReceptorInput = document.getElementById('tipo_receptor');
+
+    const casoColaborador = document.getElementById('caso-colaborador');
+    const casoCliente = document.getElementById('caso-cliente');
+    const casoNuevo = document.getElementById('caso-nuevo');
+    const paso3 = document.getElementById('paso3');
+    const btnSubmit = document.getElementById('btn-submit-firmar');
+
+    const nombresHidden = document.getElementById('nombres_receptor');
+    const paternoHidden = document.getElementById('paterno_receptor');
+    const maternoHidden = document.getElementById('materno_receptor');
+
+    const emailDestino = document.getElementById('email_destino');
+    const checkCorreo = document.getElementById('check_correo');
+    const emailHint = document.getElementById('email-hint');
+
+    const bloqueVerificarReniec = document.getElementById('bloque-verificar-reniec-opcional');
+    const btnVerificarReniecOpcional = document.getElementById('btn-verificar-reniec-opcional');
+    const resultadoReniecOpcional = document.getElementById('resultado-reniec-opcional');
+
+    let personaActualId = null;
+    let dniActual = null;
+
+    function ocultarTodosLosCasos() {
+        casoColaborador.classList.add('hidden');
+        casoCliente.classList.add('hidden');
+        casoNuevo.classList.add('hidden');
+        bloqueVerificarReniec.classList.add('hidden');
+        resultadoReniecOpcional.textContent = '';
+        paso3.classList.add('hidden');
+        btnSubmit.disabled = true;
+        tipoReceptorInput.value = '';
     }
-    
-    if (dni.length !== 8 || !/^\d+$/.test(dni)) {
-        alert('⚠️ El DNI debe tener 8 dígitos numéricos');
-        return;
-    }
-    
-    // Ocultar mensajes previos
-    document.getElementById('resultado-busqueda').classList.add('hidden');
-    document.getElementById('mensaje-no-encontrado').classList.add('hidden');
-    
-    try {
-        const response = await fetch(`{{ route('colaborador.resoluciones.buscar-usuario') }}?dni=${dni}`, {
-            method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok && data.success) {
-            // Verificar si ya está agregado
-            if (usuariosNotificar.find(u => u.id === data.usuario.id)) {
-                alert('⚠️ Este usuario ya fue agregado a la lista');
+
+    async function verificarDni(dni, idPersonaRelacionada = null) {
+        if (dni.length !== 8) {
+            alert('⚠️ Ingrese un DNI válido de 8 dígitos');
+            return;
+        }
+
+        dniActual = dni;
+        dniFinal.value = dni;
+        loader.classList.remove('hidden');
+        textBtn.classList.add('hidden');
+        btnVerificar.disabled = true;
+        ocultarTodosLosCasos();
+
+        try {
+            const response = await fetch('{{ route("colaborador.resoluciones.verificar-receptor") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ dni: dni, id_persona_resolucion_datos: idPersonaRelacionada })
+            });
+
+            const data = await response.json();
+
+            if (data.tipo === 'colaborador') {
+                document.getElementById('msg-colaborador').textContent = data.message;
+                casoColaborador.classList.remove('hidden');
                 return;
             }
-            
-            // Mostrar resultado
-            document.getElementById('usuario-nombre').textContent = data.usuario.nombre_completo;
-            document.getElementById('usuario-dni').textContent = `DNI: ${data.usuario.dni}`;
-            document.getElementById('usuario-email').textContent = `📧 ${data.usuario.email}`;
-            document.getElementById('resultado-busqueda').classList.remove('hidden');
-            
-            // Guardar temporalmente el usuario encontrado
-            document.getElementById('btn-agregar-usuario').setAttribute('data-usuario', JSON.stringify(data.usuario));
-        } else {
-            document.getElementById('mensaje-no-encontrado').classList.remove('hidden');
+
+            if (data.tipo === 'cliente') {
+                tipoReceptorInput.value = 'cliente';
+                personaActualId = data.id_persona;
+
+                nombresHidden.value = data.nombres;
+                paternoHidden.value = data.apellido_paterno;
+                maternoHidden.value = data.apellido_materno;
+
+                document.getElementById('cliente-nombre').textContent = `${data.nombres} ${data.apellido_paterno} ${data.apellido_materno || ''}`;
+                document.getElementById('cliente-email-sistema').textContent = data.username;
+                document.getElementById('cliente-correo-texto').textContent = data.correo || '(sin correo registrado)';
+                document.getElementById('msg-reenvio').textContent = '';
+                casoCliente.classList.remove('hidden');
+
+                // Si no tiene correo registrado, mostrar el input directamente
+                if (!data.correo) {
+                    correoTexto.classList.add('hidden');
+                    correoInput.classList.remove('hidden');
+                    btnEditarCorreo.classList.add('hidden');
+                    btnGuardarCorreo.classList.remove('hidden');
+                    document.getElementById('btn-reenviar-acceso').disabled = true;
+                    document.getElementById('msg-reenvio').textContent = '⚠️ Agrega el correo primero para poder enviar las credenciales.';
+                }
+
+                // Paso 3: prellenado, editable, NO obligatorio
+                emailDestino.value = data.correo || '';
+                emailDestino.required = false;
+                checkCorreo.checked = !!data.correo;
+                checkCorreo.disabled = false;
+                emailHint.textContent = 'Cliente ya registrado: este aviso es opcional, no genera credenciales nuevas.';
+
+                paso3.classList.remove('hidden');
+                btnSubmit.disabled = false;
+                return;
+            }
+
+            // tipo === 'nuevo'
+            tipoReceptorInput.value = 'nuevo';
+            personaActualId = null;
+
+            document.getElementById('nuevo-nombres').value = data.nombres || '';
+            document.getElementById('nuevo-paterno').value = data.apellido_paterno || '';
+            document.getElementById('nuevo-materno').value = data.apellido_materno || '';
+            nombresHidden.value = data.nombres || '';
+            paternoHidden.value = data.apellido_paterno || '';
+            maternoHidden.value = data.apellido_materno || '';
+            casoNuevo.classList.remove('hidden');
+
+            // Botón opcional de verificación con RENIEC solo si los datos fueron ingresados a mano
+            if (data.obtenido_reniec === false) {
+                bloqueVerificarReniec.classList.remove('hidden');
+            }
+
+            // Paso 3: vacío, obligatorio
+            emailDestino.value = '';
+            emailDestino.required = true;
+            checkCorreo.checked = true;
+            checkCorreo.disabled = true;
+            emailHint.textContent = 'Obligatorio: aquí se enviarán las credenciales de acceso al sistema nuevo.';
+
+            paso3.classList.remove('hidden');
+            btnSubmit.disabled = false;
+
+        } catch (error) {
+            console.error('Error de verificación:', error);
+            alert('❌ Error al conectar con el servicio de verificación');
+        } finally {
+            loader.classList.add('hidden');
+            textBtn.classList.remove('hidden');
+            btnVerificar.disabled = false;
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('❌ Error al buscar usuario. Intente nuevamente.');
     }
+
+    btnVerificar.addEventListener('click', function() {
+        verificarDni(dniInput.value.trim());
+    });
+
+    // Lista de personas externas ya vinculadas a la resolución
+    document.querySelectorAll('.btn-seleccionar-persona').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const idPersonaRelacionada = this.closest('.persona-relacionada').dataset.id;
+            verificarDni(this.dataset.dni, idPersonaRelacionada);
+        });
+    });
+
+    document.querySelectorAll('.btn-guardar-dni-faltante').forEach(function(btn) {
+        btn.addEventListener('click', async function() {
+            const fila = this.closest('.persona-relacionada');
+            const idPersonaRelacionada = fila.dataset.id;
+            const dniInputFaltante = fila.querySelector('.input-dni-faltante');
+            const advertenciaEl = fila.querySelector('.advertencia-dni');
+            const dni = dniInputFaltante.value.trim();
+
+            if (dni.length !== 8) {
+                alert('⚠️ Ingrese un DNI válido de 8 dígitos');
+                return;
+            }
+
+            this.disabled = true;
+            try {
+                const response = await fetch(`/colaborador/resoluciones/personas-relacionadas/${idPersonaRelacionada}/actualizar-dni`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ dni: dni })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.advertencia) {
+                        advertenciaEl.textContent = '⚠️ ' + data.advertencia;
+                        advertenciaEl.classList.remove('hidden');
+                    }
+                    verificarDni(data.dni, idPersonaRelacionada);
+                } else {
+                    alert(data.message || 'No se pudo guardar el DNI');
+                }
+            } catch (error) {
+                console.error('Error guardando DNI:', error);
+                alert('❌ Error al guardar el DNI');
+            } finally {
+                this.disabled = false;
+            }
+        });
+    });
+
+    // Botón opcional: confirmar con RENIEC los datos ingresados a mano
+    btnVerificarReniecOpcional.addEventListener('click', async function() {
+        if (!dniActual) return;
+
+        this.disabled = true;
+        resultadoReniecOpcional.textContent = 'Consultando RENIEC...';
+        resultadoReniecOpcional.className = 'text-xs font-medium mt-2 text-gray-500';
+
+        try {
+            const response = await fetch('{{ route("colaborador.reniec.consultar") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ dni: dniActual })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                const nombreReniec = `${data.nombres} ${data.apellido_paterno} ${data.apellido_materno || ''}`.trim();
+                const nombreActual = `${document.getElementById('nuevo-nombres').value} ${document.getElementById('nuevo-paterno').value}`.trim();
+                const coincide = nombreReniec.toLowerCase().includes(nombreActual.toLowerCase()) || nombreActual.toLowerCase().includes(nombreReniec.toLowerCase());
+
+                resultadoReniecOpcional.textContent = coincide
+                    ? `✅ RENIEC confirma: ${nombreReniec}`
+                    : `⚠️ RENIEC registra: "${nombreReniec}" — revisa si coincide con lo ingresado.`;
+                resultadoReniecOpcional.className = coincide
+                    ? 'text-xs font-medium mt-2 text-green-700'
+                    : 'text-xs font-medium mt-2 text-yellow-700';
+            } else {
+                resultadoReniecOpcional.textContent = '❌ ' + (data.message || 'No se encontraron datos en RENIEC.');
+                resultadoReniecOpcional.className = 'text-xs font-medium mt-2 text-red-600';
+            }
+        } catch (error) {
+            console.error('Error consultando RENIEC:', error);
+            resultadoReniecOpcional.textContent = '❌ Error al conectar con RENIEC';
+            resultadoReniecOpcional.className = 'text-xs font-medium mt-2 text-red-600';
+        } finally {
+            this.disabled = false;
+        }
+    });
+
+    // Sincronizar campos editables del caso "nuevo" con los hidden que se envían
+    ['nuevo-nombres', 'nuevo-paterno', 'nuevo-materno'].forEach((id, idx) => {
+        const targets = [nombresHidden, paternoHidden, maternoHidden];
+        document.getElementById(id).addEventListener('input', function() {
+            targets[idx].value = this.value;
+        });
+    });
+
+    // Caso (b): editar correo de contacto inline (AJAX, sin salir de la vista)
+    const correoTexto = document.getElementById('cliente-correo-texto');
+    const correoInput = document.getElementById('cliente-correo-input');
+    const btnEditarCorreo = document.getElementById('btn-editar-correo');
+    const btnGuardarCorreo = document.getElementById('btn-guardar-correo');
+
+    btnEditarCorreo.addEventListener('click', function() {
+        correoInput.value = correoTexto.textContent.trim() === '(sin correo registrado)' ? '' : correoTexto.textContent.trim();
+        correoTexto.classList.add('hidden');
+        correoInput.classList.remove('hidden');
+        btnEditarCorreo.classList.add('hidden');
+        btnGuardarCorreo.classList.remove('hidden');
+    });
+
+    btnGuardarCorreo.addEventListener('click', async function() {
+        if (!personaActualId || !correoInput.value) {
+            alert('Ingrese un correo válido');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/colaborador/personas/${personaActualId}/actualizar-correo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ correo: correoInput.value })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                correoTexto.textContent = data.correo;
+                emailDestino.value = data.correo;
+                checkCorreo.checked = true;
+                correoTexto.classList.remove('hidden');
+                correoInput.classList.add('hidden');
+                btnEditarCorreo.classList.remove('hidden');
+                btnGuardarCorreo.classList.add('hidden');
+                // Habilitar botón de reenvío ahora que hay correo
+                const btnReenviar = document.getElementById('btn-reenviar-acceso');
+                btnReenviar.disabled = false;
+                const msgReenvio = document.getElementById('msg-reenvio');
+                if (msgReenvio.textContent.startsWith('⚠️')) msgReenvio.textContent = '';
+            } else {
+                alert(data.message || 'No se pudo actualizar el correo');
+            }
+        } catch (error) {
+            console.error('Error actualizando correo:', error);
+            alert('❌ Error al actualizar el correo');
+        }
+    });
+
+    // Caso (b): reenviar usuario + nueva contraseña (= DNI) al correo actual
+    document.getElementById('btn-reenviar-acceso').addEventListener('click', async function() {
+        if (!personaActualId) return;
+
+        const msg = document.getElementById('msg-reenvio');
+        this.disabled = true;
+        msg.textContent = 'Enviando...';
+
+        try {
+            const response = await fetch(`/colaborador/personas/${personaActualId}/reenviar-acceso`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            });
+            const data = await response.json();
+
+            msg.textContent = data.success
+                ? `✅ Enviado a ${data.correo}`
+                : `❌ ${data.message}`;
+        } catch (error) {
+            console.error('Error reenviando acceso:', error);
+            msg.textContent = '❌ Error al enviar';
+        } finally {
+            this.disabled = false;
+        }
+    });
 });
-
-// Agregar usuario a la lista
-document.getElementById('btn-agregar-usuario').addEventListener('click', function() {
-    const usuarioData = this.getAttribute('data-usuario');
-    if (!usuarioData) return;
-    
-    const usuario = JSON.parse(usuarioData);
-    
-    // Agregar al array
-    usuariosNotificar.push(usuario);
-    
-    // Actualizar vista
-    actualizarListaUsuarios();
-    
-    // Limpiar búsqueda
-    document.getElementById('dni_buscar').value = '';
-    document.getElementById('resultado-busqueda').classList.add('hidden');
-});
-
-// Actualizar lista de usuarios
-function actualizarListaUsuarios() {
-    const lista = document.getElementById('lista-usuarios-notificar');
-    const mensaje = document.getElementById('mensaje-sin-usuarios');
-    const contador = document.getElementById('contador-usuarios');
-    
-    contador.textContent = usuariosNotificar.length;
-    
-    if (usuariosNotificar.length === 0) {
-        lista.innerHTML = '';
-        mensaje.classList.remove('hidden');
-        actualizarInputsOcultos();
-        return;
-    }
-    
-    mensaje.classList.add('hidden');
-    
-    lista.innerHTML = usuariosNotificar.map((usuario, index) => `
-        <div class="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-200 rounded-lg hover:shadow-md transition-shadow">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
-                    ${usuario.nombre_completo.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
-                </div>
-                <div>
-                    <p class="font-semibold text-gray-900">${usuario.nombre_completo}</p>
-                    <div class="flex gap-3 text-sm text-gray-600">
-                        <span>DNI: ${usuario.dni}</span>
-                        <span>•</span>
-                        <span>📧 ${usuario.email}</span>
-                    </div>
-                </div>
-            </div>
-            <button type="button" 
-                    onclick="eliminarUsuario(${index})"
-                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Eliminar">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-            </button>
-        </div>
-    `).join('');
-    
-    actualizarInputsOcultos();
-}
-
-// Eliminar usuario de la lista
-function eliminarUsuario(index) {
-    usuariosNotificar.splice(index, 1);
-    actualizarListaUsuarios();
-}
-
-// Actualizar inputs ocultos para enviar con el formulario
-function actualizarInputsOcultos() {
-    const container = document.getElementById('inputs-usuarios-notificar');
-    container.innerHTML = usuariosNotificar.map((usuario, index) => 
-        `<input type="hidden" name="usuarios_notificar_adicionales[${index}]" value="${usuario.id}">`
-    ).join('');
-}
 </script>
 @endpush
 @endsection

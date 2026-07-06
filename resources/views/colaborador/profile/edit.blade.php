@@ -80,91 +80,108 @@
                 Datos Personales
             </h3>
 
+            @php $reniecVerificado = $persona?->obtenido_reniec ?? false; @endphp
+
+            @if($reniecVerificado)
+            <div class="mb-5 flex items-center gap-3 bg-blue-50 border border-blue-200 border-l-4 border-l-blue-400 rounded p-3">
+                <svg class="w-5 h-5 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                <p class="text-sm text-blue-700"><strong>Identidad verificada con RENIEC.</strong> El documento y nombre no pueden modificarse.</p>
+            </div>
+            @endif
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Tipo de Documento -->
                 <div>
-                    <label for="tipo_documento" class="block text-sm font-medium text-gray-700 mb-2">
-                        Tipo de Documento <span class="text-red-500">*</span>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de Documento
                     </label>
-                    <select id="tipo_documento" 
-                            name="tipo_documento" 
-                            required
-                            class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('tipo_documento') border-red-500 @enderror">
-                        <option value="">Seleccione...</option>
-                        <option value="DNI" {{ old('tipo_documento', $persona->tipo_documento ?? '') == 'DNI' ? 'selected' : '' }}>DNI</option>
-                        <option value="CE" {{ old('tipo_documento', $persona->tipo_documento ?? '') == 'CE' ? 'selected' : '' }}>Carnet de Extranjería</option>
-                        <option value="PASAPORTE" {{ old('tipo_documento', $persona->tipo_documento ?? '') == 'PASAPORTE' ? 'selected' : '' }}>Pasaporte</option>
-                    </select>
-                    @error('tipo_documento')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    @if($reniecVerificado)
+                        <input type="text" value="{{ $persona->tipo_documento }}" readonly
+                               class="w-full rounded-lg border-gray-300 bg-gray-100 cursor-not-allowed text-gray-500">
+                    @else
+                        <select id="tipo_documento" name="tipo_documento" required
+                                class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('tipo_documento') border-red-500 @enderror">
+                            <option value="">Seleccione...</option>
+                            <option value="DNI" {{ old('tipo_documento', $persona->tipo_documento ?? '') == 'DNI' ? 'selected' : '' }}>DNI</option>
+                            <option value="CE" {{ old('tipo_documento', $persona->tipo_documento ?? '') == 'CE' ? 'selected' : '' }}>Carnet de Extranjería</option>
+                            <option value="PASAPORTE" {{ old('tipo_documento', $persona->tipo_documento ?? '') == 'PASAPORTE' ? 'selected' : '' }}>Pasaporte</option>
+                        </select>
+                        @error('tipo_documento')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    @endif
                 </div>
 
                 <!-- Número de Documento -->
                 <div>
-                    <label for="num_documento" class="block text-sm font-medium text-gray-700 mb-2">
-                        Número de Documento <span class="text-red-500">*</span>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Número de Documento
                     </label>
-                    <input type="text" 
-                           id="num_documento" 
-                           name="num_documento" 
-                           value="{{ old('num_documento', $persona->num_documento ?? '') }}"
-                           required
-                           maxlength="20"
-                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('num_documento') border-red-500 @enderror">
-                    @error('num_documento')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    @if($reniecVerificado)
+                        <input type="text" value="{{ $persona->num_documento }}" readonly
+                               class="w-full rounded-lg border-gray-300 bg-gray-100 cursor-not-allowed text-gray-500">
+                    @else
+                        <input type="text" id="num_documento" name="num_documento"
+                               value="{{ old('num_documento', $persona->num_documento ?? '') }}"
+                               required maxlength="20"
+                               class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('num_documento') border-red-500 @enderror">
+                        @error('num_documento')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    @endif
                 </div>
 
                 <!-- Nombres -->
                 <div>
-                    <label for="nombres" class="block text-sm font-medium text-gray-700 mb-2">
-                        Nombres <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" 
-                           id="nombres" 
-                           name="nombres" 
-                           value="{{ old('nombres', $persona->nombres ?? '') }}"
-                           required
-                           maxlength="100"
-                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('nombres') border-red-500 @enderror">
-                    @error('nombres')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nombres</label>
+                    @if($reniecVerificado)
+                        <input type="text" value="{{ $persona->nombres }}" readonly
+                               class="w-full rounded-lg border-gray-300 bg-gray-100 cursor-not-allowed text-gray-500">
+                    @else
+                        <input type="text" id="nombres" name="nombres"
+                               value="{{ old('nombres', $persona->nombres ?? '') }}"
+                               required maxlength="100"
+                               class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('nombres') border-red-500 @enderror">
+                        @error('nombres')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    @endif
                 </div>
 
                 <!-- Apellido Paterno -->
                 <div>
-                    <label for="apellido_paterno" class="block text-sm font-medium text-gray-700 mb-2">
-                        Apellido Paterno <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" 
-                           id="apellido_paterno" 
-                           name="apellido_paterno" 
-                           value="{{ old('apellido_paterno', $persona->apellido_paterno ?? '') }}"
-                           required
-                           maxlength="100"
-                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('apellido_paterno') border-red-500 @enderror">
-                    @error('apellido_paterno')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Apellido Paterno</label>
+                    @if($reniecVerificado)
+                        <input type="text" value="{{ $persona->apellido_paterno }}" readonly
+                               class="w-full rounded-lg border-gray-300 bg-gray-100 cursor-not-allowed text-gray-500">
+                    @else
+                        <input type="text" id="apellido_paterno" name="apellido_paterno"
+                               value="{{ old('apellido_paterno', $persona->apellido_paterno ?? '') }}"
+                               required maxlength="100"
+                               class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('apellido_paterno') border-red-500 @enderror">
+                        @error('apellido_paterno')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    @endif
                 </div>
 
                 <!-- Apellido Materno -->
                 <div>
-                    <label for="apellido_materno" class="block text-sm font-medium text-gray-700 mb-2">
-                        Apellido Materno
-                    </label>
-                    <input type="text" 
-                           id="apellido_materno" 
-                           name="apellido_materno" 
-                           value="{{ old('apellido_materno', $persona->apellido_materno ?? '') }}"
-                           maxlength="100"
-                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('apellido_materno') border-red-500 @enderror">
-                    @error('apellido_materno')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Apellido Materno</label>
+                    @if($reniecVerificado)
+                        <input type="text" value="{{ $persona->apellido_materno }}" readonly
+                               class="w-full rounded-lg border-gray-300 bg-gray-100 cursor-not-allowed text-gray-500">
+                    @else
+                        <input type="text" id="apellido_materno" name="apellido_materno"
+                               value="{{ old('apellido_materno', $persona->apellido_materno ?? '') }}"
+                               maxlength="100"
+                               class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('apellido_materno') border-red-500 @enderror">
+                        @error('apellido_materno')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    @endif
                 </div>
 
                 <!-- Teléfono -->
@@ -180,22 +197,6 @@
                            maxlength="20"
                            class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('telefono') border-red-500 @enderror">
                     @error('telefono')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- WhatsApp -->
-                <div>
-                    <label for="whatsapp" class="block text-sm font-medium text-gray-700 mb-2">
-                        WhatsApp
-                    </label>
-                    <input type="text" 
-                           id="whatsapp" 
-                           name="whatsapp" 
-                           value="{{ old('whatsapp', $persona->whatsapp ?? '') }}"
-                           maxlength="20"
-                           class="w-full rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500 @error('whatsapp') border-red-500 @enderror">
-                    @error('whatsapp')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

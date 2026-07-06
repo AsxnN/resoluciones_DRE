@@ -26,14 +26,15 @@ class Persona extends Model
         'apellido_materno',
         'correo',
         'telefono',
-        'whatsapp',
         'direccion',
         'datos_completos',
+        'obtenido_reniec',
         'i_active',
     ];
 
     protected $casts = [
         'datos_completos' => 'boolean',
+        'obtenido_reniec' => 'boolean',
         'i_active' => 'boolean',
         'fecha_creacion' => 'datetime',
         'fecha_actualizacion' => 'datetime',

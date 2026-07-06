@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Spatie\Permission\Models\Role;
 
 class UsuarioController extends Controller implements HasMiddleware
 {
@@ -46,11 +45,9 @@ class UsuarioController extends Controller implements HasMiddleware
             });
         }
 
-        // Filtro por rol
+        // Filtro por rol (tipo_acceso es la fuente real de autorización; los roles de Spatie no se usan)
         if ($request->filled('role')) {
-            $query->whereHas('roles', function($q) use ($request) {
-                $q->where('name', $request->role);
-            });
+            $query->where('tipo_acceso', $request->role);
         }
 
         // Filtro por estado (usar i_active)
@@ -60,17 +57,14 @@ class UsuarioController extends Controller implements HasMiddleware
 
         $usuarios = $query->orderBy('name')->paginate(20)->withQueryString();
 
-        // Roles disponibles para filtro
-        $roles = Role::where('guard_name', 'colaborador')->get();
-
-        // Estadísticas (usar i_active)
+        // Estadísticas (usar i_active y tipo_acceso, no roles de Spatie - esa tabla no se usa)
         $stats = [
             'activos' => User::where('i_active', true)->count(),
-            'admins' => User::whereHas('roles', fn($q) => $q->where('name', 'admin'))->count(),
-            'colaboradores' => User::whereHas('roles', fn($q) => $q->where('name', 'colaborador'))->count(),
+            'admins' => User::where('tipo_acceso', 'admin')->count(),
+            'colaboradores' => User::where('tipo_acceso', 'colaborador')->count(),
         ];
 
-        return view('colaborador.usuarios.index', compact('usuarios', 'roles', 'stats'));
+        return view('colaborador.usuarios.index', compact('usuarios', 'stats'));
     }
 
     public function create()
@@ -114,7 +108,6 @@ class UsuarioController extends Controller implements HasMiddleware
             'tipo_documento' => 'required|in:DNI,CE,Pasaporte',
             'num_documento' => 'required|string|max:20|unique:persona,num_documento',
             'telefono' => 'nullable|string|max:20',
-            'whatsapp' => 'nullable|string|max:20',
             'direccion' => 'nullable|string',
             
             // Colaborador
@@ -129,8 +122,13 @@ class UsuarioController extends Controller implements HasMiddleware
             'colaborador_activo' => 'nullable|boolean',
         ]);
 
+        // Evitar escalación de privilegios: solo un admin puede crear otro admin
+        if ($validated['tipo_acceso'] === 'admin' && Auth::user()->tipo_acceso !== 'admin') {
+            abort(403, 'No tienes permiso para crear usuarios administradores.');
+        }
+
         DB::beginTransaction();
-        
+
         try {
             // 1. Generar username único
             $username = $this->generarUsernameUnico(
@@ -150,7 +148,6 @@ class UsuarioController extends Controller implements HasMiddleware
                     'apellido_materno' => $validated['apellido_materno'] ?? null,
                     'correo' => $validated['email'],
                     'telefono' => $validated['telefono'] ?? null,
-                    'whatsapp' => $validated['whatsapp'] ?? null,
                     'direccion' => $validated['direccion'] ?? null,
                     'datos_completos' => true,
                     'i_active' => true,
@@ -169,6 +166,7 @@ class UsuarioController extends Controller implements HasMiddleware
                 'tipo_acceso' => $validated['tipo_acceso'],
                 'i_active' => $validated['i_active'] ?? true,
                 'email_verified_at' => ($validated['email_verified'] ?? false) ? now() : null,
+                'id_rol' => $validated['id_rol'] ?? null,
             ]);
 
             // 4. Crear registro según tipo
@@ -185,7 +183,6 @@ class UsuarioController extends Controller implements HasMiddleware
                     'id_area' => $validated['id_area'] ?? null,
                     'id_especialidad' => $validated['id_especialidad'] ?? null,
                     'id_tipo_personal' => $validated['id_tipo_personal'] ?? null,
-                    'id_rol' => $validated['id_rol'] ?? null,
                     'i_active' => $validated['colaborador_activo'] ?? true,
                 ]);
             } elseif ($validated['tipo_acceso'] === 'cliente') {
@@ -214,9 +211,11 @@ class UsuarioController extends Controller implements HasMiddleware
                 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error al crear usuario: ' . $e->getMessage());
+            $msg = app()->isProduction() ? 'Error interno al crear el usuario.' : $e->getMessage();
             return redirect()->back()
                 ->withInput()
-                ->with('error', '❌ Error al crear usuario: ' . $e->getMessage());
+                ->with('error', '❌ Error al crear usuario: ' . $msg);
         }
     }
 
@@ -268,7 +267,7 @@ class UsuarioController extends Controller implements HasMiddleware
     
     public function show(User $usuario)
     {
-        $usuario->load(['persona', 'roles.permissions', 'permissions']);
+        $usuario->load(['persona', 'rolOrganizacional', 'permissions']);
 
         return view('colaborador.usuarios.show', compact('usuario'));
     }
@@ -281,77 +280,79 @@ class UsuarioController extends Controller implements HasMiddleware
             ->orderBy('apellido_paterno')
             ->get();
 
-        // Roles disponibles
-        $roles = Role::where('guard_name', 'colaborador')->get();
-
-        return view('colaborador.usuarios.edit', compact('usuario', 'personas', 'roles'));
+        return view('colaborador.usuarios.edit', compact('usuario', 'personas'));
     }
 
     public function update(Request $request, User $usuario)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $usuario->id,
-            'password' => ['nullable', 'confirmed', Password::min(8)],
-            'id_persona' => 'nullable|exists:persona,id_persona|unique:users,id_persona,' . $usuario->id,
-            'id_rol' => 'nullable|exists:roles_organizacionales,id_rol',
-            'tipo_acceso' => 'required|in:admin,colaborador,cliente',
-            'roles' => 'required|array|min:1',
-            'roles.*' => 'exists:roles,name',
-            'activo' => 'nullable|boolean',
-            // Campos para PERSONA
-            'dni' => 'nullable|string|max:8',
-            'telefono' => 'nullable|string|max:15',
+            'email'              => 'required|email|unique:users,email,' . $usuario->id,
+            'password'           => ['nullable', 'confirmed', Password::min(8)],
+            'id_rol'             => 'nullable|exists:roles_organizacionales,id_rol',
+            'tipo_acceso'        => 'required|in:admin,colaborador,cliente',
+            'activo'             => 'nullable|boolean',
+            // Campos editables de persona
+            'telefono'           => 'nullable|string|max:20',
+            'direccion'          => 'nullable|string|max:500',
+            // Nombres: solo se aceptan si la persona NO fue verificada por RENIEC
+            'nombres'            => 'nullable|string|max:100',
+            'apellido_paterno'   => 'nullable|string|max:100',
+            'apellido_materno'   => 'nullable|string|max:100',
             // Campos para COLABORADOR
-            'id_cargos' => 'nullable|exists:cargo,id_cargos',
-            'id_unidad' => 'nullable|exists:unidad,id_unidad',
-            'id_direcciones' => 'nullable|exists:direccion,id_direcciones',
-            'id_dependencia' => 'nullable|exists:dependencia,id_dependencias',
-            'id_area' => 'nullable|exists:area,id_area',
-            'id_especialidad' => 'nullable|exists:especialidad,id_especialidad',
-            'id_tipo_personal' => 'nullable|exists:tipo_personal,id_tipo_personal',
+            'id_cargos'          => 'nullable|exists:cargo,id_cargos',
+            'id_unidad'          => 'nullable|exists:unidad,id_unidad',
+            'id_direcciones'     => 'nullable|exists:direccion,id_direcciones',
+            'id_dependencia'     => 'nullable|exists:dependencia,id_dependencias',
+            'id_area'            => 'nullable|exists:area,id_area',
+            'id_especialidad'    => 'nullable|exists:especialidad,id_especialidad',
+            'id_tipo_personal'   => 'nullable|exists:tipo_personal,id_tipo_personal',
             'colaborador_activo' => 'nullable|boolean',
         ]);
 
+        // Evitar escalación de privilegios: solo un admin puede asignar tipo admin
+        if ($validated['tipo_acceso'] === 'admin' && Auth::user()->tipo_acceso !== 'admin') {
+            abort(403, 'No tienes permiso para asignar tipo de acceso administrador.');
+        }
+
         DB::beginTransaction();
-        
+
         try {
-            // Actualizar usuario (solo campos de users)
+            // Actualizar usuario
             $dataUsuario = [
-                'name' => $validated['name'],
-                'email' => $validated['email'],
+                'email'       => $validated['email'],
                 'tipo_acceso' => $validated['tipo_acceso'],
-                'i_active' => $request->boolean('activo'),
-                'id_rol' => $validated['id_rol'] ?? null,
+                'i_active'    => $request->boolean('activo'),
+                'id_rol'      => $validated['id_rol'] ?? null,
             ];
 
-            // Solo actualizar password si se proporcionó
             if ($request->filled('password')) {
                 $dataUsuario['password'] = Hash::make($validated['password']);
             }
 
             $usuario->update($dataUsuario);
 
-            // Sincronizar email y teléfono con persona si está asociada
+            // Actualizar persona asociada
             if ($usuario->persona) {
-                $dataPersona = ['correo' => $validated['email']];
-                
-                if (!empty($validated['telefono'])) {
-                    $dataPersona['telefono'] = $validated['telefono'];
+                $dataPersona = [
+                    'correo'    => $validated['email'],
+                    'telefono'  => $validated['telefono'] ?? null,
+                    'direccion' => $validated['direccion'] ?? null,
+                ];
+
+                // Nombres solo editables si NO fue verificado por RENIEC
+                if (!$usuario->persona->obtenido_reniec) {
+                    if (!empty($validated['nombres']))          $dataPersona['nombres']          = $validated['nombres'];
+                    if (!empty($validated['apellido_paterno'])) $dataPersona['apellido_paterno'] = $validated['apellido_paterno'];
+                    if (isset($validated['apellido_materno']))  $dataPersona['apellido_materno'] = $validated['apellido_materno'];
                 }
-                
-                if (!empty($validated['dni'])) {
-                    // Verificar que el DNI no esté en uso por otra persona
-                    $existeDni = Persona::where('num_documento', $validated['dni'])
-                        ->where('id_persona', '!=', $usuario->id_persona)
-                        ->exists();
-                        
-                    if (!$existeDni) {
-                        $dataPersona['num_documento'] = $validated['dni'];
-                    }
-                }
-                
+
                 $usuario->persona->update($dataPersona);
+
+                // Sincronizar users.name con el nombre completo de persona
+                $persona = $usuario->persona->fresh();
+                $usuario->update([
+                    'name' => trim($persona->nombres . ' ' . $persona->apellido_paterno . ' ' . $persona->apellido_materno),
+                ]);
             }
 
             // Actualizar datos del colaborador si existe
@@ -370,9 +371,6 @@ class UsuarioController extends Controller implements HasMiddleware
                 $usuario->colaborador->update($dataColaborador);
             }
 
-            // Sincronizar roles de Spatie
-            $usuario->syncRoles($validated['roles']);
-
             // Registrar auditoría
             \App\Models\Auditoria::create([
                 'tabla_afectada' => 'users',
@@ -390,7 +388,9 @@ class UsuarioController extends Controller implements HasMiddleware
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withInput()->withErrors(['error' => 'Error al actualizar usuario: ' . $e->getMessage()]);
+            \Log::error('Error al actualizar usuario: ' . $e->getMessage());
+            $msg = app()->isProduction() ? 'Error interno al actualizar el usuario.' : $e->getMessage();
+            return back()->withInput()->withErrors(['error' => 'Error al actualizar usuario: ' . $msg]);
         }
     }
 
@@ -431,7 +431,21 @@ class UsuarioController extends Controller implements HasMiddleware
         $usuario->password = Hash::make($nuevaPassword);
         $usuario->save();
 
+        if ($usuario->email) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($usuario->email)
+                    ->send(new \App\Mail\CredencialesAcceso([
+                        'nombre'      => $usuario->name,
+                        'username'    => $usuario->username,
+                        'password'    => $nuevaPassword,
+                        'tipo_acceso' => $usuario->tipo_acceso,
+                    ]));
+            } catch (\Exception $e) {
+                \Log::error('Error al enviar credenciales tras reseteo: ' . $e->getMessage());
+            }
+        }
+
         return redirect()->back()
-            ->with('success', "✅ Contraseña restablecida a: {$nuevaPassword}");
+            ->with('success', 'Contraseña restablecida. Las nuevas credenciales han sido enviadas al correo del usuario.');
     }
 }

@@ -160,7 +160,7 @@
         <div class="space-y-6">
             @foreach($modulos as $modulo)
             <div class="bg-white rounded-lg shadow-lg overflow-hidden border-l-4 border-{{ $modulo->tipo_modulo === 'admin' ? 'red' : ($modulo->tipo_modulo === 'colaborador' ? 'blue' : 'green') }}-500">
-                
+
                 <!-- Header del Módulo -->
                 <div class="bg-gray-50 px-6 py-4 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
@@ -170,7 +170,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                             </svg>
                         </div>
-                        
+
                         <div>
                             <h3 class="text-lg font-bold text-gray-900">{{ $modulo->nombre_modulo }}</h3>
                             @if($modulo->descripcion)
@@ -189,12 +189,12 @@
                         <span class="text-sm text-gray-600">
                             <span class="font-bold text-gray-900" data-modulo-counter="{{ $modulo->id_modulo }}">
                                 {{ $modulo->permisos->whereIn('id', $permisosUsuario)->count() }}
-                            </span> 
+                            </span>
                             / {{ $modulo->permisos->count() }}
                         </span>
 
                         <!-- Seleccionar/Deseleccionar todo -->
-                        <button type="button" 
+                        <button type="button"
                                 onclick="toggleModulo({{ $modulo->id_modulo }})"
                                 class="px-3 py-1 text-xs font-semibold bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                             Marcar/Desmarcar Todo
@@ -209,14 +209,14 @@
                         @foreach($modulo->permisos as $permiso)
                         <label class="flex items-center p-3 rounded-lg border-2 cursor-pointer transition
                                       {{ in_array($permiso->id, $permisosUsuario) ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50' }}">
-                            <input type="checkbox" 
-                                   name="permisos[]" 
+                            <input type="checkbox"
+                                   name="permisos[]"
                                    value="{{ $permiso->id }}"
                                    data-modulo="{{ $modulo->id_modulo }}"
                                    {{ in_array($permiso->id, $permisosUsuario) ? 'checked' : '' }}
                                    onchange="actualizarContador({{ $modulo->id_modulo }})"
                                    class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            
+
                             <div class="ml-3 flex-1">
                                 <span class="text-sm font-medium text-gray-900 block">
                                     {{ ucfirst(str_replace('_', ' ', $permiso->name)) }}
@@ -313,7 +313,7 @@ function actualizarContador(idModulo) {
     if (counter) {
         counter.textContent = checkboxes.length;
     }
-    
+
     // Actualizar total
     const totalChecked = document.querySelectorAll('input[name="permisos[]"]:checked').length;
     document.getElementById('totalPermisos').textContent = totalChecked;
@@ -323,11 +323,11 @@ function actualizarContador(idModulo) {
 function toggleModulo(idModulo) {
     const checkboxes = document.querySelectorAll(`input[data-modulo="${idModulo}"]`);
     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
-    
+
     checkboxes.forEach(checkbox => {
         checkbox.checked = !allChecked;
     });
-    
+
     actualizarContador(idModulo);
 }
 

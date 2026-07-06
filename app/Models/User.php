@@ -20,7 +20,7 @@ class User extends Authenticatable
     use TwoFactorAuthenticatable;
     use HasRoles; // ← TRAIT DE SPATIE
 
-    protected $guard_name = 'colaborador'; // ← GUARD PARA SPATIE
+    protected $guard_name = 'web'; // único guard definido en config/auth.php
 
     protected $fillable = [
         'id_persona',

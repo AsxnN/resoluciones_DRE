@@ -36,7 +36,13 @@ class UnidadController extends Controller implements HasMiddleware
 
         $unidades = $query->orderBy('nombre_unidad')->paginate(20)->withQueryString();
 
-        return view('colaborador.unidades.index', compact('unidades'));
+        $stats = [
+            'total' => Unidad::count(),
+            'activas' => Unidad::where('i_active', true)->count(),
+            'inactivas' => Unidad::where('i_active', false)->count(),
+        ];
+
+        return view('colaborador.unidades.index', compact('unidades', 'stats'));
     }
 
     public function create()

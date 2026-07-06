@@ -4,7 +4,6 @@
 namespace App\Http\Controllers\Colaborador;
 
 use App\Http\Controllers\Controller;
-use App\Models\ColaFirma;
 use App\Models\Notificacion;
 use App\Models\Resolucion;
 use Illuminate\Http\Request;
@@ -17,18 +16,23 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Estadísticas del colaborador
+        // Estadísticas generales y del colaborador
         $stats = [
             // Resoluciones creadas por el usuario
-            'mis_resoluciones' => Resolucion::where('id_usuario', $user->id)->count(),
+            'resoluciones_creadas' => Resolucion::where('id_usuario', $user->id)->count(),
             'resoluciones_mes' => Resolucion::where('id_usuario', $user->id)
                 ->whereMonth('fecha_creacion', now()->month)
                 ->count(),
 
-            // Firmas pendientes
-            'firmas_pendientes' => ColaFirma::where('id_usuario_firmante', $user->id)
-                ->whereHas('estadoFirma', fn($q) => $q->where('nombre_estado', 'Pendiente'))
-                ->count(),
+            // Resoluciones del sistema que todavía no se han firmado
+            'resoluciones_sin_firmar' => Resolucion::whereNull('archivo_firmado')->count(),
+
+            // Resoluciones donde el usuario está relacionado como persona interna
+            // (no las creó, pero está involucrado/mencionado en el trámite)
+            'resoluciones_relacionadas' => Resolucion::whereHas('personasRelacionadas', function ($q) use ($user) {
+                $q->where('persona_resolucion_datos.id_user', $user->id)
+                  ->where('persona_resolucion_datos.es_interna', true);
+            })->count(),
 
             // Notificaciones no leídas
             'notificaciones_pendientes' => Notificacion::where('id_usuario', $user->id)
@@ -37,21 +41,16 @@ class DashboardController extends Controller
 
             // Resoluciones firmadas por el usuario
             'resoluciones_firmadas' => Resolucion::where('id_usuario_firma', $user->id)->count(),
+
+            // Estadísticas globales (para el dashboard)
+            'personas_registradas' => \App\Models\Persona::count(),
+            'areas_activas' => \App\Models\Area::where('i_active', true)->count(),
         ];
 
-        // Mis resoluciones recientes (últimas 5)
-        $misResoluciones = Resolucion::with(['estado', 'tipoResolucion'])
+        // Mis resoluciones recientes (últimas 5) - Cambiado para coincidir con la vista
+        $resoluciones_recientes = Resolucion::with(['estado', 'tipoResolucion'])
             ->where('id_usuario', $user->id)
             ->orderBy('fecha_creacion', 'desc')
-            ->limit(5)
-            ->get();
-
-        // Firmas pendientes (urgentes primero)
-        $firmasPendientes = ColaFirma::with(['resolucion.tipoResolucion', 'usuarioSolicita.persona', 'estadoFirma'])
-            ->where('id_usuario_firmante', $user->id)
-            ->whereHas('estadoFirma', fn($q) => $q->where('nombre_estado', 'Pendiente'))
-            ->orderByRaw("FIELD(prioridad, 'alta', 'media', 'baja')")
-            ->orderBy('fecha_limite', 'asc')
             ->limit(5)
             ->get();
 
@@ -63,30 +62,17 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Resoluciones por estado (del usuario)
-        $resolucionesPorEstado = Resolucion::select('estado.nombre_estado', DB::raw('count(*) as total'))
-            ->join('estado', 'resolucion.id_estado', '=', 'estado.id_estado')
-            ->where('resolucion.id_usuario', $user->id)
-            ->groupBy('estado.nombre_estado')
-            ->pluck('total', 'nombre_estado');
-
-        // Actividad reciente del usuario
-        $actividadReciente = \App\Models\Auditoria::where('id_usuario', $user->id)
+        // Actividad reciente del usuario - Cambiado para coincidir con la vista
+        $actividades = \App\Models\Auditoria::where('id_usuario', $user->id)
             ->orderBy('fecha_accion', 'desc')
             ->limit(10)
             ->get();
 
-        // Permisos del usuario (para mostrar módulos disponibles)
-        $permisos = $user->getAllPermissions()->groupBy('modulo.nombre_modulo');
-
         return view('colaborador.dashboard', compact(
             'stats',
-            'misResoluciones',
-            'firmasPendientes',
+            'resoluciones_recientes',
             'notificaciones',
-            'resolucionesPorEstado',
-            'actividadReciente',
-            'permisos'
+            'actividades'
         ));
     }
 

@@ -38,7 +38,6 @@ class UserObserver
                         'apellido_materno' => $apellidoMaterno,
                         'correo' => $user->email,
                         'telefono' => null,
-                        'whatsapp' => null,
                         'direccion' => null,
                         'datos_completos' => false,
                         'i_active' => true,

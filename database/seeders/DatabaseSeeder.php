@@ -19,7 +19,11 @@ class DatabaseSeeder extends Seeder
         $this->command->info('🔐 Creando permisos...');
         $this->call(PermisoSeeder::class);
 
-        // 3. Catálogos del sistema
+        // 3. Usuario Admin inicial
+        $this->command->info('👤 Creando usuario admin...');
+        $this->call(UserSeeder::class);
+
+        // 4. Catálogos del sistema
         $this->command->info('📚 Creando catálogos...');
         $this->call([
             EstadoSeeder::class,
@@ -27,10 +31,6 @@ class DatabaseSeeder extends Seeder
             TipoResolucionSeeder::class,
             CatalogosSeeder::class,
         ]);
-
-        // 4. Usuario Admin inicial
-        $this->command->info('👤 Creando usuario admin...');
-        $this->call(UserSeeder::class);
 
         $this->command->info('✅ Seeders completados exitosamente!');
     }

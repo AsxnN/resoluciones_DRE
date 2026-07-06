@@ -72,18 +72,19 @@ class ProfileController extends Controller
         $persona = $user->persona;
         $colaborador = $persona?->colaborador;
 
+        $reniecVerificado = $persona?->obtenido_reniec ?? false;
+
         $validated = $request->validate([
             // Datos de Usuario (users)
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            
-            // Datos de Persona (persona)
-            'tipo_documento' => 'required|string|max:20',
-            'num_documento' => 'required|string|max:20|unique:persona,num_documento,' . $persona->id_persona . ',id_persona',
-            'nombres' => 'required|string|max:100',
-            'apellido_paterno' => 'required|string|max:100',
-            'apellido_materno' => 'nullable|string|max:100',
+
+            // Datos de Persona — solo si NO fue verificado por RENIEC
+            'tipo_documento' => $reniecVerificado ? 'nullable' : 'required|string|max:20',
+            'num_documento'  => $reniecVerificado ? 'nullable' : 'required|string|max:20|unique:persona,num_documento,' . $persona->id_persona . ',id_persona',
+            'nombres'         => $reniecVerificado ? 'nullable' : 'required|string|max:100',
+            'apellido_paterno'=> $reniecVerificado ? 'nullable' : 'required|string|max:100',
+            'apellido_materno'=> 'nullable|string|max:100',
             'telefono' => 'nullable|string|max:20',
-            'whatsapp' => 'nullable|string|max:20',
             'direccion' => 'nullable|string',
             
             // Datos de Colaborador (colaborador)
@@ -105,7 +106,10 @@ class ProfileController extends Controller
         DB::beginTransaction();
         try {
             // Construir el nombre completo
-            $nombreCompleto = trim($validated['nombres'] . ' ' . $validated['apellido_paterno'] . ' ' . ($validated['apellido_materno'] ?? ''));
+            $nombresParaNombre  = $reniecVerificado ? $persona->nombres          : ($validated['nombres'] ?? $persona->nombres);
+            $paternoParaNombre  = $reniecVerificado ? $persona->apellido_paterno : ($validated['apellido_paterno'] ?? $persona->apellido_paterno);
+            $maternoParaNombre  = $reniecVerificado ? $persona->apellido_materno : ($validated['apellido_materno'] ?? '');
+            $nombreCompleto = trim($nombresParaNombre . ' ' . $paternoParaNombre . ' ' . $maternoParaNombre);
 
             // Actualizar User
             $user->update([
@@ -114,17 +118,21 @@ class ProfileController extends Controller
             ]);
 
             // Actualizar Persona
-            $persona->update([
-                'tipo_documento' => $validated['tipo_documento'],
-                'num_documento' => $validated['num_documento'],
-                'nombres' => $validated['nombres'],
-                'apellido_paterno' => $validated['apellido_paterno'],
-                'apellido_materno' => $validated['apellido_materno'],
-                'correo' => $validated['email'], // Sincronizar email
-                'telefono' => $validated['telefono'],
-                'whatsapp' => $validated['whatsapp'],
+            $dataPersona = [
+                'correo'    => $validated['email'],
+                'telefono'  => $validated['telefono'],
                 'direccion' => $validated['direccion'],
-            ]);
+            ];
+
+            if (!$reniecVerificado) {
+                $dataPersona['tipo_documento']   = $validated['tipo_documento'];
+                $dataPersona['num_documento']    = $validated['num_documento'];
+                $dataPersona['nombres']          = $validated['nombres'];
+                $dataPersona['apellido_paterno'] = $validated['apellido_paterno'];
+                $dataPersona['apellido_materno'] = $validated['apellido_materno'];
+            }
+
+            $persona->update($dataPersona);
 
             // Actualizar Colaborador
             if ($colaborador) {
@@ -163,9 +171,11 @@ class ProfileController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Error al actualizar perfil: ' . $e->getMessage());
+            $msg = app()->isProduction() ? 'Error interno al actualizar el perfil.' : $e->getMessage();
             return back()
                 ->withInput()
-                ->with('error', '❌ Error al actualizar perfil: ' . $e->getMessage());
+                ->with('error', '❌ Error al actualizar perfil: ' . $msg);
         }
     }
 

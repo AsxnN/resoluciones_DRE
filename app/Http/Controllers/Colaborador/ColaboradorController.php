@@ -14,7 +14,6 @@ use App\Models\Persona;
 use App\Models\TipoPersonal;
 use App\Models\Unidad;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 
@@ -24,9 +23,8 @@ class ColaboradorController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:colaboradores.ver', only: ['index', 'show']),
-            new Middleware('permission:colaboradores.crear', only: ['create', 'store']),
             new Middleware('permission:colaboradores.editar', only: ['edit', 'update']),
-            new Middleware('permission:colaboradores.eliminar', only: ['destroy']),
+            new Middleware('permission:colaboradores.eliminar', only: ['destroy', 'toggleEstado']),
         ];
     }
 
@@ -49,7 +47,7 @@ class ColaboradorController extends Controller implements HasMiddleware
                 $q->where('nombres', 'like', "%{$search}%")
                 ->orWhere('apellido_paterno', 'like', "%{$search}%")
                 ->orWhere('apellido_materno', 'like', "%{$search}%")
-                ->orWhere('dni', 'like', "%{$search}%");
+                ->orWhere('num_documento', 'like', "%{$search}%");
             });
         }
 
@@ -57,8 +55,8 @@ class ColaboradorController extends Controller implements HasMiddleware
             $query->where('id_cargos', $request->id_cargos);
         }
 
-        if ($request->filled('id_unidades')) {
-            $query->where('id_unidades', $request->id_unidades);
+        if ($request->filled('id_unidad')) {
+            $query->where('id_unidad', $request->id_unidad);
         }
 
         if ($request->filled('id_direcciones')) {
@@ -79,60 +77,22 @@ class ColaboradorController extends Controller implements HasMiddleware
         $especialidades = Especialidad::where('i_active', true)->orderBy('nombre_especialidad')->get();
         $tiposPersonal = TipoPersonal::where('i_active', true)->orderBy('nombre_tipo_personal')->get();
 
+        $stats = [
+            'total' => ColaboradorModel::count(),
+            'activos' => ColaboradorModel::where('i_active', true)->count(),
+            'inactivos' => ColaboradorModel::where('i_active', false)->count(),
+        ];
+
         return view('colaborador.colaboradores.index', compact(
-            'colaboradores', 
-            'cargos', 
-            'unidades', 
-            'direcciones',
-            'dependencias',
-            'especialidades',
-            'tiposPersonal'
-        ));
-    }
-
-    public function create()
-    {
-        $personas = Persona::whereDoesntHave('colaborador')
-            ->orderBy('apellido_paterno')
-            ->get();
-
-        $cargos = Cargo::where('i_active', true)->orderBy('nombre_cargo')->get();
-        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidad')->get(); // ← Cambiado
-        $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get();
-        $dependencias = Dependencia::where('i_active', true)->orderBy('nombre_dependencia')->get();
-        $especialidades = Especialidad::where('i_active', true)->orderBy('nombre_especialidad')->get();
-        $tiposPersonal = TipoPersonal::where('i_active', true)->orderBy('nombre_tipo_personal')->get();
-
-        return view('colaborador.colaboradores.create', compact(
-            'personas',
+            'colaboradores',
             'cargos',
             'unidades',
             'direcciones',
             'dependencias',
             'especialidades',
-            'tiposPersonal'
+            'tiposPersonal',
+            'stats'
         ));
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'id_persona' => 'required|exists:persona,id_persona|unique:colaborador,id_persona',
-            'id_cargos' => 'required|exists:cargo,id_cargo',
-            'id_unidades' => 'required|exists:unidad,id_unidad',
-            'id_direcciones' => 'required|exists:direccion,id_direcciones',
-            'id_dependencia' => 'required|exists:dependencia,id_dependencia',
-            'id_especialidad' => 'required|exists:especialidad,id_especialidad',
-            'id_tipo_personal' => 'required|exists:tipo_personal,id_tipo_personal',
-        ]);
-
-        $validated['id_usuario'] = Auth::id();
-        $validated['i_active'] = 1;
-
-        ColaboradorModel::create($validated);
-
-        return redirect()->route('colaborador.colaboradores.index')
-            ->with('success', '✅ Colaborador creado exitosamente');
     }
 
     public function show(ColaboradorModel $colaborador)
@@ -154,8 +114,9 @@ class ColaboradorController extends Controller implements HasMiddleware
     public function edit(ColaboradorModel $colaborador)
     {
         $personas = Persona::orderBy('apellido_paterno')->get();
+        $areas = Area::where('i_active', true)->orderBy('nombre_area')->get();
         $cargos = Cargo::where('i_active', true)->orderBy('nombre_cargo')->get();
-        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidad')->get(); // ← Cambiado
+        $unidades = Unidad::where('i_active', true)->orderBy('nombre_unidad')->get();
         $direcciones = Direccion::where('i_active', true)->orderBy('nombre_direcciones')->get();
         $dependencias = Dependencia::where('i_active', true)->orderBy('nombre_dependencia')->get();
         $especialidades = Especialidad::where('i_active', true)->orderBy('nombre_especialidad')->get();
@@ -164,6 +125,7 @@ class ColaboradorController extends Controller implements HasMiddleware
         return view('colaborador.colaboradores.edit', compact(
             'colaborador',
             'personas',
+            'areas',
             'cargos',
             'unidades',
             'direcciones',
@@ -177,14 +139,16 @@ class ColaboradorController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'id_persona' => 'required|exists:persona,id_persona|unique:colaborador,id_persona,' . $colaborador->id_colab_dis . ',id_colab_dis',
-            'id_cargos' => 'required|exists:cargo,id_cargo',
-            'id_unidades' => 'required|exists:unidad,id_unidad',
+            'id_area' => 'required|exists:area,id_area',
+            'id_cargos' => 'required|exists:cargo,id_cargos',
+            'id_unidad' => 'required|exists:unidad,id_unidad',
             'id_direcciones' => 'required|exists:direccion,id_direcciones',
-            'id_dependencia' => 'required|exists:dependencia,id_dependencia',
+            'id_dependencia' => 'required|exists:dependencia,id_dependencias',
             'id_especialidad' => 'required|exists:especialidad,id_especialidad',
             'id_tipo_personal' => 'required|exists:tipo_personal,id_tipo_personal',
-            'i_active' => 'required|boolean',
         ]);
+
+        $validated['i_active'] = $request->boolean('i_active');
 
         $colaborador->update($validated);
 
@@ -198,5 +162,16 @@ class ColaboradorController extends Controller implements HasMiddleware
 
         return redirect()->route('colaborador.colaboradores.index')
             ->with('success', '✅ Colaborador eliminado exitosamente');
+    }
+
+    public function toggleEstado(ColaboradorModel $colaborador)
+    {
+        $colaborador->i_active = !$colaborador->i_active;
+        $colaborador->save();
+
+        $estado = $colaborador->i_active ? 'activado' : 'desactivado';
+
+        return redirect()->back()
+            ->with('success', "✅ Colaborador {$estado} correctamente");
     }
 }

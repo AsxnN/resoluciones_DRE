@@ -15,7 +15,7 @@
                     </svg>
                 </a>
                 <div>
-                    <h1 class="text-3xl font-bold text-gray-900">💼 {{ $cargo->nombre_cargo }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ $cargo->nombre_cargo }}</h1>
                     <p class="text-gray-600 mt-1">Código: {{ $cargo->codigo_cargo }}</p>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 @can('cargos.editar')
                 <a href="{{ route('colaborador.cargos.edit', $cargo) }}" 
                    class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg">
-                    ✏️ Editar
+                    Editar
                 </a>
                 @endcan
             </div>
@@ -35,7 +35,7 @@
         <!-- Info Principal -->
         <div class="lg:col-span-2">
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold mb-4">📋 Información del Cargo</h3>
+                <h3 class="text-lg font-semibold mb-4">Información del Cargo</h3>
                 
                 <dl class="space-y-4">
                     <div>
@@ -73,7 +73,7 @@
             <!-- Colaboradores -->
             @if($cargo->colaboradores->count() > 0)
             <div class="mt-6 bg-white rounded-lg shadow-lg p-6">
-                <h3 class="text-lg font-semibold mb-4">👥 Colaboradores con este Cargo</h3>
+                <h3 class="text-lg font-semibold mb-4">Colaboradores con este Cargo</h3>
                 
                 <div class="space-y-3">
                     @foreach($cargo->colaboradores as $colaborador)
@@ -98,7 +98,7 @@
         <!-- Sidebar -->
         <div>
             <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
-                <h3 class="text-lg font-semibold mb-4">📊 Estadísticas</h3>
+                <h3 class="text-lg font-semibold mb-4">Estadísticas</h3>
                 
                 <div class="space-y-4">
                     <div>

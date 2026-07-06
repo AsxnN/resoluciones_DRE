@@ -70,7 +70,7 @@
                     @endcan
                     
                     <!-- Mis Resoluciones (siempre visible para colaboradores) -->
-                    <a href="{{ route('colaborador.mis-resoluciones.index') }}" 
+                    <a href="{{ route('colaborador.mis-resoluciones.index') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.mis-resoluciones.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -78,20 +78,19 @@
                         <span class="font-medium">Mis Resoluciones</span>
                     </a>
 
-                    <!-- Cola de Firma -->
-                    @can('resoluciones.firmar')
-                    <a href="{{ route('colaborador.resoluciones-firmadas.index') }}" 
+                    <!-- Resoluciones Firmadas -->
+                    @can('resoluciones-firmadas.ver')
+                    <a href="{{ route('colaborador.resoluciones-firmadas.index') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.resoluciones-firmadas.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span class="font-medium">Cola de Firma</span>
-                        <span class="ml-auto bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">3</span>
+                        <span class="font-medium">Resoluciones Firmadas</span>
                     </a>
                     @endcan
 
                     <!-- Asistente IA -->
-                    @can('asistente_ia.usar')
+                    @can('asistente-ia.usar')
                     <a href="{{ route('colaborador.chatbot.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.chatbot.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,7 +102,7 @@
                     @endcan
                     
                     <!-- Divider solo si hay permisos de gestión -->
-                    @canany(['personas.ver', 'colaboradores.ver', 'direcciones.ver', 'dependencias.ver', 'areas.ver', 'cargos.ver', 'especialidades.ver', 'tipos_personal.ver'])
+                    @canany(['personas.ver', 'colaboradores.ver', 'direcciones.ver', 'dependencias.ver', 'areas.ver', 'cargos.ver', 'especialidades.ver', 'tipos-personal.ver'])
                     <div class="my-4 border-t border-blue-800"></div>
                     
                     <div class="px-4 py-2">
@@ -211,7 +210,7 @@
                     @endcan
 
                     <!-- Tipos de Resolución -->
-                    @can('tipos_resolucion.ver')
+                    @can('tipos-resolucion.ver')
                     <a href="{{ route('colaborador.tipos-resolucion.index') }}" 
                        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.tipos-resolucion.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,27 +232,15 @@
                     @endcan
                     
 
-                    <!-- Divider para Sistema (solo si tiene permisos de usuarios o privilegios) -->
-                    @canany(['usuarios.ver', 'privilegios.gestionar'])
+                    <!-- Divider para Sistema (solo si tiene permiso de usuarios) -->
+                    @can('usuarios.ver')
                     <div class="my-4 border-t border-blue-800"></div>
-                    
+
                     <div class="px-4 py-2">
                         <p class="text-xs font-semibold text-blue-300 uppercase tracking-wider">Sistema</p>
                     </div>
 
-                    <!-- Gestión de Privilegios -->
-                    @can('privilegios.gestionar')
-                    <a href="{{ route('admin.privilegios.index') }}" 
-                       class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('admin.privilegios.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                        <span class="font-medium">Gestión de Privilegios</span>
-                    </a>
-                    @endcan
-                    
-                    @can('usuarios.ver')
-                    <a href="{{ route('colaborador.usuarios.index') }}" 
+                    <a href="{{ route('colaborador.usuarios.index') }}"
                        class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-10 {{ request()->routeIs('colaborador.usuarios.*') ? 'sidebar-link-active' : 'text-gray-300' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -261,7 +248,6 @@
                         <span class="font-medium">Usuarios</span>
                     </a>
                     @endcan
-                    @endcanany
                 </div>
             </nav>
 
@@ -342,13 +328,10 @@
                                  class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-50"
                                  style="display: none;">
                                 <a href="{{ route('colaborador.profile.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    👤 Mi Perfil
-                                </a>
-                                <a href="{{ route('colaborador.profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                                    ⚙️ Configuración
+                                    Mi Perfil
                                 </a>
                                 <div class="border-t border-gray-100"></div>
-                                <form action="{{ route('colaborador.logout') }}" method="POST">
+                                <form action="{{ route('logout') }}" method="POST">
                                     @csrf
                                     <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
                                         🚪 Cerrar Sesión

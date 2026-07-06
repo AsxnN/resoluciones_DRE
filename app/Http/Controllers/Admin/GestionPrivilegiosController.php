@@ -35,6 +35,7 @@ class GestionPrivilegiosController extends Controller
             $query->where('i_active', true)->orderBy('name');
         }])
         ->where('i_active', true)
+        ->where('slug', '!=', 'gestion-privilegios')
         ->orderBy('orden')
         ->get();
 

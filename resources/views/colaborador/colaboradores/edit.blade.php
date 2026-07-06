@@ -3,21 +3,6 @@
 
 @section('title', 'Editar Colaborador')
 
-@section('breadcrumb')
-<li class="flex items-center">
-    <svg class="w-5 h-5 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <a href="{{ route('colaborador.colaboradores.index') }}" class="text-gray-600 hover:text-gray-900">Colaboradores</a>
-</li>
-<li class="flex items-center">
-    <svg class="w-5 h-5 text-gray-400 mx-2" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-    </svg>
-    <span class="text-gray-600 font-medium">Editar</span>
-</li>
-@endsection
-
 @section('content')
 <div class="max-w-3xl mx-auto">
     <div class="bg-white rounded-lg shadow-sm p-6">
@@ -28,7 +13,7 @@
             @method('PUT')
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
+
                 <!-- Persona -->
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -38,7 +23,7 @@
                         <option value="">Seleccionar persona</option>
                         @foreach($personas as $persona)
                         <option value="{{ $persona->id_persona }}" {{ old('id_persona', $colaborador->id_persona) == $persona->id_persona ? 'selected' : '' }}>
-                            {{ $persona->nombre_completo }} - {{ $persona->dni }}
+                            {{ $persona->nombre_completo }} - {{ $persona->num_documento }}
                         </option>
                         @endforeach
                     </select>
@@ -70,15 +55,105 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         Cargo <span class="text-red-500">*</span>
                     </label>
-                    <select name="id_cargo" required class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('id_cargo') border-red-500 @enderror">
+                    <select name="id_cargos" required class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('id_cargos') border-red-500 @enderror">
                         <option value="">Seleccionar cargo</option>
                         @foreach($cargos as $cargo)
-                        <option value="{{ $cargo->id_cargo }}" {{ old('id_cargo', $colaborador->id_cargo) == $cargo->id_cargo ? 'selected' : '' }}>
+                        <option value="{{ $cargo->id_cargos }}" {{ old('id_cargos', $colaborador->id_cargos) == $cargo->id_cargos ? 'selected' : '' }}>
                             {{ $cargo->nombre_cargo }}
                         </option>
                         @endforeach
                     </select>
-                    @error('id_cargo')
+                    @error('id_cargos')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Unidad -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Unidad <span class="text-red-500">*</span>
+                    </label>
+                    <select name="id_unidad" required class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('id_unidad') border-red-500 @enderror">
+                        <option value="">Seleccionar unidad</option>
+                        @foreach($unidades as $unidad)
+                        <option value="{{ $unidad->id_unidad }}" {{ old('id_unidad', $colaborador->id_unidad) == $unidad->id_unidad ? 'selected' : '' }}>
+                            {{ $unidad->nombre_unidad }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('id_unidad')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Dirección -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Dirección <span class="text-red-500">*</span>
+                    </label>
+                    <select name="id_direcciones" required class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('id_direcciones') border-red-500 @enderror">
+                        <option value="">Seleccionar dirección</option>
+                        @foreach($direcciones as $direccion)
+                        <option value="{{ $direccion->id_direcciones }}" {{ old('id_direcciones', $colaborador->id_direcciones) == $direccion->id_direcciones ? 'selected' : '' }}>
+                            {{ $direccion->nombre_direcciones }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('id_direcciones')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Dependencia -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Dependencia <span class="text-red-500">*</span>
+                    </label>
+                    <select name="id_dependencia" required class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('id_dependencia') border-red-500 @enderror">
+                        <option value="">Seleccionar dependencia</option>
+                        @foreach($dependencias as $dependencia)
+                        <option value="{{ $dependencia->id_dependencias }}" {{ old('id_dependencia', $colaborador->id_dependencia) == $dependencia->id_dependencias ? 'selected' : '' }}>
+                            {{ $dependencia->nombre_dependencia }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('id_dependencia')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Especialidad -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Especialidad <span class="text-red-500">*</span>
+                    </label>
+                    <select name="id_especialidad" required class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('id_especialidad') border-red-500 @enderror">
+                        <option value="">Seleccionar especialidad</option>
+                        @foreach($especialidades as $especialidad)
+                        <option value="{{ $especialidad->id_especialidad }}" {{ old('id_especialidad', $colaborador->id_especialidad) == $especialidad->id_especialidad ? 'selected' : '' }}>
+                            {{ $especialidad->nombre_especialidad }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('id_especialidad')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <!-- Tipo de Personal -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de Personal <span class="text-red-500">*</span>
+                    </label>
+                    <select name="id_tipo_personal" required class="w-full px-4 py-2 border border-gray-300 rounded-lg @error('id_tipo_personal') border-red-500 @enderror">
+                        <option value="">Seleccionar tipo de personal</option>
+                        @foreach($tiposPersonal as $tipoPersonal)
+                        <option value="{{ $tipoPersonal->id_tipo_personal }}" {{ old('id_tipo_personal', $colaborador->id_tipo_personal) == $tipoPersonal->id_tipo_personal ? 'selected' : '' }}>
+                            {{ $tipoPersonal->nombre_tipo_personal }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('id_tipo_personal')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

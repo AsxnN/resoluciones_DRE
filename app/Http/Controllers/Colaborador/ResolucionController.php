@@ -29,7 +29,7 @@ class ResolucionController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware('permission:resoluciones.ver', only: ['index', 'show']),
+            new Middleware('permission:resoluciones.ver', only: ['index', 'show', 'descargar', 'descargarFirmado']),
             new Middleware('permission:resoluciones.crear', only: ['create', 'store']),
             new Middleware('permission:resoluciones.editar', only: ['edit', 'update']),
             new Middleware('permission:resoluciones.eliminar', only: ['destroy', 'toggleEstado']),
@@ -176,8 +176,9 @@ class ResolucionController extends Controller implements HasMiddleware
      */
     public function show(Resolucion $resolucion)
     {
-        // El middleware ya verificó el permiso 'resoluciones.ver'
-        // Ya no necesitamos verificaciones adicionales
+        if (!Auth::user()->can('ver_todas_resoluciones') && $resolucion->id_usuario !== Auth::id()) {
+            abort(403);
+        }
 
         $resolucion->load([
             'estado',
@@ -190,6 +191,8 @@ class ResolucionController extends Controller implements HasMiddleware
             'colaFirmas.usuarioFirmante.persona',
             'historialFirmas.usuario.persona',
             'notificaciones' => fn($q) => $q->latest()->limit(5),
+            'entregas.personaEntrega.user',
+            'entregas.usuarioFirma.persona',
         ]);
 
         return view('colaborador.resoluciones.show', compact('resolucion'));
@@ -315,9 +318,22 @@ class ResolucionController extends Controller implements HasMiddleware
      */
     public function descargar(Resolucion $resolucion)
     {
+        if (!Auth::user()->can('ver_todas_resoluciones') && $resolucion->id_usuario !== Auth::id()) {
+            abort(403);
+        }
+
         if (!$resolucion->archivo_resolucion || !Storage::disk('public')->exists($resolucion->archivo_resolucion)) {
             abort(404, 'Archivo no encontrado');
         }
+
+        \App\Models\Auditoria::create([
+            'tabla_afectada' => 'resolucion',
+            'id_registro'    => $resolucion->id_resolucion,
+            'accion'         => 'descargar',
+            'id_usuario'     => Auth::id(),
+            'ip_address'     => request()->ip(),
+            'descripcion'    => "Descarga de resolución: {$resolucion->num_resolucion}",
+        ]);
 
         return Storage::disk('public')->download(
             $resolucion->archivo_resolucion,
@@ -330,9 +346,22 @@ class ResolucionController extends Controller implements HasMiddleware
      */
     public function descargarFirmado(Resolucion $resolucion)
     {
+        if (!Auth::user()->can('ver_todas_resoluciones') && $resolucion->id_usuario !== Auth::id()) {
+            abort(403);
+        }
+
         if (!$resolucion->archivo_firmado || !Storage::disk('public')->exists($resolucion->archivo_firmado)) {
             abort(404, 'Archivo firmado no encontrado');
         }
+
+        \App\Models\Auditoria::create([
+            'tabla_afectada' => 'resolucion',
+            'id_registro'    => $resolucion->id_resolucion,
+            'accion'         => 'descargar_firmado',
+            'id_usuario'     => Auth::id(),
+            'ip_address'     => request()->ip(),
+            'descripcion'    => "Descarga de resolución firmada: {$resolucion->num_resolucion}",
+        ]);
 
         return Storage::disk('public')->download(
             $resolucion->archivo_firmado,
@@ -409,7 +438,8 @@ class ResolucionController extends Controller implements HasMiddleware
     }
 
     /**
-     * Consultar RENIEC por DNI
+     * Buscar persona externa por DNI: primero en BD, luego RENIEC.
+     * Si no se encuentra en ninguno, no se permite agregar.
      */
     public function consultarReniec(Request $request)
     {
@@ -417,17 +447,120 @@ class ResolucionController extends Controller implements HasMiddleware
             'dni' => 'required|digits:8',
         ]);
 
-        $reniecService = new ReniecService();
-        $resultado = $reniecService->consultarDni($request->dni);
+        // 1. Buscar en la BD primero
+        $persona = Persona::where('num_documento', $request->dni)->first();
 
-        if ($resultado && $resultado['success']) {
-            return response()->json($resultado);
+        if ($persona) {
+            if ($persona->tipo_persona === 'colaborador') {
+                return response()->json([
+                    'success' => false,
+                    'fuente'  => 'sistema',
+                    'message' => 'Esta persona es colaborador interno de la DRE y no puede ser agregada como persona externa.',
+                ], 422);
+            }
+
+            return response()->json([
+                'success'          => true,
+                'fuente'           => 'sistema',
+                'id_persona'       => $persona->id_persona,
+                'nombres'          => $persona->nombres,
+                'apellido_paterno' => $persona->apellido_paterno,
+                'apellido_materno' => $persona->apellido_materno,
+                'obtenido_reniec'  => true,
+                'message'          => 'Persona encontrada en el sistema.',
+            ]);
         }
 
+        // 2. No existe en BD: consultar RENIEC
+        $resultado = (new ReniecService())->consultarDni($request->dni);
+
+        if ($resultado && $resultado['success']) {
+            return response()->json([
+                'success'          => true,
+                'fuente'           => 'reniec',
+                'nombres'          => $resultado['nombres'],
+                'apellido_paterno' => $resultado['apellido_paterno'],
+                'apellido_materno' => $resultado['apellido_materno'] ?? '',
+                'obtenido_reniec'  => true,
+                'message'          => 'Datos obtenidos de RENIEC.',
+            ]);
+        }
+
+        // 3. No encontrado en ningún lado
         return response()->json([
             'success' => false,
-            'message' => 'No se encontraron datos en RENIEC o el servicio no está disponible.',
+            'fuente'  => 'no_encontrado',
+            'message' => 'DNI no encontrado en RENIEC. No es posible agregar a esta persona sin verificación.',
         ], 404);
+    }
+
+    /**
+     * Verificar a quién se le entrega una resolución (Paso 2 de revisar-firma).
+     * Distingue 3 casos: es colaborador interno (bloquear), ya es cliente (mostrar datos),
+     * o no existe en el sistema (cuenta nueva).
+     *
+     * Si la persona viene de la lista de personas ya vinculadas a la resolución
+     * (id_persona_resolucion_datos), se reutilizan los nombres/apellidos ya guardados
+     * en lugar de volver a consultar RENIEC.
+     */
+    public function verificarReceptor(Request $request)
+    {
+        $request->validate([
+            'dni' => 'required|digits:8',
+            'id_persona_resolucion_datos' => 'nullable|exists:persona_resolucion_datos,id_persona_resolucion_datos',
+        ]);
+
+        $persona = Persona::where('num_documento', $request->dni)->first();
+
+        if ($persona && $persona->tipo_persona === 'colaborador') {
+            return response()->json([
+                'success' => false,
+                'tipo' => 'colaborador',
+                'message' => 'Esta persona trabaja en la DRE, no se le puede entregar por este medio.',
+                'nombre_completo' => trim($persona->nombres . ' ' . $persona->apellido_paterno . ' ' . $persona->apellido_materno),
+            ], 422);
+        }
+
+        if ($persona && $persona->tipo_persona === 'cliente' && $persona->user) {
+            return response()->json([
+                'success' => true,
+                'tipo' => 'cliente',
+                'id_persona' => $persona->id_persona,
+                'nombres' => $persona->nombres,
+                'apellido_paterno' => $persona->apellido_paterno,
+                'apellido_materno' => $persona->apellido_materno,
+                'correo' => $persona->correo,
+                'username' => $persona->user->username,
+            ]);
+        }
+
+        // No existe en el sistema: ¿ya tenemos sus datos guardados en la resolución?
+        if ($request->filled('id_persona_resolucion_datos')) {
+            $pe = PersonaResolucionDatos::find($request->id_persona_resolucion_datos);
+
+            if ($pe) {
+                return response()->json([
+                    'success' => true,
+                    'tipo' => 'nuevo',
+                    'nombres' => $pe->nombres,
+                    'apellido_paterno' => $pe->apellido_paterno,
+                    'apellido_materno' => $pe->apellido_materno,
+                    'obtenido_reniec' => (bool) $pe->obtenido_reniec,
+                ]);
+            }
+        }
+
+        // Receptor no estaba en la lista: sí hace falta consultar RENIEC
+        $resultado = (new ReniecService())->consultarDni($request->dni);
+
+        return response()->json([
+            'success' => true,
+            'tipo' => 'nuevo',
+            'nombres' => $resultado['nombres'] ?? '',
+            'apellido_paterno' => $resultado['apellido_paterno'] ?? '',
+            'apellido_materno' => $resultado['apellido_materno'] ?? '',
+            'obtenido_reniec' => $resultado['success'] ?? false,
+        ]);
     }
 
     /**
@@ -461,7 +594,7 @@ class ResolucionController extends Controller implements HasMiddleware
             'personas_externas.*.apellido_materno' => 'nullable|string|max:100',
             'personas_externas.*.tipo_relacion' => 'required|in:beneficiario,afectado,involucrado,testigo,otro',
             'personas_externas.*.descripcion_relacion' => 'nullable|string|max:255',
-            'personas_externas.*.obtenido_reniec' => 'nullable|in:true,false,0,1', // ← CAMBIAR
+            'personas_externas.*.obtenido_reniec' => 'required|in:true,1',
             'personas_externas.*.es_interna' => 'required|in:true,false,0,1', // ← CAMBIAR
         ]);
 
@@ -515,7 +648,10 @@ class ResolucionController extends Controller implements HasMiddleware
             'id_resolucion_dependiente' => 'nullable|exists:resolucion,id_resolucion',
             'visto_resolucion' => 'required|string',
             'asunto_resolucion' => 'required|string|max:500',
-            'archivo_resolucion' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+            'archivo_resolucion' => 'nullable|file|extensions:pdf,doc,docx|max:10240',
+        ], [
+            'archivo_resolucion.extensions' => 'El archivo debe ser de tipo: pdf, doc, docx.',
+            'archivo_resolucion.max' => 'El archivo no debe pesar más de 10MB.',
         ]);
 
         // Subir archivo si existe
@@ -587,19 +723,39 @@ class ResolucionController extends Controller implements HasMiddleware
                 'id_usuario' => Auth::id(),
             ]);
 
+            // Mover archivo si existe y está en temp
+            if ($resolucion->archivo_resolucion && str_contains($resolucion->archivo_resolucion, 'resoluciones/temp/')) {
+                $nombreArchivo = basename($resolucion->archivo_resolucion);
+                $nuevoPath = 'resoluciones/' . $nombreArchivo;
+                
+                if (Storage::disk('public')->exists($resolucion->archivo_resolucion)) {
+                    Storage::disk('public')->move($resolucion->archivo_resolucion, $nuevoPath);
+                    $resolucion->update(['archivo_resolucion' => $nuevoPath]);
+                }
+            }
+
             // Guardar personas INTERNAS (trabajadores DRE con cuenta de usuario)
             if (isset($datosPaso1['personas_internas']) && is_array($datosPaso1['personas_internas'])) {
                 foreach ($datosPaso1['personas_internas'] as $persona) {
-                    // Separar nombre completo en partes
-                    $nombrePartes = explode(' ', $persona['nombre_completo']);
-                    $nombres = $nombrePartes[0] ?? '';
-                    $apellidoPaterno = $nombrePartes[1] ?? '';
-                    $apellidoMaterno = isset($nombrePartes[2]) ? implode(' ', array_slice($nombrePartes, 2)) : '';
+                    // Obtener datos reales de la persona desde su usuario
+                    $usuarioRelacionado = User::with('persona')->find($persona['id_user']);
+                    
+                    if ($usuarioRelacionado && $usuarioRelacionado->persona) {
+                        $nombres = $usuarioRelacionado->persona->nombres;
+                        $apellidoPaterno = $usuarioRelacionado->persona->apellido_paterno;
+                        $apellidoMaterno = $usuarioRelacionado->persona->apellido_materno;
+                    } else {
+                        // Fallback por si acaso
+                        $nombrePartes = explode(' ', $persona['nombre_completo']);
+                        $nombres = $nombrePartes[0] ?? '';
+                        $apellidoPaterno = $nombrePartes[1] ?? '';
+                        $apellidoMaterno = isset($nombrePartes[2]) ? implode(' ', array_slice($nombrePartes, 2)) : '';
+                    }
 
                     PersonaResolucionDatos::create([
                         'id_resolucion' => $resolucion->id_resolucion,
-                        'id_user' => $persona['id_user'], // ← IMPORTANTE: Relacionar con usuario
-                        'tipo_documento' => 'DNI', // Las personas internas siempre tienen DNI
+                        'id_user' => $persona['id_user'],
+                        'tipo_documento' => 'DNI',
                         'num_documento' => $persona['num_documento'],
                         'nombres' => $nombres,
                         'apellido_paterno' => $apellidoPaterno,
@@ -607,29 +763,52 @@ class ResolucionController extends Controller implements HasMiddleware
                         'tipo_relacion' => $persona['tipo_relacion'],
                         'descripcion_relacion' => $persona['descripcion_relacion'] ?? null,
                         'obtenido_reniec' => false,
-                        'es_interna' => true, // ← IMPORTANTE: Marcar como interna
+                        'es_interna' => true,
                     ]);
                 }
             }
 
             // Guardar personas EXTERNAS (no tienen cuenta de usuario)
             if (isset($datosPaso1['personas_externas']) && is_array($datosPaso1['personas_externas'])) {
-                foreach ($datosPaso1['personas_externas'] as $persona) {
-                    PersonaResolucionDatos::create([
+                foreach ($datosPaso1['personas_externas'] as $personaData) {
+                    $personaRelacion = PersonaResolucionDatos::create([
                         'id_resolucion' => $resolucion->id_resolucion,
-                        'id_user' => null, // ← No tienen relación con usuario
-                        'tipo_documento' => $persona['tipo_documento'],
-                        'num_documento' => $persona['num_documento'] ?? null,
-                        'nombres' => $persona['nombres'],
-                        'apellido_paterno' => $persona['apellido_paterno'],
-                        'apellido_materno' => $persona['apellido_materno'] ?? null,
-                        'tipo_relacion' => $persona['tipo_relacion'],
-                        'descripcion_relacion' => $persona['descripcion_relacion'] ?? null,
-                        'obtenido_reniec' => filter_var($persona['obtenido_reniec'] ?? false, FILTER_VALIDATE_BOOLEAN),
-                        'es_interna' => false, // ← IMPORTANTE: Marcar como externa
+                        'id_user' => null,
+                        'tipo_documento' => $personaData['tipo_documento'],
+                        'num_documento' => $personaData['num_documento'] ?? null,
+                        'nombres' => $personaData['nombres'],
+                        'apellido_paterno' => $personaData['apellido_paterno'],
+                        'apellido_materno' => $personaData['apellido_materno'] ?? null,
+                        'tipo_relacion' => $personaData['tipo_relacion'],
+                        'descripcion_relacion' => $personaData['descripcion_relacion'] ?? null,
+                        'obtenido_reniec' => filter_var($personaData['obtenido_reniec'] ?? false, FILTER_VALIDATE_BOOLEAN),
+                        'es_interna' => false,
+                    ]);
+
+                    // AUTO-CREAR Registro de Firma para Entrega (Cola de Firma para externos)
+                    \App\Models\RegistroFirmaEntrega::create([
+                        'id_resolucion' => $resolucion->id_resolucion,
+                        'id_persona_resolucion_datos' => $personaRelacion->id_persona_resolucion_datos,
+                        'id_usuario_solicita' => Auth::id(),
+                        'id_usuario_firmante' => Auth::id(), // Por defecto el mismo
+                        'firmado' => false,
+                        'fecha_solicitud' => now(),
                     ]);
                 }
             }
+
+            // CREAR ENTRADA EN COLA DE FIRMA (Para que aparezca en el dashboard de firmas)
+            $estadoPendienteFirma = \App\Models\EstadoFirma::where('nombre_estado', 'Pendiente')->first();
+            \App\Models\ColaFirma::create([
+                'id_resolucion' => $resolucion->id_resolucion,
+                'id_usuario_solicita' => Auth::id(),
+                'id_usuario_firmante' => Auth::id(), // El creador puede ser el primer firmante o asignarlo luego
+                'id_estado_firma' => $estadoPendienteFirma?->id_estado_firma,
+                'prioridad' => 'media',
+                'fecha_solicitud' => now(),
+                'fecha_limite' => now()->addDays(3),
+                'observaciones' => 'Firma inicial generada automáticamente al crear resolución.',
+            ]);
 
             // Registrar auditoría
             \App\Models\Auditoria::create([
@@ -650,9 +829,12 @@ class ResolucionController extends Controller implements HasMiddleware
             if ($request->has('usuarios_notificar')) {
                 foreach ($request->usuarios_notificar as $userId) {
                     $user = User::find($userId);
-                    if ($user) {
-                        // Enviar notificación por email
-                        // Mail::to($user->email)->send(new ResolucionNotificacion($resolucion));
+                    if ($user && $user->email) {
+                        try {
+                            Mail::to($user->email)->send(new ResolucionNotificacion($resolucion));
+                        } catch (\Exception $e) {
+                            \Log::error('Error enviando email de notificación: ' . $e->getMessage());
+                        }
                     }
                 }
                 
@@ -662,7 +844,7 @@ class ResolucionController extends Controller implements HasMiddleware
             return redirect()
                 ->route('colaborador.resoluciones.show', $resolucion)
                 ->with('success', '✅ Resolución creada exitosamente' . 
-                    (session('usuarios_notificados') ? ' y se notificará a ' . session('usuarios_notificados') . ' usuario(s)' : ''));
+                    (session('usuarios_notificados') ? ' y se notificó a ' . session('usuarios_notificados') . ' usuario(s)' : ''));
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -693,115 +875,247 @@ class ResolucionController extends Controller implements HasMiddleware
             return redirect()->route('colaborador.resoluciones.index')->with('error', '❌ No se seleccionaron resoluciones');
         }
 
+        // Una resolución puede entregarse varias veces (a distintas personas, o de nuevo
+        // a la misma), así que ya estar firmada no la excluye de este flujo.
         $resoluciones = Resolucion::with(['estado', 'tipoResolucion', 'usuarioCreador.persona', 'personasInvolucradas'])
             ->whereIn('id_resolucion', $ids)
-            ->whereNull('archivo_firmado') // Solo no firmadas
+            ->where('id_usuario', Auth::id())
             ->get();
 
         if ($resoluciones->isEmpty()) {
-            return redirect()->route('colaborador.resoluciones.index')->with('error', '❌ No hay resoluciones válidas para firmar');
+            return redirect()->route('colaborador.resoluciones.index')->with('error', '❌ No se encontraron las resoluciones seleccionadas');
         }
 
-        return view('colaborador.resoluciones.revisar-firma', compact('resoluciones'));
+        // Personas externas ya vinculadas a estas resoluciones desde su creación
+        // (pueden tener el DNI sin completar todavía)
+        $personasExternas = PersonaResolucionDatos::whereIn('id_resolucion', $ids)
+            ->where('es_interna', false)
+            ->get();
+
+        return view('colaborador.resoluciones.revisar-firma', compact('resoluciones', 'personasExternas'));
+    }
+
+    /**
+     * Completar el DNI de una persona externa que se vinculó a una resolución
+     * sin DNI al momento de crearla (AJAX, desde Paso 2 de revisar-firma).
+     */
+    public function actualizarDniPersonaRelacionada(Request $request, PersonaResolucionDatos $personaResolucionDatos)
+    {
+        $request->validate([
+            'dni' => 'required|digits:8',
+        ]);
+
+        $personaResolucionDatos->update(['num_documento' => $request->dni]);
+
+        // Primera vez que se vincula este DNI a esta identidad: corroborar con RENIEC
+        $advertencia = null;
+        $resultado = (new ReniecService())->consultarDni($request->dni);
+
+        if ($resultado && ($resultado['success'] ?? false)) {
+            $nombreReniec = trim(($resultado['nombres'] ?? '') . ' ' . ($resultado['apellido_paterno'] ?? ''));
+            $nombreGuardado = trim($personaResolucionDatos->nombres . ' ' . $personaResolucionDatos->apellido_paterno);
+
+            if (strcasecmp($nombreReniec, $nombreGuardado) !== 0) {
+                $advertencia = "⚠️ RENIEC registra a \"{$nombreReniec}\" para este DNI, pero aquí se guardó \"{$nombreGuardado}\". Verifica antes de continuar.";
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'dni' => $request->dni,
+            'advertencia' => $advertencia,
+        ]);
     }
 
     public function firmarMasivo(Request $request)
     {
         $request->validate([
             'resoluciones_ids' => 'required|json',
-            'enviar_whatsapp' => 'nullable|boolean',
+            'archivo_firmado' => 'required|file|mimes:pdf|max:15360',
+            'dni' => 'required|digits:8',
+            'tipo_receptor' => 'required|in:cliente,nuevo',
+            'nombres' => 'required_if:tipo_receptor,nuevo|nullable|string',
+            'apellido_paterno' => 'required_if:tipo_receptor,nuevo|nullable|string',
+            'apellido_materno' => 'nullable|string',
+            'email_destino' => 'required_if:tipo_receptor,nuevo|nullable|email',
             'enviar_correo' => 'nullable|boolean',
-            'usuarios_notificar_adicionales' => 'nullable|array',
-            'usuarios_notificar_adicionales.*' => 'exists:users,id',
         ]);
 
         $ids = json_decode($request->resoluciones_ids);
-        
+
         if (empty($ids)) {
             return redirect()->back()->with('error', '❌ No se seleccionaron resoluciones');
         }
 
+        // Defensa adicional: nunca permitir entregar a un colaborador interno
+        $personaExistente = Persona::where('num_documento', $request->dni)->first();
+        if ($personaExistente && $personaExistente->tipo_persona === 'colaborador') {
+            return redirect()->back()->with('error', '❌ Esta persona trabaja en la DRE, no se le puede entregar por este medio.');
+        }
+
         DB::beginTransaction();
         try {
-            $firmadas = 0;
-            
-            // Obtener el estado "Firmado" de la tabla estados_firma
+            $archivo = $request->file('archivo_firmado');
+            $nombreArchivo = 'firmado_' . time() . '_' . $archivo->getClientOriginalName();
+            $pathFirmado = $archivo->storeAs('resoluciones/firmadas', $nombreArchivo, 'public');
+
             $estadoFirmado = \App\Models\EstadoFirma::where('nombre_estado', 'Firmado')->first();
-            
             if (!$estadoFirmado) {
                 throw new \Exception('No se encontró el estado "Firmado" en la tabla estados_firma');
             }
-            
+
+            // 1. Resolver al receptor: cliente existente o cuenta nueva
+            $credencialesNuevas = null;
+
+            if ($request->tipo_receptor === 'cliente') {
+                $persona = Persona::where('num_documento', $request->dni)->where('tipo_persona', 'cliente')->firstOrFail();
+
+                if ($request->filled('email_destino') && $request->email_destino !== $persona->correo) {
+                    $persona->update(['correo' => $request->email_destino]);
+                }
+            } else {
+                // Puede existir un registro de Persona "cliente" sin cuenta de usuario todavía
+                // (verificarReceptor() solo devuelve 'cliente' cuando ya tiene User). Reusarlo
+                // evita chocar con el único (tipo_documento, num_documento) de la tabla persona.
+                $persona = Persona::where('tipo_documento', 'DNI')->where('num_documento', $request->dni)->first();
+
+                if ($persona) {
+                    $persona->update([
+                        'nombres' => $request->nombres,
+                        'apellido_paterno' => $request->apellido_paterno,
+                        'apellido_materno' => $request->apellido_materno,
+                        'correo' => $request->email_destino,
+                        'datos_completos' => true,
+                    ]);
+                } else {
+                    $persona = Persona::create([
+                        'tipo_persona' => 'cliente',
+                        'tipo_documento' => 'DNI',
+                        'num_documento' => $request->dni,
+                        'nombres' => $request->nombres,
+                        'apellido_paterno' => $request->apellido_paterno,
+                        'apellido_materno' => $request->apellido_materno,
+                        'correo' => $request->email_destino,
+                        'datos_completos' => true,
+                        'i_active' => true,
+                    ]);
+                }
+
+                // Usuario de acceso = primera letra del nombre + apellido paterno (ej. "jperez").
+                // La contraseña es su DNI. El correo del sistema solo existe porque la columna
+                // lo requiere (única, no nula); no se usa para iniciar sesión.
+                $primerNombre = explode(' ', trim($request->nombres))[0];
+                $usernameBase = strtolower(substr($primerNombre, 0, 1) . $request->apellido_paterno);
+                $username = $usernameBase;
+                $i = 1;
+                while (User::where('username', $username)->exists()) {
+                    $username = $usernameBase . $i++;
+                }
+
+                $correoSistema = $username . '@dre.com';
+                $contador = 1;
+                while (User::where('email', $correoSistema)->exists()) {
+                    $correoSistema = $username . $contador++ . '@dre.com';
+                }
+
+                $passwordPlano = $request->dni;
+
+                $user = User::create([
+                    'id_persona' => $persona->id_persona,
+                    'name' => trim($request->nombres . ' ' . $request->apellido_paterno . ' ' . $request->apellido_materno),
+                    'username' => $username,
+                    'email' => $correoSistema,
+                    'password' => Hash::make($passwordPlano),
+                    'tipo_acceso' => 'cliente',
+                    'i_active' => true,
+                ]);
+
+                \App\Models\Cliente::firstOrCreate(
+                    ['id_persona' => $persona->id_persona],
+                    ['i_active' => true]
+                );
+
+                $credencialesNuevas = [
+                    'username' => $username,
+                    'password' => $passwordPlano,
+                ];
+            }
+
+            // 2. Aplicar la firma a cada resolución seleccionada
+            $firmadas = 0;
+            $resolucionesFirmadas = [];
+
             foreach ($ids as $id) {
                 $resolucion = Resolucion::find($id);
-                
-                if ($resolucion && !$resolucion->archivo_firmado) {
-                    // Actualizar resolución
+
+                if ($resolucion) {
+                    // Campos en la resolución = "última entrega" (acceso rápido).
+                    // El historial completo de entregas vive en entrega_resolucion,
+                    // porque una misma resolución puede entregarse varias veces.
                     $resolucion->update([
-                        'archivo_firmado' => 'firmado',  // Marcador temporal
+                        'archivo_firmado' => $pathFirmado,
                         'fecha_firma' => now(),
                         'id_usuario_firma' => Auth::id(),
+                        'id_persona_entrega' => $persona->id_persona,
+                        'correo_entrega' => $persona->correo,
                     ]);
-                    
-                    // Crear registro en cola_firma
+
+                    \App\Models\EntregaResolucion::create([
+                        'id_resolucion' => $resolucion->id_resolucion,
+                        'id_persona_entrega' => $persona->id_persona,
+                        'correo_entrega' => $persona->correo,
+                        'archivo_firmado' => $pathFirmado,
+                        'id_usuario_firma' => Auth::id(),
+                        'cuenta_creada' => (bool) $credencialesNuevas,
+                        'fecha_entrega' => now(),
+                    ]);
+
                     \App\Models\ColaFirma::create([
                         'id_resolucion' => $resolucion->id_resolucion,
-                        'id_usuario_solicita' => $resolucion->id_usuario,
+                        'id_usuario_solicita' => $resolucion->id_usuario ?? Auth::id(),
                         'id_usuario_firmante' => Auth::id(),
                         'id_estado_firma' => $estadoFirmado->id_estado_firma,
                         'prioridad' => 'media',
                         'fecha_firma' => now(),
-                        'observaciones' => 'Firmado mediante firma masiva',
+                        'observaciones' => 'Firmado y entregado a ' . trim($request->nombres ?? $persona->nombres . ' ' . ($request->apellido_paterno ?? $persona->apellido_paterno)),
                     ]);
-                    
-                    // Enviar a personas involucradas
-                    if ($request->boolean('enviar_whatsapp') || $request->boolean('enviar_correo')) {
-                        $resolucion->load('personasInvolucradas');
-                        
-                        foreach ($resolucion->personasInvolucradas as $persona) {
-                            if ($request->boolean('enviar_correo') && $persona->correo) {
-                                try {
-                                    Mail::to($persona->correo)->send(new \App\Mail\ResolucionNotificacion($resolucion, $persona));
-                                } catch (\Exception $e) {
-                                    \Log::error('Error enviando correo: ' . $e->getMessage());
-                                }
-                            }
-                            
-                            // TODO: Implementar envío por WhatsApp
-                            if ($request->boolean('enviar_whatsapp') && $persona->whatsapp) {
-                                // Lógica de WhatsApp aquí
-                            }
-                        }
-                    }
-                    
-                    // Enviar a usuarios adicionales por correo
-                    if ($request->has('usuarios_notificar_adicionales') && $request->boolean('enviar_correo')) {
-                        foreach ($request->usuarios_notificar_adicionales as $userId) {
-                            $user = User::find($userId);
-                            if ($user && $user->email) {
-                                try {
-                                    Mail::to($user->email)->send(new \App\Mail\ResolucionNotificacion($resolucion));
-                                } catch (\Exception $e) {
-                                    \Log::error('Error enviando correo a usuario adicional: ' . $e->getMessage());
-                                }
-                            }
-                        }
-                    }
-                    
+
+                    $resolucionesFirmadas[] = $resolucion;
                     $firmadas++;
+                }
+            }
+
+            // 3. Notificaciones: credenciales nuevas (obligatorio) + aviso de cada resolución (opcional)
+            if ($credencialesNuevas) {
+                try {
+                    Mail::to($persona->correo)->send(new \App\Mail\CredencialesAcceso([
+                        'nombre' => trim($persona->nombres . ' ' . $persona->apellido_paterno . ' ' . $persona->apellido_materno),
+                        'username' => $credencialesNuevas['username'],
+                        'password' => $credencialesNuevas['password'],
+                        'resolucion' => $resolucionesFirmadas[0] ?? null,
+                    ]));
+                } catch (\Exception $e) {
+                    \Log::error('Error enviando credenciales de acceso: ' . $e->getMessage());
+                }
+            }
+
+            if ($request->boolean('enviar_correo') && $persona->correo) {
+                foreach ($resolucionesFirmadas as $resolucion) {
+                    try {
+                        Mail::to($persona->correo)->send(new \App\Mail\ResolucionNotificacion($resolucion, $persona));
+                    } catch (\Exception $e) {
+                        \Log::error('Error enviando correo: ' . $e->getMessage());
+                    }
                 }
             }
 
             DB::commit();
 
-            $mensaje = "✅ Se firmaron {$firmadas} resolución(es) correctamente.";
-            
-            if ($request->boolean('enviar_whatsapp') || $request->boolean('enviar_correo')) {
-                $mensaje .= " Se enviaron las notificaciones correspondientes.";
-            }
-            
-            if ($request->has('usuarios_notificar_adicionales')) {
-                $mensaje .= " Se notificó a " . count($request->usuarios_notificar_adicionales) . " usuario(s) adicional(es).";
+            $mensaje = "✅ Se firmaron {$firmadas} resolución(es) y se entregaron a "
+                . trim($persona->nombres . ' ' . $persona->apellido_paterno) . '.';
+
+            if ($credencialesNuevas) {
+                $mensaje .= ' Se creó su cuenta y se le enviaron las credenciales de acceso.';
             }
 
             return redirect()
@@ -810,6 +1124,9 @@ class ResolucionController extends Controller implements HasMiddleware
 
         } catch (\Exception $e) {
             DB::rollBack();
+            if (isset($pathFirmado)) {
+                Storage::disk('public')->delete($pathFirmado);
+            }
             return redirect()->back()->with('error', '❌ Error al firmar resoluciones: ' . $e->getMessage());
         }
     }
@@ -838,11 +1155,14 @@ class ResolucionController extends Controller implements HasMiddleware
             );
 
             return response()->json([
-                'id_user' => $user->id,
-                'nombre_completo' => trim($persona->apellido_paterno . ' ' . $persona->apellido_materno . ', ' . $persona->nombres),
-                'num_documento' => $persona->num_documento,
-                'correo' => $user->email,
-                'iniciales' => $iniciales
+                'success' => true,
+                'usuario' => [
+                    'id' => $user->id,
+                    'nombre_completo' => trim($persona->nombres . ' ' . $persona->apellido_paterno . ' ' . $persona->apellido_materno),
+                    'dni' => $persona->num_documento,
+                    'email' => $user->email,
+                    'iniciales' => $iniciales
+                ]
             ]);
         }
 
@@ -863,11 +1183,12 @@ class ResolucionController extends Controller implements HasMiddleware
 
             if ($personas->isEmpty()) {
                 return response()->json([
+                    'success' => false,
                     'message' => 'No se encontraron usuarios con ese nombre'
                 ], 404);
             }
 
-            // Si hay varios resultados, devolver el primero (o puedes modificar para devolver todos)
+            // Si hay varios resultados, devolver el primero
             $persona = $personas->first();
             $user = $persona->user;
             
@@ -877,266 +1198,21 @@ class ResolucionController extends Controller implements HasMiddleware
             );
 
             return response()->json([
-                'id_user' => $user->id,
-                'nombre_completo' => trim($persona->apellido_paterno . ' ' . $persona->apellido_materno . ', ' . $persona->nombres),
-                'num_documento' => $persona->num_documento,
-                'correo' => $user->email,
-                'iniciales' => $iniciales
+                'success' => true,
+                'usuario' => [
+                    'id' => $user->id,
+                    'nombre_completo' => trim($persona->nombres . ' ' . $persona->apellido_paterno . ' ' . $persona->apellido_materno),
+                    'dni' => $persona->num_documento,
+                    'email' => $user->email,
+                    'iniciales' => $iniciales
+                ]
             ]);
         }
 
-        return response()->json(['message' => 'Debe proporcionar dni o nombre'], 400);
-    }
-    
-    public function enviarCredenciales(Request $request, $personaResolucionDatosId)
-    {
-        $request->validate([
-            'correo' => 'required|email',
-        ]);
-
-        try {
-            $personaResolucionDatos = PersonaResolucionDatos::with('resolucion')->findOrFail($personaResolucionDatosId);
-            
-            // ← CAMBIO: PERMITIR REENVÍOS - Eliminar verificación de id_user
-            // Verificar que sea persona externa
-            if ($personaResolucionDatos->es_interna) {
-                return redirect()->back()->with('error', '❌ Esta persona es trabajador interno de la DRE');
-            }
-
-            // ← CAMBIO: Verificar DNI solo si NO tiene id_user aún
-            if (!$personaResolucionDatos->id_user) {
-                $personaExistente = Persona::where('num_documento', $personaResolucionDatos->num_documento)
-                    ->where('i_active', true)
-                    ->first();
-
-                if ($personaExistente) {
-                    return redirect()->back()->with('error', '❌ El DNI ' . $personaResolucionDatos->num_documento . ' ya está registrado en el sistema');
-                }
-            }
-
-            // Generar correo del sistema: Primera letra del nombre + 3 letras apellido paterno + 3 letras apellido materno
-            // Ejemplo: Juan Alcarraz Sarmiento = jalcsar@dre.com
-            
-            // Separar los nombres y obtener solo el PRIMER nombre
-            $nombres = explode(' ', trim($personaResolucionDatos->nombres));
-            $primerNombre = $nombres[0];
-            
-            $primeraLetraNombre = strtolower(substr($primerNombre, 0, 1));
-            $tresLetrasPaterno = strtolower(substr($personaResolucionDatos->apellido_paterno, 0, 3));
-            $tresLetrasMaterno = strtolower(substr($personaResolucionDatos->apellido_materno ?? '', 0, 3));
-            
-            $correoSistemaBase = $primeraLetraNombre . $tresLetrasPaterno . $tresLetrasMaterno . '@dre.com';
-            $correoSistema = $correoSistemaBase;
-            
-            // Verificar si el correo del sistema ya está registrado
-            $correoSistemaExistente = User::where('email', $correoSistema)->first();
-            
-            if ($correoSistemaExistente) {
-                // Si existe, agregar un número al final
-                $contador = 1;
-                $correoOriginal = str_replace('@dre.com', '', $correoSistemaBase);
-                while (User::where('email', $correoOriginal . $contador . '@dre.com')->exists()) {
-                    $contador++;
-                }
-                $correoSistema = $correoOriginal . $contador . '@dre.com';
-            }
-
-            // Generar contraseña aleatoria
-            $password = Str::random(10);
-            $passwordHash = Hash::make($password);
-
-            DB::beginTransaction();
-
-            $user = null;
-            $persona = null;
-            $estadoEnvio = 'enviado';
-            $observaciones = null;
-
-            // ← CAMBIO: Solo crear usuario si NO existe (id_user es null)
-            if (!$personaResolucionDatos->id_user) {
-                // 1. Crear registro en la tabla persona
-                $persona = Persona::create([
-                    'tipo_persona' => 'cliente',
-                    'num_documento' => $personaResolucionDatos->num_documento,
-                    'tipo_documento' => $personaResolucionDatos->tipo_documento,
-                    'nombres' => $personaResolucionDatos->nombres,
-                    'apellido_paterno' => $personaResolucionDatos->apellido_paterno,
-                    'apellido_materno' => $personaResolucionDatos->apellido_materno,
-                    'correo' => $request->correo, // Correo personal
-                    'datos_completos' => true,
-                    'i_active' => true,
-                ]);
-
-                // 2. Crear usuario
-                $user = User::create([
-                    'id_persona' => $persona->id_persona,
-                    'name' => trim($personaResolucionDatos->nombres . ' ' . $personaResolucionDatos->apellido_paterno . ' ' . $personaResolucionDatos->apellido_materno),
-                    'email' => $correoSistema,
-                    'password' => $passwordHash,
-                    'tipo_acceso' => 'cliente',
-                    'i_active' => true,
-                ]);
-
-                // 3. Crear registro en tabla cliente
-                \App\Models\Cliente::create([
-                    'id_persona' => $persona->id_persona,
-                    'i_active' => true,
-                ]);
-
-                // 4. Actualizar PersonaResolucionDatos con el id_user
-                $personaResolucionDatos->update([
-                    'id_user' => $user->id,
-                ]);
-
-                $observaciones = 'Primera cuenta creada para este usuario';
-            } else {
-                // Ya tiene cuenta, solo reenviar con nueva contraseña
-                $user = User::find($personaResolucionDatos->id_user);
-                
-                if (!$user) {
-                    throw new \Exception('Usuario vinculado no encontrado');
-                }
-
-                // Actualizar contraseña del usuario existente
-                $user->update([
-                    'password' => $passwordHash,
-                ]);
-
-                $correoSistema = $user->email; // Usar el correo existente
-                $observaciones = 'Reenvío de credenciales con nueva contraseña';
-            }
-
-            // 5. ← NUEVO: Registrar envío de credenciales
-            $envioCredencial = \App\Models\EnvioCredencial::create([
-                'id_persona_resolucion_datos' => $personaResolucionDatos->id_persona_resolucion_datos,
-                'correo_destino' => $request->correo,
-                'correo_sistema_generado' => $correoSistema,
-                'password_generado_hash' => $passwordHash,
-                'id_usuario_envia' => Auth::id(),
-                'estado_envio' => 'enviado',
-                'observaciones' => $observaciones,
-                'ip_address' => $request->ip(),
-                'fecha_envio' => now(),
-            ]);
-
-            // 6. Registrar auditoría
-            \App\Models\Auditoria::create([
-                'tabla_afectada' => 'envios_credenciales',
-                'id_registro' => $envioCredencial->id_envio_credencial,
-                'accion' => 'enviar_credenciales',
-                'id_usuario' => Auth::id(),
-                'ip_address' => $request->ip(),
-                'descripcion' => "Credenciales enviadas a {$request->correo} para {$personaResolucionDatos->nombre_completo} (Usuario sistema: {$correoSistema})",
-            ]);
-
-            // 7. Enviar email con las credenciales
-            try {
-                Mail::to($request->correo)->send(new \App\Mail\CredencialesAcceso([
-                    'nombre' => $personaResolucionDatos->nombre_completo,
-                    'email' => $correoSistema,
-                    'password' => $password,
-                    'resolucion' => $personaResolucionDatos->resolucion,
-                ]));
-            } catch (\Exception $e) {
-                // Si falla el envío, actualizar estado
-                $envioCredencial->update([
-                    'estado_envio' => 'fallido',
-                    'observaciones' => ($observaciones ?? '') . ' | Error: ' . $e->getMessage(),
-                ]);
-                
-                DB::commit(); // Guardar el registro aunque falle el email
-                
-                \Log::error('Error enviando email de credenciales', [
-                    'error' => $e->getMessage(),
-                    'correo' => $request->correo,
-                    'envio_id' => $envioCredencial->id_envio_credencial,
-                ]);
-                
-                return redirect()->back()->with('error', '❌ Error al enviar el correo: ' . $e->getMessage());
-            }
-
-            DB::commit();
-
-            $mensaje = '✅ Credenciales enviadas a ' . $request->correo;
-            if ($observaciones && str_contains($observaciones, 'Reenvío')) {
-                $mensaje .= ' (Reenvío con nueva contraseña)';
-            }
-            $mensaje .= '. Usuario del sistema: ' . $correoSistema;
-
-            return redirect()->back()->with('success', $mensaje);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            \Log::error('Error al enviar credenciales', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-                'persona_id' => $personaResolucionDatosId,
-            ]);
-
-            return redirect()->back()->with('error', '❌ Error al enviar credenciales: ' . $e->getMessage());
-        }
-    }
-
-    public function asignarCliente(Request $request, Resolucion $resolucion, PersonaResolucionDatos $personaResolucionDatos)
-    {
-        try {
-            // Verificar que la persona pertenece a esta resolución
-            if ($personaResolucionDatos->id_resolucion !== $resolucion->id_resolucion) {
-                return back()->with('error', 'La persona no pertenece a esta resolución.');
-            }
-
-            // Verificar que es persona externa
-            if ($personaResolucionDatos->es_interna) {
-                return back()->with('error', 'Solo se puede asignar a personas externas.');
-            }
-
-            // Verificar que tiene usuario creado
-            if (!$personaResolucionDatos->id_user) {
-                return back()->with('error', 'La persona debe tener una cuenta de usuario primero. Envía las credenciales antes de asignar la resolución.');
-            }
-
-            // Verificar que la resolución esté firmada
-            if (!$resolucion->archivo_firmado) {
-                return back()->with('error', 'Solo se pueden asignar resoluciones firmadas.');
-            }
-
-            // Crear o actualizar la relación en la tabla pivot (si usas relación many-to-many)
-            // O actualizar un campo booleano en persona_resolucion_datos
-            
-            // Opción 1: Si agregas un campo 'asignado_a_cliente' en persona_resolucion_datos
-            $personaResolucionDatos->update([
-                'asignado_a_cliente' => true,
-                'fecha_asignacion' => now()
-            ]);
-
-            // Registrar auditoría
-            \App\Models\Auditoria::create([
-                'tabla_afectada' => 'resolucion',
-                'id_registro'    => $resolucion->id_resolucion,
-                'accion'         => 'asignar_cliente',
-                'id_usuario'     => Auth::id(),
-                'ip_address'     => request()->ip(),
-                'descripcion'    => "Resolución {$resolucion->num_resolucion} asignada a {$personaResolucionDatos->nombre_completo} (id_user: {$personaResolucionDatos->id_user})",
-            ]);
-
-            // Opcional: Enviar notificación por correo
-            $usuario = User::find($personaResolucionDatos->id_user);
-            if ($usuario && $usuario->email) {
-                try {
-                    // Aquí podrías enviar un correo notificando que tiene una nueva resolución
-                    // Mail::to($usuario->email)->send(new ResolucionAsignada($resolucion));
-                } catch (\Exception $e) {
-                    \Log::error('Error al enviar notificación de asignación: ' . $e->getMessage());
-                }
-            }
-
-            return back()->with('success', 'Resolución asignada correctamente al cliente. Ahora podrá verla en su módulo "Mis Resoluciones".');
-
-        } catch (\Exception $e) {
-            \Log::error('Error al asignar resolución a cliente: ' . $e->getMessage());
-            return back()->with('error', 'Error al asignar la resolución: ' . $e->getMessage());
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Debe proporcionar dni o nombre'
+        ], 400);
     }
 
 }

@@ -36,7 +36,13 @@ class CargoController extends Controller implements HasMiddleware
 
         $cargos = $query->orderBy('codigo_cargo')->paginate(20)->withQueryString();
 
-        return view('colaborador.cargos.index', compact('cargos'));
+        $stats = [
+            'total' => Cargo::count(),
+            'activos' => Cargo::where('i_active', true)->count(),
+            'inactivos' => Cargo::where('i_active', false)->count(),
+        ];
+
+        return view('colaborador.cargos.index', compact('cargos', 'stats'));
     }
 
     public function create()
